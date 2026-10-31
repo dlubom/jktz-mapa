@@ -28,39 +28,51 @@
   "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
   "current": "original",
   "last": null,
-  "pending": {
-    "archives": {
-      "A": {
-        "asset": "A.tar",
-        "asset_id": 694852572,
-        "bytes": 399360,
-        "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
-        "release_id": 429817445,
-        "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+  "pending": null,
+  "rejected_operations": [
+    {
+      "evidence_run_id": 41185758641,
+      "pages_status": {
+        "status": "deployment_failed"
       },
-      "original": {
-        "asset": "original.tar",
-        "asset_id": 694852569,
-        "bytes": 399360,
-        "manifest_sha256": null,
-        "release_id": 429817445,
-        "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
-      }
-    },
-    "from": "original",
-    "operation": {
-      "created_at": "2026-10-31T08:43:29Z",
-      "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
-      "job_id": 124492241688,
-      "job_name": "pages-publication-probe-41185758641-1",
-      "operation": "publish-A",
-      "run_attempt": 1,
-      "run_id": 41185758641,
-      "step_name": "Publish Pages probe",
-      "step_number": 6
-    },
-    "to": "A"
-  },
+      "pending": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "from": "original",
+        "operation": {
+          "created_at": "2026-10-31T08:43:29Z",
+          "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+          "job_id": 124492241688,
+          "job_name": "pages-publication-probe-41185758641-1",
+          "operation": "publish-A",
+          "run_attempt": 1,
+          "run_id": 41185758641,
+          "step_name": "Publish Pages probe",
+          "step_number": 6
+        },
+        "to": "A"
+      },
+      "public_readback": "original hashes matched; marker HTTP404",
+      "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+      "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+    }
+  ],
   "retired": {},
   "schema": 1
 }
