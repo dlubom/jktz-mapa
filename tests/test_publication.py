@@ -1,8 +1,12 @@
 import copy
 import importlib.util
+import io
 import json
+import os
 from pathlib import Path
 import tempfile
+import subprocess
+import zipfile
 import unittest
 from unittest.mock import patch
 
@@ -36,6 +40,43 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'nowe Run'):
             pub.choose_inputs(2, None, resolver)
         self.assertEqual(calls, ['latest', 'latest'])
+
+    def test_inputs_readback_downloads_zip_with_json_accept_header(self):
+        pins = b'{"schemaVersion":1,"sources":[]}\n'
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, 'w') as archive:
+            archive.writestr('inputs.json', pins)
+        zipped = buffer.getvalue()
+        artifact = {'id': 123, 'expired': False, 'digest': 'sha256:' + pub.digest(zipped)}
+        requests = []
+        def github(args, **kwargs):
+            path, accept = args[4], args[6]
+            requests.append((path, accept))
+            if path.endswith('/123/zip'):
+                if accept != 'Accept: application/vnd.github+json':
+                    return subprocess.CompletedProcess(args, 1, b'', b'Unsupported Accept header (HTTP 415)')
+                return subprocess.CompletedProcess(args, 0, zipped, b'')
+            return subprocess.CompletedProcess(args, 0, pub.encoded({'artifacts': [artifact]}), b'')
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'inputs.json').write_bytes(pins)
+            output = root / 'output.txt'
+            with patch.object(pub, 'BUILD', root), patch.object(pub.subprocess, 'run', side_effect=github), \
+                 patch.dict(os.environ, {'GITHUB_RUN_ID': '456', 'GITHUB_RUN_ATTEMPT': '1', 'GITHUB_OUTPUT': str(output)}):
+                pub.inputs_phase(readback=True)
+            self.assertEqual((root / 'inputs.json').read_bytes(), pins)
+            self.assertEqual(output.read_text(), 'upload=false\n')
+            self.assertEqual(requests[-1], ('repos/dlubom/jktz-mapa/actions/artifacts/123/zip', 'Accept: application/vnd.github+json'))
+
+    def test_release_asset_download_keeps_octet_stream_header(self):
+        raw = b'archive bytes'
+        asset = {'id': 123, 'size': len(raw), 'digest': 'sha256:' + pub.digest(raw)}
+        with tempfile.TemporaryDirectory() as temp, \
+             patch.object(pub.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, raw, b'')) as github:
+            target = Path(temp) / 'release.tar'
+            pub.download_asset(asset, target)
+            self.assertEqual(target.read_bytes(), raw)
+            self.assertIn('Accept: application/octet-stream', github.call_args.args[0])
 
     def test_retention_starts_at_replacement_not_build(self):
         data = pub.prepare_transition(state(), operation(2, 2), 'pages-B', archive(2))

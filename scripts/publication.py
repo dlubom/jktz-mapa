@@ -181,9 +181,10 @@ class ApiError(RuntimeError):
     pass
 
 
-def api(path, method='GET', payload=None, binary=False, missing_ok=False):
-    args = ['gh', 'api', '--method', method, path, '-H',
-            'Accept: application/octet-stream' if binary else 'Accept: application/vnd.github+json']
+def api(path, method='GET', payload=None, binary=False, missing_ok=False, accept='application/vnd.github+json'):
+    # Binary responses and API media types are independent: artifact ZIPs use
+    # the JSON API media type; release asset downloads require octet-stream.
+    args = ['gh', 'api', '--method', method, path, '-H', f'Accept: {accept}']
     if payload is not None:
         args += ['--input', '-']
     result = subprocess.run(args, input=encoded(payload) if payload is not None else None,
@@ -212,7 +213,7 @@ def release(tag):
 
 
 def download_asset(asset, path):
-    raw = api(f'repos/{REPO}/releases/assets/{asset["id"]}', binary=True)
+    raw = api(f'repos/{REPO}/releases/assets/{asset["id"]}', binary=True, accept='application/octet-stream')
     require(len(raw) == asset['size'] and asset.get('digest') == 'sha256:' + digest(raw), 'Release asset digest differs or missing')
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(raw)
@@ -395,7 +396,7 @@ def public_check(metadata):
 def verify_remote_archive(metadata, filename='verified.tar.gz'):
     path = BUILD / filename
     path.parent.mkdir(parents=True, exist_ok=True)
-    raw = api(f'repos/{REPO}/releases/assets/{metadata["asset_id"]}', binary=True)
+    raw = api(f'repos/{REPO}/releases/assets/{metadata["asset_id"]}', binary=True, accept='application/octet-stream')
     path.write_bytes(raw)
     verify_package(path, full_metadata(metadata))
     return path
@@ -404,7 +405,7 @@ def verify_remote_archive(metadata, filename='verified.tar.gz'):
 def full_metadata(record):
     if 'metadata_asset_id' not in record:
         return record
-    raw = api(f'repos/{REPO}/releases/assets/{record["metadata_asset_id"]}', binary=True)
+    raw = api(f'repos/{REPO}/releases/assets/{record["metadata_asset_id"]}', binary=True, accept='application/octet-stream')
     require(digest(raw) == record['metadata_sha256'], 'Archive metadata checksum differs')
     metadata = json.loads(raw)
     require(all(metadata[key] == record[key] for key in ('package_id', 'app_sha', 'bytes', 'sha256', 'manifest_sha256', 'site_bytes')), 'Archive metadata identity differs')
