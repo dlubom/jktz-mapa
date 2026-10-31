@@ -50,6 +50,49 @@ try{
     const mapBox=await page.locator('#map').boundingBox(),panelBox=await page.locator('#sidebar').boundingBox();
     if(mobile)assert.ok(mapBox.y+mapBox.height<=panelBox.y+2,'map remains above mobile panel');
     await page.getByRole('tab',{name:'Warstwy'}).click();
+    // Geology uses native PL-1992 WMS requests; pin success/outage independently of PIG uptime.
+    let geologyOffline=false;const geologyRequests=[],offlineAttempts=new Map();
+    await page.route('https://cbdgmapa.pgi.gov.pl/**',route=>{
+      geologyRequests.push(new URL(route.request().url()));
+      if(geologyOffline){const url=route.request().url();offlineAttempts.set(url,(offlineAttempts.get(url)||0)+1);}
+      return geologyOffline?route.abort():route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#bc8dbc"/></svg>'});
+    });
+    for(const [value,service,layers] of [['smgt_a_zakryta','smgt_a_zakryta','0,1,2,3,4,5'],['smgt_b_odkryta','smgt_b_odkryta','0,1,2,3,4']]){
+      await page.locator('#basemap').selectOption(value,{timeout:3000});
+      await waitForDownload(u=>u.includes(`/kartografia/${service}/`),service);
+      const request=geologyRequests.find(u=>u.pathname.includes(`/kartografia/${service}/`));
+      assert.equal(request.searchParams.get('SRS'),'EPSG:2180');
+      assert.equal(request.searchParams.get('LAYERS'),layers);
+      const bbox=request.searchParams.get('BBOX').split(',').map(Number);
+      assert.ok(bbox[0]>550000&&bbox[0]<590000&&bbox[1]>140000&&bbox[1]<170000,'WMS 1.1.1 uses easting/northing');
+      await page.locator('#tpn-message').waitFor({state:'hidden'});
+      assert.ok(await page.locator('.ol-attribution').getByText('PIG-PIB',{exact:false}).count());
+      const legend=new URL(await page.locator('#geology-legend').getAttribute('href'));
+      assert.ok(legend.pathname.includes(`/kartografia/${service}/MapServer/WMSServer`));
+      assert.equal(legend.searchParams.get('request'),'GetLegendGraphic');
+      assert.equal(legend.searchParams.get('layer'),'0');
+    }
+    await page.locator('#basemap-opacity').evaluate(el=>{el.value='45';el.dispatchEvent(new Event('input',{bubbles:true}));});
+    assert.equal(await page.locator('#base-opacity-value').innerText(),'45%');
+    const beforeOutage=new Set(finishedURLs);
+    geologyOffline=true;await page.locator('#basemap').selectOption('smgt_a_zakryta');
+    // WebKit can reuse decoded images despite routing. Zoom to request uncached tiles.
+    await page.locator('.ol-zoom-in').click();
+    await page.locator('#tpn-message').waitFor({state:'visible'});
+    assert.match(await page.locator('#tpn-message').innerText(),/geologiczn.*OSM/);
+    // Exhaust the automatic retry while offline before testing the manual retry.
+    // Otherwise a slow click can race the timer, which restores tiles and hides the button.
+    const retryDeadline=Date.now()+10000;
+    while(![...offlineAttempts.values()].some(count=>count>=2)){
+      assert.ok(Date.now()<retryDeadline,'geology automatically retries failed tiles');await page.waitForTimeout(50);
+    }
+    await page.locator('#tpn-message').waitFor({state:'visible'});
+    geologyOffline=false;await page.locator('#retry-tpn').click();
+    await waitForDownload(u=>u.includes('/kartografia/smgt_a_zakryta/')&&!beforeOutage.has(u),'geology recovered after retry');
+    await page.locator('#tpn-message').waitFor({state:'hidden'});
+    await page.locator('#basemap').selectOption('osm');
+    assert.equal(await page.locator('#base-opacity-value').innerText(),'45%');
+    await page.locator('#basemap').selectOption('rgb_2020');
     for(const id of ['other','rejected','differences'])await page.locator(`#layer-${id}`).check();
     await waitForDownload(u=>u.endsWith('measurements.geojson'),'measurements');
     await page.locator('#layer-plans').uncheck();
