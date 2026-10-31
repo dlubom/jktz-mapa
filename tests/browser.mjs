@@ -126,6 +126,46 @@ try{
     assert.equal(await page.locator('#plan-list [data-plan-toggle="001459-pza-2024"]').isChecked(),false);
     await page.locator('#plan-list [data-plan-info="001459-pza-2024"]').click();await page.getByText('Pochodzenie, transformacja i metadane planu',{exact:true}).waitFor();
     await page.locator('#search').fill('C-0295');await page.locator('[data-cave="C-0295"]').click();await page.getByText('Brak jawnie przypisanego obiektu w tej migawce.',{exact:false}).waitFor();
+    // Description links use pinned cave IDs in both panels; never fetch their targets.
+    const descriptionUrl='https://antkiewiczjaskinie.pl/system-ptasia-studnia-t-e-11-06t-e-11-10t-e-11-09/';
+    const checkDescription=async(kind,id,expectedUrl,pigId)=>{
+      await page.locator('#search').fill(id);
+      await page.locator(`[data-${kind}="${id}"]`).first().click();
+      await page.getByText(kind==='cave'?'Metadane jaskini i źródła':'Metadane obiektu, relacje i załączniki',{exact:true}).waitFor();
+      const panel=page.locator('#object-panel'),primary=panel.getByRole('link',{name:'Opis jaskini ↗',exact:true});
+      assert.equal(await primary.count(),expectedUrl?1:0,`${kind} ${id}: one primary or none`);
+      if(expectedUrl){
+        assert.equal(await primary.getAttribute('href'),expectedUrl);
+        assert.equal(await primary.getAttribute('target'),'_blank');
+        assert.equal(await primary.getAttribute('rel'),'noopener noreferrer');
+        const nearTitle=await primary.evaluate(el=>el.getBoundingClientRect().top-el.closest('#object-panel').querySelector('h2').getBoundingClientRect().bottom);
+        assert.ok(nearTitle>=0&&nearTitle<150,'description link is near the title');
+      }
+      if(expectedUrl===descriptionUrl){
+        const description=panel.locator('.cave-description');
+        assert.match(await description.innerText(),/System Ptasia Studnia/);
+        assert.match(await description.innerText(),/Anna Antkiewicz/);
+        assert.match(await description.innerText(),/system jaskiniowy/);
+        assert.match(await description.innerText(),/1999\/2004/);
+      }
+      const hrefs=await panel.locator('a[href]').evaluateAll(links=>links.map(a=>a.href));
+      assert.equal(new Set(hrefs).size,hrefs.length,'no duplicate displayed URL');
+      if(pigId){
+        const pig=`https://jaskiniepolski.pgi.gov.pl/Details/Information/${pigId}`;
+        assert.ok(hrefs.includes(pig),'original PIG URL is retained');
+        if(expectedUrl===descriptionUrl)assert.equal(await panel.locator('.description-sources a').filter({hasText:`PIG: ${pigId}`}).count(),1);
+      }
+      assert.ok(!requests.some(u=>u.startsWith('https://antkiewiczjaskinie.pl/')||u.startsWith('https://jaskiniepolski.pgi.gov.pl/')),'no requests to description sites');
+    };
+    for(const [cave,object,pig] of [['C-0167','MTZ-0015','1473'],['C-0273','MTW-0023','1475'],['C-0072','MTW-0004','1474']]){
+      await checkDescription('cave',cave,descriptionUrl,pig);
+      await checkDescription('object',object,descriptionUrl,pig);
+    }
+    await page.locator('.panel-scroll').evaluate(el=>el.scrollTop=0);
+    assert.equal(await page.locator('#sidebar').evaluate(el=>el.scrollWidth<=el.clientWidth),true,'panel has no horizontal overflow');
+    await page.screenshot({path:`output/playwright/${caseName}-description.png`});
+    for(const [kind,id] of [['cave','C-0346'],['object','BIA-0001']])await checkDescription(kind,id,'https://jaskiniepolski.pgi.gov.pl/Details/Information/11053','11053');
+    for(const [kind,id] of [['cave','C-0997'],['object','MTZ-0066'],['cave','C-0862'],['object','BIA-0003']])await checkDescription(kind,id,undefined);
     await page.getByRole('tab',{name:'Źródła',exact:true}).click();assert.equal(await page.locator('.source-card').count(),3);
     assert.equal(await page.locator('a[href="data/inputs.json"]').count(),1);
     assert.deepEqual(errors,[],`${name}: no JS errors`);
