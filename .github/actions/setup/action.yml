@@ -1,0 +1,21 @@
+name: Map build tools
+description: Node and the native GDAL Python environment used by the complete map build
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version: '22.14.0'
+        cache: npm
+    - name: Install native data tools
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-venv
+        /usr/bin/python3 -m venv --system-site-packages .venv
+        .venv/bin/python -m pip install --disable-pip-version-check -r requirements-data.txt
+        echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+        .venv/bin/python -c 'from osgeo import gdal; import sys; print(sys.version); print(gdal.VersionInfo("--version"))'
+    - name: Install application dependencies
+      shell: bash
+      run: npm ci
