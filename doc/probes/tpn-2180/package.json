@@ -1,0 +1,8 @@
+{
+  "name": "jktz-tpn-2180-disposable-probe",
+  "private": true,
+  "type": "module",
+  "scripts": {"build": "vite build --base=./"},
+  "dependencies": {"ol": "10.11.0", "proj4": "2.22.0"},
+  "devDependencies": {"vite": "8.3.5"}
+}

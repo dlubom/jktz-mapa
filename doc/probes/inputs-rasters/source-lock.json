@@ -1,0 +1,105 @@
+[
+  {
+    "repository": "dlubom/Georeferencer",
+    "checked_at": "2026-10-31T07:32:23.700883+00:00",
+    "release_id": 429377515,
+    "tag": "v0.7.4",
+    "tag_chain": [
+      {
+        "sha": "2d577cc71375ea7f6fb30bca6d6a3dd1cffd51df",
+        "type": "tag",
+        "url": "https://api.github.com/repos/dlubom/Georeferencer/git/tags/2d577cc71375ea7f6fb30bca6d6a3dd1cffd51df"
+      },
+      {
+        "sha": "a47c390955db88d7bdbb4eada4a9315884e9ccbe",
+        "type": "commit",
+        "url": "https://api.github.com/repos/dlubom/Georeferencer/git/commits/a47c390955db88d7bdbb4eada4a9315884e9ccbe"
+      }
+    ],
+    "commit": "a47c390955db88d7bdbb4eada4a9315884e9ccbe",
+    "draft": false,
+    "prerelease": false,
+    "immutable": false,
+    "release_url": "https://github.com/dlubom/Georeferencer/releases/tag/v0.7.4",
+    "assets": [
+      {
+        "id": 693073187,
+        "name": "geotiff-tatry-v0.7.4.zip",
+        "size": 21746297,
+        "digest": "sha256:52a7f5a9238e5f4a2836b61f09cfe403ef101bcc3378fd4a27642f13db62d93b",
+        "browser_download_url": "https://github.com/dlubom/Georeferencer/releases/download/v0.7.4/geotiff-tatry-v0.7.4.zip"
+      }
+    ]
+  },
+  {
+    "repository": "dlubom/Jaskiniowy-Kataster-Tatr-Zachodnich",
+    "checked_at": "2026-10-31T07:32:20.804990+00:00",
+    "release_id": 426443343,
+    "tag": "v1.4.12",
+    "tag_chain": [
+      {
+        "sha": "51095ba4c4b4a89d829da022ac9a7891779dc95b",
+        "type": "tag",
+        "url": "https://api.github.com/repos/dlubom/Jaskiniowy-Kataster-Tatr-Zachodnich/git/tags/51095ba4c4b4a89d829da022ac9a7891779dc95b"
+      },
+      {
+        "sha": "3f865414d1dacaa15cd5477e567b0f852c43b32d",
+        "type": "commit",
+        "url": "https://api.github.com/repos/dlubom/Jaskiniowy-Kataster-Tatr-Zachodnich/git/commits/3f865414d1dacaa15cd5477e567b0f852c43b32d"
+      }
+    ],
+    "commit": "3f865414d1dacaa15cd5477e567b0f852c43b32d",
+    "draft": false,
+    "prerelease": false,
+    "immutable": false,
+    "release_url": "https://github.com/dlubom/Jaskiniowy-Kataster-Tatr-Zachodnich/releases/tag/v1.4.12",
+    "assets": [
+      {
+        "id": 684414283,
+        "name": "JKTZ-v1.4.12.zip",
+        "size": 22002141,
+        "digest": "sha256:4e2b30ead79ee520c3a9fca84786e3112801fe8d7723d527bc07d81698cbbc91",
+        "browser_download_url": "https://github.com/dlubom/Jaskiniowy-Kataster-Tatr-Zachodnich/releases/download/v1.4.12/JKTZ-v1.4.12.zip"
+      }
+    ]
+  },
+  {
+    "repository": "dlubom/gps-kataster-obiektow-tatr",
+    "checked_at": "2026-10-31T07:32:22.202405+00:00",
+    "release_id": 423386015,
+    "tag": "v1.3.2",
+    "tag_chain": [
+      {
+        "sha": "462528f7c16051dd207662853166a43d80ebdc5e",
+        "type": "tag",
+        "url": "https://api.github.com/repos/dlubom/gps-kataster-obiektow-tatr/git/tags/462528f7c16051dd207662853166a43d80ebdc5e"
+      },
+      {
+        "sha": "13d734213328e5491c1a5c3171e2cb0fdcef705c",
+        "type": "commit",
+        "url": "https://api.github.com/repos/dlubom/gps-kataster-obiektow-tatr/git/commits/13d734213328e5491c1a5c3171e2cb0fdcef705c"
+      }
+    ],
+    "commit": "13d734213328e5491c1a5c3171e2cb0fdcef705c",
+    "draft": false,
+    "prerelease": false,
+    "immutable": false,
+    "release_url": "https://github.com/dlubom/gps-kataster-obiektow-tatr/releases/tag/v1.3.2",
+    "assets": [
+      {
+        "id": 674981453,
+        "name": "katalog.sqlite.zip",
+        "size": 535497,
+        "digest": "sha256:b93b6ecfbf51a306d603abdea25f91d017313fa9d6d57288a64291f09c70e4b6",
+        "browser_download_url": "https://github.com/dlubom/gps-kataster-obiektow-tatr/releases/download/v1.3.2/katalog.sqlite.zip"
+      },
+      {
+        "id": 674981456,
+        "name": "metadata.json",
+        "size": 270,
+        "digest": "sha256:e51abd42c25791ada468e9736078a2ad669b055ef06277fffd955f3722cf9821",
+        "browser_download_url": "https://github.com/dlubom/gps-kataster-obiektow-tatr/releases/download/v1.3.2/metadata.json"
+      }
+    ]
+  }
+]

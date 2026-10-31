@@ -1,5 +1,13 @@
 # QGIS WebAssembly a statyczna mapa JKTZ
 
+**Uzupełnienie 2026-10-31:** [nowa próba przeglądarki](PAGES_BROWSER_PROBE.md)
+potwierdziła renderowanie czterech podkładów TPN w EPSG:2180
+przez `XYZ`/Canvas2D, bez proxy: najpierw lokalnie, następnie po osobnej
+zgodzie na publicznym Pages. Kontrole CORS i DataTile nie wczytały kafli.
+To nowy dowód ponad poniższą analizę z 2026-10-30; stan silników opisuje
+raport. Nie zalicza natywnego Safari/iPhone ani Androida.
+QGIS WASM nie był ponownie badany.
+
 Stan źródeł: **2026-10-30**, qgis-js / `@qgis-js/ol` **4.2.3**, OpenLayers **10.11.0**. Zakres decyzji: mapa GitHub Pages w EPSG:2180, historia GPS, 73 modele ciągów i katalog 814 planów. To analiza dokumentacji i kodu, bez benchmarku przeglądarki. Liczby dotyczące całego katalogu i transferu aplikacji wymagają oddzielnego pomiaru.
 
 Aktualizacja decyzji po przeglądzie z użytkownikiem: 2026-10-30.
@@ -149,8 +157,11 @@ nie przekazuje do aplikacji kodu HTTP. Specyfikacja proponuje OSM pod TPN,
 komunikat o brakujących kaflach i ograniczone ponowienia zamiast
 diagnozowania awarii całej usługi na podstawie jednego zdarzenia.
 
-Do wykonania po odrębnym rozpoczęciu prac technicznych: cztery podkłady
-w widoku EPSG:2180 z docelowego Pages, bez proxy, przy zimnym cache;
-test poziomów, luk, krycia, przesunięć i szwów, brak `SecurityError`,
-przerwanie/powrót sieci. Wymagane desktopowe przeglądarki, iPhone 14 Pro
-wskazany przez użytkownika oraz jeszcze niewskazany rzeczywisty Android.
+Po późniejszej publikacji sondy z 2026-10-31 potwierdzono cztery podkłady
+w EPSG:2180 z docelowego Pages w Chromium i desktopowym WebKit, bez proxy.
+W Chromium sprawdzono też skale, luki, krycie, obrót oraz wymuszoną awarię
+i ręczny powrót. Szczegóły i brakujące silniki opisuje raport przeglądarki.
+Nadal wymagane są natywne Safari, iPhone 14 Pro wskazany przez użytkownika
+i rzeczywisty Android, pełniejsze testy szwów i stabilności. Celowy odczyt
+pikseli TPN ma być zabroniony; oczekiwany `SecurityError` nie jest awarią
+ścieżki wyświetlania.

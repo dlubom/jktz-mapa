@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-31T08:08:27.399089+00:00",
+  "commit": "12a6783bc09eda112f9f187f9df5825264bbf183",
+  "files": [
+    {
+      "url": "https://dlubom.github.io/jktz-mapa/assets/index-Cq-JZLFy.js",
+      "path": "assets/index-Cq-JZLFy.js",
+      "bytes": 382854,
+      "expectedSha256": "68e3afe099dc9bc29fc3c228c3326907386dac252d0dddcf8a157a6a3b6f3ee2",
+      "actualSha256": "68e3afe099dc9bc29fc3c228c3326907386dac252d0dddcf8a157a6a3b6f3ee2",
+      "matched": true,
+      "headers": "HTTP/2 200 \nserver: GitHub.com\ncontent-type: application/javascript; charset=utf-8\nlast-modified: Sat, 31 Oct 2026 08:07:57 GMT\naccess-control-allow-origin: *\netag: W/\"6ae5a1dd-5d786\"\nexpires: Sat, 31 Oct 2026 08:18:26 GMT\ncache-control: max-age=600\ncontent-encoding: gzip\nx-proxy-cache: MISS\nx-github-request-id: BA66:3BB10B:17A1F1F:17DAC9B:6AE5A1F9\nx-github-edge-region: fra\naccept-ranges: bytes\nage: 0\ndate: Sat, 31 Oct 2026 08:08:26 GMT\nvia: 1.1 varnish\nx-served-by: cache-dus1260034-DUS\nx-cache: MISS\nx-cache-hits: 0\nx-timer: S1793434107.644825,VS0,VE139\nvary: Accept-Encoding\nx-fastly-request-id: af53df305e98008be7089cd276cd2284ea517830\ncontent-length: 117382\n\n"
+    },
+    {
+      "url": "https://dlubom.github.io/jktz-mapa/assets/index-c_1sG1-7.css",
+      "path": "assets/index-c_1sG1-7.css",
+      "bytes": 5263,
+      "expectedSha256": "3a2b8467811c3aa89ce93c07ec06cb0598e8c8c6e9570c10da44590ddfd08c77",
+      "actualSha256": "3a2b8467811c3aa89ce93c07ec06cb0598e8c8c6e9570c10da44590ddfd08c77",
+      "matched": true,
+      "headers": "HTTP/2 200 \nserver: GitHub.com\ncontent-type: text/css; charset=utf-8\nlast-modified: Sat, 31 Oct 2026 08:07:57 GMT\naccess-control-allow-origin: *\netag: W/\"6ae5a1dd-148f\"\nexpires: Sat, 31 Oct 2026 08:18:27 GMT\ncache-control: max-age=600\ncontent-encoding: gzip\nx-proxy-cache: MISS\nx-github-request-id: D796:1EBDF7:1674561:16AD26E:6AE5A1FA\nx-github-edge-region: fra\naccept-ranges: bytes\nage: 0\ndate: Sat, 31 Oct 2026 08:08:27 GMT\nvia: 1.1 varnish\nx-served-by: cache-dus1260026-DUS\nx-cache: MISS\nx-cache-hits: 0\nx-timer: S1793434107.989937,VS0,VE121\nvary: Accept-Encoding\nx-fastly-request-id: b559a8807fc21535bf991634c71139cef5aa8191\ncontent-length: 1363\n\n"
+    },
+    {
+      "url": "https://dlubom.github.io/jktz-mapa/index.html",
+      "path": "index.html",
+      "bytes": 1133,
+      "expectedSha256": "47ec278c634efeb19b38d8f98bd470c6de9890f4edb52a225426b66ad76a586a",
+      "actualSha256": "47ec278c634efeb19b38d8f98bd470c6de9890f4edb52a225426b66ad76a586a",
+      "matched": true,
+      "headers": "HTTP/2 200 \nserver: GitHub.com\ncontent-type: text/html; charset=utf-8\nlast-modified: Sat, 31 Oct 2026 08:07:57 GMT\naccess-control-allow-origin: *\netag: W/\"6ae5a1dd-46d\"\nexpires: Sat, 31 Oct 2026 08:18:27 GMT\ncache-control: max-age=600\ncontent-encoding: gzip\nx-proxy-cache: MISS\nx-github-request-id: 7320:1581:BA8FF5:BCAA59:6AE5A1FA\nx-github-edge-region: fra\naccept-ranges: bytes\nage: 0\ndate: Sat, 31 Oct 2026 08:08:27 GMT\nvia: 1.1 varnish\nx-served-by: cache-dus1260028-DUS\nx-cache: MISS\nx-cache-hits: 0\nx-timer: S1793434107.258005,VS0,VE120\nvary: Accept-Encoding\nx-fastly-request-id: 568a8fb72031b78580e49c55c90a838c701dc3ea\ncontent-length: 676\n\n"
+    }
+  ],
+  "totalBytes": 389250
+}

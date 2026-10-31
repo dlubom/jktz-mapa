@@ -1,5 +1,22 @@
 # Plany jaskiń: pomiary ładowania i ocena QGIS WASM
 
+**Nowe dowody 2026-10-31:** [pełny katalog i formaty](PAGES_INPUTS_RASTERS_PROBE.md)
+oraz [renderowanie OpenLayers przy DPR 1/3](PAGES_BROWSER_PROBE.md).
+Nowe podglądy 512 wszystkich 814 planów zajmują 21 086 822 B; ich wspólne
+RGBA wynosiłoby 629,15 MiB, więc nadal nie należy wczytywać całego katalogu.
+W szczególe Miętusiej przy DPR 3 sonda pobrała 20 kafli, 333 740 B treści
+i 20 MiB obliczonych buforów 512². Nie jest to pomiar RSS ani telefonu.
+Poniższe wyniki z 2026-10-30 pozostają historyczną, inną próbą.
+
+Sama sonda TPN została następnie opublikowana i sprawdzona na Pages
+w silnikach desktopowych; [raport](PAGES_BROWSER_PROBE.md) rozdziela ten
+dowód od niewykonanego odbioru całej mapy, rastrów na Pages i telefonów.
+
+Pełna zmierzona piramida 512 px: 254 195 184 B, 35 031 kafli; razem
+z podglądami **275 282 006 B / 262,53 MiB, 35 845 plików**. Nie obejmuje
+gutterów ani pozostałych plików przyszłej strony. Ten wynik uzasadnia
+kontynuację WebP512 bez dodatkowego renderera COG na tym etapie.
+
 Badanie: 2026-10-30. Wynik dotyczy prototypów i próbek, nie gotowego serwisu
 Pages. Źródło planów: [Georeferencer v0.7.4](https://github.com/dlubom/Georeferencer/releases/tag/v0.7.4).
 SHA-256 archiwum: `52a7f5a9238e5f4a2836b61f09cfe403ef101bcc3378fd4a27642f13db62d93b`.
@@ -205,9 +222,10 @@ potrzebne dowody. Nie są wejściami produkcyjnego workflow.
 Źródłowych TIFF-ów, prototypu QGIS i README projektu nie zmieniono.
 
 Przed odbiorem pozostają: właściwa mapa z wszystkimi funkcjami, testy
-na docelowym Pages, telefon, pełna pamięć procesu, zimny start nowego
-profilu przeglądarki, cała piramida i jej rozmiar, prawidłowa georeferencja
-oraz bezpośrednie podkłady TPN w EPSG:2180 bez lokalnego proxy.
+na docelowym Pages, telefon, pełna pamięć procesu, zimny start całej mapy,
+pełny rozmiar strony, georeferencja w produkcyjnym rendererze oraz
+bezpośrednie TPN w EPSG:2180 na docelowym hostingu. Rozmiar wariantu
+piramidy i lokalne renderowanie potwierdzono osobno 2026-10-31.
 
 Cele 1 MB aplikacji i indeksów, 3 s gotowości oraz p95 klatki 33 ms nie są
 wynikami tego badania. Następny projekt pomiaru musi wskazać urządzenia,

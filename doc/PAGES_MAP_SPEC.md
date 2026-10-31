@@ -1,8 +1,19 @@
 # Mapa JKTZ 2D — specyfikacja robocza po przeglądzie
 
-Data: 2026-10-30. Etap: dopracowanie projektu, przed implementacją.
+Aktualizacja: 2026-10-31. Etap: dopracowanie projektu i lokalne próby
+techniczne, przed pełną implementacją.
 Uzgodnione wymagania opisano oddzielnie od propozycji technicznych i kwestii
 wymagających dowodów. Dokument nie zatwierdza całej implementacji.
+
+Nowsze polecenie użytkownika dopuściło odrzucalne próby lokalne. Wyniki:
+[TPN i rastry w przeglądarce](PAGES_BROWSER_PROBE.md),
+[kontrakty źródeł i pełny katalog rastrów](PAGES_INPUTS_RASTERS_PROBE.md),
+[publikacja i odzyskiwanie](PAGES_PUBLICATION_RESEARCH.md).
+Po osobnej zgodzie użytkownika opublikowano małą sondę TPN na Pages.
+Potwierdzono sumy publicznych plików i renderowanie w Chromium/WebKit;
+szczegółowy stan przeglądarek i urządzeń jest w raporcie. Nie jest to pełna
+aplikacja ani dowód jej gotowości. Tymczasowa publikacja z `gh-pages`
+nie wdraża docelowego workflow danych i rollbacku.
 
 ## Uzgodniony zakres i miejsce projektu
 
@@ -15,7 +26,8 @@ Mapa korzysta z migawki przygotowanej przy wdrożeniu.
   i ręczny workflow. Roboczy katalog: `jktz-mapa`;
   [repozytorium](https://github.com/dlubom/jktz-mapa) utworzono 2026-10-30
   na osobne polecenie użytkownika, aby zapisać dokumentację w Git.
-  Pages pozostaje wyłączone; nie rozpoczęto implementacji aplikacji.
+  Po późniejszej osobnej zgodzie z 2026-10-31 Pages pokazuje wyłącznie
+  sondę TPN; nie rozpoczęto pełnej implementacji aplikacji.
 - Obecna przeglądarka CaveView 3D w JKTZ, jej adres, wygląd i publikacja
   pozostają bez zmian. Nie przenosimy jej pod `3d/`, nie zastępujemy strony
   głównej JKTZ i nie tworzymy wspólnej paczki. Serwisy mogą używać różnych
@@ -36,6 +48,15 @@ walidacji pomiarów z repozytorium danych JKTZ.
 
 Po jednorazowym skonfigurowaniu Pages w nowym repozytorium kliknięcie
 **Run workflow** uruchamia cały proces bez obowiązkowych parametrów wersji:
+
+Każdy nowy poprawny przebieg publikuje aktualną migawkę po sprawdzeniach,
+o ile nie został zastąpiony nowszą zakończoną operacją deployu/rollbacku.
+Rekomendacja techniczna: brak zmiany trzech źródeł nie pomija zmian
+aplikacji lub profilu przetwarzania; tożsamość paczki uwzględnia także te
+wejścia. Ponowna publikacja dokładnie tej samej bieżącej paczki nie
+oznacza jej zastąpienia i nie rozpoczyna terminu usunięcia. Wskazanie
+GitHub Latest jest wiążące także wtedy, gdy tag wygląda na starszy;
+nie wprowadzamy własnego porządku SemVer.
 
 **Doprecyzowanie użytkownika z 2026-10-30:** każde nowe kliknięcie
 „Run workflow” ponownie sprawdza Latest we wszystkich trzech repozytoriach.
@@ -94,6 +115,11 @@ ani kompletności katalogowych powiązań. Ograniczenia materiału źródłowego
 nie blokują publikacji. Udostępniamy istniejące metadane i niepewności,
 bez dopisywania brakujących informacji.
 
+Rozróżnienie techniczne: poprawnie brakująca relacja katalogowa pozostaje
+brakiem. Uszkodzona struktura (np. wskazanie Best na nieistniejący pomiar
+danego obiektu albo zduplikowany klucz) zatrzymuje importer. Nie służy to
+ocenie, czy wybór Best był merytorycznie właściwy.
+
 - Widok, podziałka i odczyt współrzędnych: **EPSG:2180**, metry.
   Etykiety: `X — północ`, `Y — wschód`; wewnętrzny porządek biblioteki
   mapowej to easting/northing. Odczyt przeliczonych współrzędnych nad
@@ -112,6 +138,12 @@ bez dopisywania brakujących informacji.
   Niezweryfikowana orientacja zachowuje oznaczenie źródłowe.
 
 ## Kontrakty wejść — zweryfikowany profil z 2026-10-30
+
+Kontrola 2026-10-31 ponownie potwierdziła te trzy Latest/commity, sumy
+czterech assets, 2442 składników manifestu Geo i 814 metadanych `meta.yaml`.
+Próba odrzuciła pięć kontrolowanych wad danych. To sonda kontraktów,
+nie komplet produkcyjnych importerów; szczegóły i ograniczenia zawiera
+[raport wejść](PAGES_INPUTS_RASTERS_PROBE.md).
 
 Poniższe wersje są próbką do zaprojektowania importerów, **nie stałym
 przypięciem przyszłego workflow**. Odpowiedzi GitHub Latest oraz lokalne
@@ -311,6 +343,13 @@ Fallback OSM nie zastępuje działającej integracji TPN przy odbiorze.
 Dokładne próbki, źródła i ograniczenia opisano w
 [analizie podkładów](QGIS_WASM_RESEARCH.md).
 
+**Nowy dowód 2026-10-31:** lokalny statyczny build wyrenderował wszystkie
+cztery podkłady przez powyższe `XYZ` w Chromium; kontrole z CORS/DataTile
+zawiodły zgodnie z oczekiwaniem. Sprawdzono też DPR 3, luki, wymuszoną
+awarię, ręczny powrót, krycie i skale źródłowe 15/20. To uzupełnia analizę
+kodu, ale nie zastępuje testu hostingu ani rzeczywistych telefonów.
+[Warunki i wyniki](PAGES_BROWSER_PROBE.md).
+
 ## Architektura i dostarczanie danych — propozycje techniczne
 
 Przyjęto OpenLayers. Proponowane uzupełnienie: TypeScript, Vite i proj4js,
@@ -342,6 +381,17 @@ publikacji lub liczba żądań uzasadnią dodatkową złożoność. Wtedy obowi�
 próba rzeczywistego COG na Pages, nie ekstrapolacja z `.3d`.
 To rekomendacja autora projektu, nie potwierdzony wynik pełnego benchmarku.
 
+**Wynik 2026-10-31 i rekomendacja do następnego etapu:** zmierzona piramida
+WebP lossless 512 px całego katalogu wraz z podglądami zajmuje
+275 282 006 B (262,53 MiB), 35 845 plików. Dlatego pozostajemy przy
+podglądach i kaflach 512; obecne dane nie uzasadniają dokładania COG.
+To subtotal rastrów bez gutterów, aplikacji, wektorów i historii,
+nie pomiar gotowej strony. Oględziny pięciu planów w OpenLayers DPR 1/3
+potwierdziły podglądy i szczegóły; pełna pamięć telefonu, długie używanie,
+gęste nakładanie i granice kafli pozostają do testu. [Szczegóły rastrów](PAGES_INPUTS_RASTERS_PROBE.md)
+i [przeglądarka](PAGES_BROWSER_PROBE.md). Parametry poniżej pozostają
+hipotezami, a nie nowymi uzgodnieniami użytkownika.
+
 Wartości do eksperymentów, **nie zatwierdzone gwarancje**:
 
 | Parametr | Hipoteza do sprawdzenia |
@@ -368,6 +418,27 @@ hipotezą. Nie stosujemy arbitralnego limitu pierwszych 24 planów.
 Zmiana widoku anuluje zbędne żądania, a ograniczony cache zwalnia zasoby.
 Proponowane obniżanie rozdzielczości pod presją pamięci musi być jawne
 i sprawdzone pod względem czytelności oraz nakładania wielu planów.
+
+## Granice modułów — rekomendacja do przyszłej implementacji
+
+Według `mattpocock-skills:codebase-design` proponowane są poniższe
+moduły z małymi interfejsami. Nie tworzymy obecnie pełnej aplikacji,
+ogólnego rejestru importerów ani abstrakcji dla nieużywanego COG.
+
+| Moduł / interfejs | Ukryta złożoność i istotna powierzchnia testów |
+| --- | --- |
+| Wejścia przebiegu: `prepareInputs(run)` | Latest, tag→commit, trwałe przypięcia, sumy i bezpieczne rozpakowanie. Testy: zmiana Latest między/ podczas runów, Re-run bez manifestu, zmieniony asset, wadliwe archiwum. Trzy jawne czytniki źródeł. |
+| Pakiet mapy: `buildPackage(inputs, profile)` | Import, relacje, transformacje i rastry, komplet plików oraz rozmiar strony. Testy wyników: osie, obrót/pół piksela, wiele otworów i wariantów, zachowanie źródłowych wartości, kompletność paczki. Bez audytu pomiarów. |
+| Katalog: wyszukanie, szczegóły i jawne relacje migawki | Normalizacja polskich znaków, historia na żądanie i klucz `(object_id,id)`. Testy: powtarzające się lokalne ID pomiarów, odrzucone w szczegółach, brak relacji, opóźniona odpowiedź po zmianie wyboru. |
+| Widok mapy i zasoby: stan widoku/warstw → gotowość/błędy | OpenLayers, wybór poziomów, anulowanie i cache, TPN/OSM. Testy rzeczywistej przeglądarki: wyjątek „Pokaż cały plan”, brak żądań spoza widoku, DPR, spóźnione odpowiedzi, luki/powrót, długa nawigacja. |
+| Publikacja i ochrona: `applyOperation(operation, package)` | Kolejność deploy/rollback, ewidencja i retencja. Testy obserwowalnych stanów: A→B→A, stary build po rollbacku, wersja bieżąca przez 60+ dni, przerwanie na etapach zapisu/deployu, ochrona unknown. |
+
+To rekomendacja techniczna autora, nie uzgodnienie nazw modułów ani
+ostatecznych granic testów. TDD istotnych zachowań zacznie się po zgodzie
+na implementację i uzgodnieniu tych granic. Zewnętrzne efekty GitHub
+i renderer mają rzeczywiste miejsca podmiany/testowania; nie opakowujemy
+każdego endpointu osobną warstwą. Wynik sondy nie jest testem produkcyjnego
+modułu. Testy z atrapą API nie zastępują integracji z GitHub.
 
 ## Publikacja, manifest i ręczne cofnięcie
 
@@ -409,6 +480,12 @@ SHA-256 wejść i wyników, commit aplikacji, wersje narzędzi, parametry
 przekształceń i raport techniczny. Hash pobranego pliku trzeba odróżniać
 od porównania z oczekiwaną sumą opublikowaną przez źródło. Kontrakt sum
 kontrolnych opisuje sekcja kontraktów wejść.
+
+Rekomendacja doprecyzowana 2026-10-31: niezmienne przypięcia wejść i późniejszy
+manifest wyniku są osobnymi dokumentami. Nie dopisujemy wyników walidacji
+do artefaktu `inputs-<run_id>` po jego zapisaniu. Paczka zawiera oba;
+zapis przypięć wymaga odczytu potwierdzającego kompletność. Szczegóły
+retencji, ponowień i aktualnego API: [badanie publikacji](PAGES_PUBLICATION_RESEARCH.md).
 
 Po publikacji test działającego adresu raportuje błąd w wyniku workflow.
 **Nie uruchamia automatycznego cofnięcia.** Błąd wykryty dopiero po
@@ -479,13 +556,21 @@ strony. Przy sprzecznym/nieznanym wyniku zatrzymuje dalszą publikację
 i sprzątanie, zachowując paczki. Błąd testu adresu po potwierdzonym deployu
 nie zmienia historii zastąpienia i nie powoduje automatycznego rollbacku.
 
-**Niezamknięte ryzyko techniczne:** wybrana wersja `actions/deploy-pages`
-musi pozwolić niezawodnie zapisać/odszukać deployment ID do odzyskiwania
-operacji. Samo udokumentowane wyjście `page_url` tego nie zapewnia.
-Trzeba przeprowadzić test przerwania po skutecznym deployu, przed zapisem
-ewidencji. Dopóki wynik nie jest znany, mechanizm jest projektem, nie
-potwierdzoną gwarancją. Potwierdzona awaria przed publikacją nie uruchamia
-retencji poprzedniej wersji; niejednoznaczna awaria nie uprawnia do usuwania.
+**Niezamknięte ryzyko techniczne, uściślone 2026-10-31:** sprawdzone
+`actions/deploy-pages` v5.0.1 nie ma outputu deployment ID; `page_url`
+powstaje przed końcowym sukcesem. SHA aplikacji także nie identyfikuje
+jednoznacznie wdrożenia danych lub rollbacku. Najpierw testujemy prostszą
+rekomendację: `pending` utrwala `run_id`, `run_attempt`, job i nazwę kroku;
+po przerwaniu **po ukończeniu kroku deploy** Actions Jobs API potwierdza
+sukces tego konkretnego kroku, a odczyt strony zgodność paczki. Dopiero
+wtedy uzgadniamy ewidencję. Bez `continue-on-error` na kroku publikacji.
+
+Przerwanie **wewnątrz kroku**, timeout/cancel, brak historii lub sprzeczny
+odczyt pozostają `unknown`: obie paczki chronione, dalsza publikacja
+i usuwanie zatrzymane do rozpoznania. Nie ponawiamy POST w ciemno.
+Ta ścieżka wymaga rzeczywistej próby na GitHub; nie jest potwierdzoną
+gwarancją odzyskania. Potwierdzona awaria przed publikacją nie uruchamia
+retencji poprzedniej wersji. [Kod, API i scenariusze](PAGES_PUBLICATION_RESEARCH.md).
 
 ### Limity publikacji i źródła kontraktu
 
@@ -497,7 +582,8 @@ są trzema różnymi wielkościami.
 
 Build raportuje pełny rozmiar publikacji przed deployem i zatrzymuje się
 po przekroczeniu limitu. Nie ogranicza po cichu katalogu planów ani ich
-szczegółowości. Pełna piramida nie została jeszcze zmierzona. Brak miejsca
+szczegółowości. Pełna piramida z podglądami została zmierzona 2026-10-31
+(275 282 006 B); pełna strona nie istnieje i jej rozmiar pozostaje do pomiaru. Brak miejsca
 wymaga zmiany sposobu kodowania/pakowania i ponownego sprawdzenia jakości;
 nie jest podstawą obietnicy, że obecna propozycja zmieści się na Pages.
 
@@ -581,29 +667,33 @@ Runda z 2026-10-30 i jej doprecyzowanie zapisały ustalenia użytkownika:
    wydania, jeśli się pojawiły; wystarczy zmiana jednego źródła.
 
 Pozostałe uzupełnienia techniczne są rekomendacjami opartymi na wskazanych
-źródłach. Nie stanowią zatwierdzenia całej specyfikacji ani zgody na
-implementację aplikacji lub publikację strony. Użytkownik osobno zlecił
-utworzenie repozytorium i commit dokumentacji; ten zakres został dopuszczony.
+źródłach. Nie stanowią zatwierdzenia całej specyfikacji ani zgody na pełną
+implementację aplikacji. Użytkownik osobno dopuścił lokalne sondy,
+publikację konkretnej sondy TPN oraz zapis dokumentacji i sond w repo.
+Nowa próba publikacji i produkcyjny workflow wymagają osobnego uzgodnienia.
 
 | Gałąź projektu | Co już ustalono/sprawdzono | Zależność i sposób zamknięcia |
 | --- | --- | --- |
-| TPN → EPSG:2180 | Wymaganie zachowane; konfiguracja, próbki HTTP i dokładna ścieżka XYZ zbadane | Test czterech podkładów na Pages bez proxy, na desktopie i telefonach. Do tego czasu zgodność pozostaje nieudowodniona. |
-| Importery i pochodzenie | Konkretny profil trzech wydań, plików, schematów, sum i dodatkowych metadanych opisany | Testy importerów na przypiętych próbkach, uszkodzonych paczkach i nieobsługiwanych formatach. Bez audytu pomiarów. |
-| Plany i rozmiar strony | Podgląd wybranego planu uzgodniony; kafle/podglądy są pierwszym wariantem do próby | Cała piramida: rozmiar, liczba plików, czas buildu; próbki: napisy, obrót, szwy, DPR, kilka nałożonych planów. COG oceniany, jeśli potrzebny do spełnienia kryteriów. |
+| TPN → EPSG:2180 | Zatwierdzona sonda opublikowana na Pages; publiczne pliki zgodne z paczką; cztery podkłady w Chromium/WebKit, negatywne kontrole CORS/DataTile, OSM w pojedynczej luce | Dokładny stan silników w raporcie przeglądarki; natywne Safari i rzeczywiste telefony nadal niewykonane. WebKit desktop nie zalicza iPhone'a. |
+| Importery i pochodzenie | Ponownie pobrane bieżące wydania, sumy i przypięte metadane; pięć wad odrzuconych przez sondę | Produkcyjne importery i pełne testy ich kontraktu dopiero po zgodzie na implementację. Bez audytu pomiarów. |
+| Plany i rozmiar strony | Pełny wariant WebP512 + podglądy: 275,28 MB; 20/20 prób OL dla pięciu planów przy DPR1/3 | Rekomendacja autora: WebP512. Pozostają szwy/gutter, nakładanie, zarządzanie zasobami, cały rozmiar strony i CI. Brak obecnej potrzeby COG. |
 | Czytelność | Wszystkie nazwy Best, bez ukrywania kolizji | Sprawdzić gęste widoki i wybór obiektu, zachowując decyzję. Układ panelu mobilnego pozostaje propozycją. |
 | Odbiór mobilny | iPhone 14 Pro wskazany; Android/Chrome nadal wymagany | Wskazać rzeczywisty Android; ustalić mierzalne progi po próbie referencyjnej. Brak urządzenia/pomiaru pozostaje brakiem dowodu. |
 | Jedno kliknięcie / Re-run | Nowy klik sprawdza aktualne Latest i wdraża dostępne nowe wydania; przypięcie i trwały manifest dotyczą pojedynczego runu oraz jego Re-run | Nowe Latest jednego źródła między kliknięciami; zmiana Latest podczas runu i przed Re-run; błędy zapisu, brak assetu i niezgodna suma. |
-| Rollback | Gotowa paczka, 15 dni od zastąpienia; zaprojektowana ewidencja i blokada | Próby A→B→A, starego buildu po nowym/rollbacku, przerwania po deployu i wersji używanej wcześniej przez 60 dni. Sposób odzyskania deployment ID pozostaje do dowiedzenia. |
+| Rollback | Gotowa paczka, 15 dni od zastąpienia; ewidencja i wspólna blokada; propozycja odzysku przez konkretny krok Actions | Prawdziwe próby A→B→A, starego buildu po rollbacku, przerwania po deployu i długotrwałej wersji. Jobs API/manifest nadal nieprzetestowane; unknown chroni obie paczki. |
 
 ### Kryteria gotowości do dalszych prac
 
 - Dokument jest podstawą zaplanowania ograniczonych prób technicznych;
-  **nie potwierdza jeszcze wykonalności wszystkich wymagań**. Test
-  wymagający nowej strony Pages nie został wykonany w tym etapie, zgodnie
-  z zakazem implementacji i publikacji.
-- Przed pełną implementacją trzeba uzyskać dowód TPN na docelowym hostingu,
-  wybrać format rastrów na podstawie jakości i pełnego rozmiaru publikacji
-  oraz rozstrzygnąć sposób bezpiecznego odzyskiwania przerwanego deployu.
+  **nie potwierdza jeszcze wykonalności wszystkich wymagań**. Lokalne
+  próby techniczne wykonano na podstawie rozszerzonej zgody z 2026-10-31;
+  ich wyniki nie zastępują odbioru. Minimalną paczkę TPN następnie
+  zatwierdzono i opublikowano na publicznym Pages. To nadal sonda techniczna.
+- Dowód renderowania TPN na docelowym hostingu uzyskano dla badanych
+  silników desktopowych. Przed pełną implementacją pozostaje sprawdzenie
+  proponowanego odzyskiwania przerwanego deployu i osobna zgoda na ten etap. Próby
+  uzasadniają format WebP512 jako rekomendację; jakość brzegów i gęstych
+  widoków oraz pełny rozmiar strony nadal wymagają weryfikacji.
   Każdy wynik ma zawierać warunki testu i ograniczenia.
 - Progi pamięci/czasu i układ panelu nie stają się wymaganiami wyłącznie
   dlatego, że wpisano propozycję do dokumentu. Wynik próby powinien
@@ -627,7 +717,8 @@ Rozpoznanie z 2026-10-30 — **wersje i liczebności nie są przypięciem buildu
 
 [Pomiary i ograniczenia](PAGES_MAP_PERFORMANCE.md),
 [analiza QGIS WASM i COG](QGIS_WASM_RESEARCH.md).
-Raporty zachowują dowody wcześniejszych prób; nie są testem nowej strony.
+Raporty zachowują dowody wcześniejszych prób; raport przeglądarki obejmuje
+także publiczną sondę TPN. Żaden nie stanowi odbioru pełnej aplikacji.
 
 Dokumentacja odniesienia:
 [OpenLayers](https://openlayers.org/doc/tutorials/raster-reprojection.html),
