@@ -1,5 +1,5 @@
 import {createServer} from 'node:http';
-import {readFile,stat,mkdir,writeFile} from 'node:fs/promises';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import assert from 'node:assert/strict';
 import {chromium,firefox,webkit} from 'playwright';
@@ -19,8 +19,19 @@ try{
   try{
    for(const mobile of [false,true]){
     const context=await browser.newContext({viewport:mobile?{width:393,height:852}:{width:1440,height:960},deviceScaleFactor:mobile?3:1,hasTouch:mobile});
-    const page=await context.newPage(),errors=[],requests=[];
-    page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
+    const page=await context.newPage(),errors=[],requests=[],network=new Map(),finishedURLs=new Set();
+    const caseName=`${name}-${mobile?'mobile':'desktop'}`;
+    page.on('pageerror',e=>errors.push(e.message));
+    page.on('request',r=>{requests.push(r.url());network.set(r,{url:r.url(),status:null,finished:false,failure:null});});
+    page.on('response',r=>{const row=network.get(r.request());if(row)row.status=r.status();});
+    page.on('requestfailed',r=>{const row=network.get(r);if(row)row.failure=r.failure()?.errorText;});
+    page.on('requestfinished',async r=>{const row=network.get(r);if(row)row.finished=true;const response=await r.response().catch(()=>null);if(response?.status()===200)finishedURLs.add(r.url());});
+    // Resource Timing is bounded telemetry, not a download-completion signal.
+    // Keep its buffer small to cover the mobile regression with many map assets.
+    await page.addInitScript(()=>{performance.setResourceTimingBufferSize(200);window.resourceTimingBufferFullCount=0;performance.addEventListener('resourcetimingbufferfull',()=>window.resourceTimingBufferFullCount++);});
+    const waitForDownload=async(predicate,label)=>{const deadline=Date.now()+30000;while(![...finishedURLs].some(predicate)){assert.ok(Date.now()<deadline,`Timed out waiting for successful completed download: ${label}`);await page.waitForTimeout(50);}};
+    const timing=()=>page.evaluate(()=>({entries:performance.getEntriesByType('resource').length,bufferFullEvents:window.resourceTimingBufferFullCount}));
+    try{
     // Controlled external outage pins fallback behaviour, independent of TPN uptime.
     await page.route('https://tpn.obliview.com/**',r=>r.abort());
     await page.route('https://*.tile.openstreetmap.org/**',r=>r.abort());
@@ -40,24 +51,24 @@ try{
     if(mobile)assert.ok(mapBox.y+mapBox.height<=panelBox.y+2,'map remains above mobile panel');
     await page.getByRole('tab',{name:'Warstwy'}).click();
     for(const id of ['other','rejected','differences'])await page.locator(`#layer-${id}`).check();
-    await page.waitForFunction(()=>performance.getEntriesByType('resource').some(r=>r.name.endsWith('measurements.geojson')));
+    await waitForDownload(u=>u.endsWith('measurements.geojson'),'measurements');
     await page.locator('#layer-plans').uncheck();
     await page.getByRole('tab',{name:'Plany',exact:true}).click();
     await page.locator('#plan-search').fill('001197');
     await page.locator('#plan-list [data-plan-fit="001197"]').click();
     const preview=catalog.plans.find(p=>p.id==='001197').preview.url;
-    await page.waitForFunction(path=>performance.getEntriesByType('resource').some(r=>r.name.endsWith(path)),preview);
+    await waitForDownload(u=>u.endsWith(preview),'001197 preview');
     await page.waitForTimeout(250);
     await page.screenshot({path:`output/playwright/${name}-${mobile?'mobile':'desktop'}-whole-plan.png`});
     if(mobile)await page.locator('#panel-toggle').click();
     await page.getByRole('tab',{name:'Plany',exact:true}).click();
     await page.locator('#plan-search').fill('001459');
     await page.locator('#plan-list [data-plan-fit="001459-pza-2024"]').click();
-    await page.waitForFunction(path=>performance.getEntriesByType('resource').some(r=>r.name.endsWith(path)),catalog.plans.find(p=>p.id==='001459-pza-2024').preview.url);
+    await waitForDownload(u=>u.endsWith(catalog.plans.find(p=>p.id==='001459-pza-2024').preview.url),'001459-pza-2024 preview');
     for(let i=0;i<3;i++){await page.locator('.ol-zoom-in').click();await page.waitForTimeout(300);}
     console.log('zoomed',name,mobile,await page.locator('#plan-status').innerText());
     await page.screenshot({path:`output/playwright/${name}-${mobile?'mobile':'desktop'}-zoom-debug.png`});
-    await page.waitForFunction(()=>performance.getEntriesByType('resource').some(r=>r.name.includes('/001459-pza-2024/tiles/')));
+    await waitForDownload(u=>u.includes('/001459-pza-2024/tiles/'),'001459-pza-2024 detail');
     await page.waitForTimeout(500);
     await page.screenshot({path:`output/playwright/${name}-${mobile?'mobile':'desktop'}-detail.png`});
     if(mobile)await page.locator('#panel-toggle').click();
@@ -71,8 +82,14 @@ try{
     await page.getByRole('tab',{name:'Źródła',exact:true}).click();assert.equal(await page.locator('.source-card').count(),3);
     assert.equal(await page.locator('a[href="data/inputs.json"]').count(),1);
     assert.deepEqual(errors,[],`${name}: no JS errors`);
-    results.push({engine:name,mobile,dpr:mobile?3:1,readyMs,planRequests:requests.filter(u=>u.endsWith('.webp')).length,errors});
-    await context.close();
+    results.push({engine:name,mobile,dpr:mobile?3:1,readyMs,planRequests:requests.filter(u=>u.endsWith('.webp')).length,resourceTiming:await timing(),errors});
+    }catch(error){
+     await page.screenshot({path:`output/playwright/${caseName}-failure.png`}).catch(()=>{});
+     const failure={engine:name,mobile,error:String(error),errors,network:[...network.values()],resourceTiming:await timing().catch(()=>null)};
+     await writeFile(`output/playwright/${caseName}-failure.json`,JSON.stringify(failure,null,2));
+     await writeFile('output/playwright/results.json',JSON.stringify([...results,failure],null,2));
+     throw error;
+    }finally{await context.close();}
    }
   }finally{await browser.close();}
  }
