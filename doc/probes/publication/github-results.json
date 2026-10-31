@@ -1,0 +1,3168 @@
+{
+  "schema": 1,
+  "checked_at": "2026-10-31T09:08:56.871634+00:00",
+  "provenance": "Recorded REST API field projections, Contents API readbacks verified against raw bytes and Git blob SHA, and HTTP byte checks. This is a bounded live probe, not a production workflow acceptance.",
+  "trial_code_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+  "baseline": {
+    "pages": {
+      "url": "https://api.github.com/repos/dlubom/jktz-mapa/pages",
+      "status": "built",
+      "cname": null,
+      "custom_404": false,
+      "html_url": "https://dlubom.github.io/jktz-mapa/",
+      "build_type": "legacy",
+      "source": {
+        "branch": "gh-pages",
+        "path": "/"
+      },
+      "public": true,
+      "protected_domain_state": null,
+      "pending_domain_unverified_at": null,
+      "https_enforced": true
+    },
+    "policies": {
+      "total_count": 1,
+      "branch_policies": [
+        {
+          "id": 65003853,
+          "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k2NTAwMzg1Mw==",
+          "name": "gh-pages",
+          "type": "branch"
+        }
+      ]
+    },
+    "gh_pages": {
+      "ref": "refs/heads/gh-pages",
+      "node_id": "REF_kwDOVdilBrNyZWZzL2hlYWRzL2doLXBhZ2Vz",
+      "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/refs/heads/gh-pages",
+      "object": {
+        "sha": "12a6783bc09eda112f9f187f9df5825264bbf183",
+        "type": "commit",
+        "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/commits/12a6783bc09eda112f9f187f9df5825264bbf183"
+      }
+    },
+    "main": {
+      "name": "main",
+      "commit": {
+        "sha": "a5f7b79b1ff84faf0f66ae03123a010873474eae",
+        "node_id": "C_kwDOVdilBtoAKGE1ZjdiNzliMWZmODRmYWYwZjY2YWUwMzEyM2EwMTA4NzM0NzRlYWU",
+        "commit": {
+          "author": {
+            "name": "Dariusz Lubomski",
+            "email": "darek.lubomski@gmail.com",
+            "date": "2026-10-31T08:20:22Z"
+          },
+          "committer": {
+            "name": "Dariusz Lubomski",
+            "email": "darek.lubomski@gmail.com",
+            "date": "2026-10-31T08:20:22Z"
+          },
+          "message": "docs: record feasibility probes and next-stage handoff",
+          "tree": {
+            "sha": "bc9c026a17a3c09bbdae2a23fa63d4f67bb9e3be",
+            "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/trees/bc9c026a17a3c09bbdae2a23fa63d4f67bb9e3be"
+          },
+          "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/commits/a5f7b79b1ff84faf0f66ae03123a010873474eae",
+          "comment_count": 0,
+          "verification": {
+            "verified": false,
+            "reason": "unsigned",
+            "signature": null,
+            "payload": null,
+            "verified_at": null
+          }
+        },
+        "url": "https://api.github.com/repos/dlubom/jktz-mapa/commits/a5f7b79b1ff84faf0f66ae03123a010873474eae",
+        "html_url": "https://github.com/dlubom/jktz-mapa/commit/a5f7b79b1ff84faf0f66ae03123a010873474eae",
+        "comments_url": "https://api.github.com/repos/dlubom/jktz-mapa/commits/a5f7b79b1ff84faf0f66ae03123a010873474eae/comments",
+        "author": {
+          "login": "dlubom",
+          "id": 5931841,
+          "node_id": "MDQ6VXNlcjU5MzE4NDE=",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5931841?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/dlubom",
+          "html_url": "https://github.com/dlubom",
+          "followers_url": "https://api.github.com/users/dlubom/followers",
+          "following_url": "https://api.github.com/users/dlubom/following{/other_user}",
+          "gists_url": "https://api.github.com/users/dlubom/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/dlubom/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/dlubom/subscriptions",
+          "organizations_url": "https://api.github.com/users/dlubom/orgs",
+          "repos_url": "https://api.github.com/users/dlubom/repos",
+          "events_url": "https://api.github.com/users/dlubom/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/dlubom/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "committer": {
+          "login": "dlubom",
+          "id": 5931841,
+          "node_id": "MDQ6VXNlcjU5MzE4NDE=",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5931841?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/dlubom",
+          "html_url": "https://github.com/dlubom",
+          "followers_url": "https://api.github.com/users/dlubom/followers",
+          "following_url": "https://api.github.com/users/dlubom/following{/other_user}",
+          "gists_url": "https://api.github.com/users/dlubom/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/dlubom/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/dlubom/subscriptions",
+          "organizations_url": "https://api.github.com/users/dlubom/orgs",
+          "repos_url": "https://api.github.com/users/dlubom/repos",
+          "events_url": "https://api.github.com/users/dlubom/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/dlubom/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "parents": [
+          {
+            "sha": "5a519dc90d504ef34229e7cfb6cf82b680e9a031",
+            "url": "https://api.github.com/repos/dlubom/jktz-mapa/commits/5a519dc90d504ef34229e7cfb6cf82b680e9a031",
+            "html_url": "https://github.com/dlubom/jktz-mapa/commit/5a519dc90d504ef34229e7cfb6cf82b680e9a031"
+          }
+        ]
+      },
+      "_links": {
+        "self": "https://api.github.com/repos/dlubom/jktz-mapa/branches/main",
+        "html": "https://github.com/dlubom/jktz-mapa/tree/main"
+      },
+      "protected": false,
+      "protection": {
+        "enabled": false,
+        "required_status_checks": {
+          "enforcement_level": "off",
+          "contexts": [],
+          "checks": []
+        }
+      },
+      "protection_url": "https://api.github.com/repos/dlubom/jktz-mapa/branches/main/protection"
+    }
+  },
+  "runs": {
+    "A-custom": {
+      "run": {
+        "id": 41185758641,
+        "run_attempt": 1,
+        "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-10-31T08:43:29Z",
+        "updated_at": "2026-10-31T08:43:52Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41185758641"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124492241688,
+          "run_id": 41185758641,
+          "run_attempt": 1,
+          "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+          "name": "pages-publication-probe-41185758641-1",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-31T08:43:34Z",
+          "completed_at": "2026-10-31T08:43:52Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41185758641/job/124492241688",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:43:34Z",
+              "completed_at": "2026-10-31T08:43:36Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:43:36Z",
+              "completed_at": "2026-10-31T08:43:37Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T08:43:37Z",
+              "completed_at": "2026-10-31T08:43:39Z"
+            },
+            {
+              "name": "Upload exact prepared archive",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T08:43:39Z",
+              "completed_at": "2026-10-31T08:43:40Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T08:43:40Z",
+              "completed_at": "2026-10-31T08:43:43Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 6,
+              "started_at": "2026-10-31T08:43:43Z",
+              "completed_at": "2026-10-31T08:43:50Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T08:43:50Z",
+              "completed_at": "2026-10-31T08:43:50Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T08:43:50Z",
+              "completed_at": "2026-10-31T08:43:50Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T08:43:50Z",
+              "completed_at": "2026-10-31T08:43:50Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T08:43:50Z",
+              "completed_at": "2026-10-31T08:43:50Z"
+            }
+          ]
+        }
+      ]
+    },
+    "A-prefix": {
+      "run": {
+        "id": 41186232166,
+        "run_attempt": 1,
+        "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-10-31T08:50:33Z",
+        "updated_at": "2026-10-31T08:50:55Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186232166"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124493604633,
+          "run_id": 41186232166,
+          "run_attempt": 1,
+          "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+          "name": "pages-publication-probe-41186232166-1",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-31T08:50:38Z",
+          "completed_at": "2026-10-31T08:50:55Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186232166/job/124493604633",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:50:38Z",
+              "completed_at": "2026-10-31T08:50:39Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:50:39Z",
+              "completed_at": "2026-10-31T08:50:40Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T08:50:40Z",
+              "completed_at": "2026-10-31T08:50:42Z"
+            },
+            {
+              "name": "Upload exact prepared archive",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T08:50:42Z",
+              "completed_at": "2026-10-31T08:50:43Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T08:50:43Z",
+              "completed_at": "2026-10-31T08:50:46Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 6,
+              "started_at": "2026-10-31T08:50:46Z",
+              "completed_at": "2026-10-31T08:50:53Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T08:50:53Z",
+              "completed_at": "2026-10-31T08:50:53Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T08:50:53Z",
+              "completed_at": "2026-10-31T08:50:53Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T08:50:53Z",
+              "completed_at": "2026-10-31T08:50:53Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T08:50:53Z",
+              "completed_at": "2026-10-31T08:50:53Z"
+            }
+          ]
+        }
+      ]
+    },
+    "A-native": {
+      "run": {
+        "id": 41186555255,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-31T08:55:30Z",
+        "updated_at": "2026-10-31T08:55:58Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186555255"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124494546306,
+          "run_id": 41186555255,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186555255-1",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T08:55:35Z",
+          "completed_at": "2026-10-31T08:55:57Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186555255/job/124494546306",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:55:35Z",
+              "completed_at": "2026-10-31T08:55:37Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:55:37Z",
+              "completed_at": "2026-10-31T08:55:38Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T08:55:38Z",
+              "completed_at": "2026-10-31T08:55:40Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T08:55:40Z",
+              "completed_at": "2026-10-31T08:55:42Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T08:55:42Z",
+              "completed_at": "2026-10-31T08:55:45Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-31T08:55:45Z",
+              "completed_at": "2026-10-31T08:55:52Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T08:55:52Z",
+              "completed_at": "2026-10-31T08:55:52Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-10-31T08:55:52Z",
+              "completed_at": "2026-10-31T08:55:55Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T08:55:55Z",
+              "completed_at": "2026-10-31T08:55:55Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T08:55:55Z",
+              "completed_at": "2026-10-31T08:55:55Z"
+            }
+          ]
+        }
+      ]
+    },
+    "B-cancelled": {
+      "run": {
+        "id": 41186621744,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "created_at": "2026-10-31T08:56:33Z",
+        "updated_at": "2026-10-31T08:59:26Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186621744"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124494742113,
+          "run_id": 41186621744,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186621744-1",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "started_at": "2026-10-31T08:56:40Z",
+          "completed_at": "2026-10-31T08:59:25Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186621744/job/124494742113",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:56:41Z",
+              "completed_at": "2026-10-31T08:56:43Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:56:43Z",
+              "completed_at": "2026-10-31T08:56:44Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T08:56:44Z",
+              "completed_at": "2026-10-31T08:56:46Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T08:56:46Z",
+              "completed_at": "2026-10-31T08:56:47Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T08:56:47Z",
+              "completed_at": "2026-10-31T08:56:50Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-31T08:56:50Z",
+              "completed_at": "2026-10-31T08:56:56Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "cancelled",
+              "number": 7,
+              "started_at": "2026-10-31T08:56:56Z",
+              "completed_at": "2026-10-31T08:59:23Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T08:59:23Z",
+              "completed_at": "2026-10-31T08:59:23Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T08:59:23Z",
+              "completed_at": "2026-10-31T08:59:23Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T08:59:23Z",
+              "completed_at": "2026-10-31T08:59:23Z"
+            }
+          ]
+        }
+      ]
+    },
+    "queued-A1": {
+      "run": {
+        "id": 41186718473,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-10-31T08:58:07Z",
+        "updated_at": "2026-10-31T08:59:36Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186718473"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124495266941,
+          "run_id": 41186718473,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186718473-1",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-31T08:59:29Z",
+          "completed_at": "2026-10-31T08:59:35Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186718473/job/124495266941",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:59:30Z",
+              "completed_at": "2026-10-31T08:59:31Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:59:31Z",
+              "completed_at": "2026-10-31T08:59:32Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 3,
+              "started_at": "2026-10-31T08:59:32Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T08:59:33Z",
+              "completed_at": "2026-10-31T08:59:33Z"
+            }
+          ]
+        }
+      ]
+    },
+    "queued-A2": {
+      "run": {
+        "id": 41186723574,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-10-31T08:58:11Z",
+        "updated_at": "2026-10-31T08:59:47Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186723574"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124495298623,
+          "run_id": 41186723574,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186723574-1",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-31T08:59:39Z",
+          "completed_at": "2026-10-31T08:59:46Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186723574/job/124495298623",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:59:40Z",
+              "completed_at": "2026-10-31T08:59:42Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:59:42Z",
+              "completed_at": "2026-10-31T08:59:43Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 3,
+              "started_at": "2026-10-31T08:59:43Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T08:59:44Z",
+              "completed_at": "2026-10-31T08:59:44Z"
+            }
+          ]
+        }
+      ]
+    },
+    "recover-B": {
+      "run": {
+        "id": 41186880269,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-31T09:00:34Z",
+        "updated_at": "2026-10-31T09:00:51Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186880269"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124495505745,
+          "run_id": 41186880269,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186880269-1",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T09:00:40Z",
+          "completed_at": "2026-10-31T09:00:51Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186880269/job/124495505745",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T09:00:41Z",
+              "completed_at": "2026-10-31T09:00:42Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T09:00:42Z",
+              "completed_at": "2026-10-31T09:00:43Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T09:00:43Z",
+              "completed_at": "2026-10-31T09:00:48Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-31T09:00:48Z",
+              "completed_at": "2026-10-31T09:00:48Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5,
+              "started_at": "2026-10-31T09:00:48Z",
+              "completed_at": "2026-10-31T09:00:48Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6,
+              "started_at": "2026-10-31T09:00:48Z",
+              "completed_at": "2026-10-31T09:00:48Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T09:00:48Z",
+              "completed_at": "2026-10-31T09:00:48Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T09:00:48Z",
+              "completed_at": "2026-10-31T09:00:48Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T09:00:48Z",
+              "completed_at": "2026-10-31T09:00:49Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T09:00:49Z",
+              "completed_at": "2026-10-31T09:00:49Z"
+            }
+          ]
+        }
+      ]
+    },
+    "recover-B-again": {
+      "run": {
+        "id": 41187188483,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-31T09:04:51Z",
+        "updated_at": "2026-10-31T09:05:01Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41187188483"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124496393833,
+          "run_id": 41187188483,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41187188483-1",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T09:04:55Z",
+          "completed_at": "2026-10-31T09:05:00Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41187188483/job/124496393833",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T09:04:55Z",
+              "completed_at": "2026-10-31T09:04:57Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T09:04:57Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T09:04:58Z",
+              "completed_at": "2026-10-31T09:04:58Z"
+            }
+          ]
+        }
+      ]
+    },
+    "rollback-A": {
+      "run": {
+        "id": 41187232608,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-31T09:05:24Z",
+        "updated_at": "2026-10-31T09:05:48Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41187232608"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124496515964,
+          "run_id": 41187232608,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41187232608-1",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T09:05:28Z",
+          "completed_at": "2026-10-31T09:05:47Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41187232608/job/124496515964",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T09:05:29Z",
+              "completed_at": "2026-10-31T09:05:30Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T09:05:30Z",
+              "completed_at": "2026-10-31T09:05:31Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T09:05:31Z",
+              "completed_at": "2026-10-31T09:05:33Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T09:05:33Z",
+              "completed_at": "2026-10-31T09:05:34Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T09:05:34Z",
+              "completed_at": "2026-10-31T09:05:36Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-31T09:05:36Z",
+              "completed_at": "2026-10-31T09:05:42Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T09:05:42Z",
+              "completed_at": "2026-10-31T09:05:42Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-10-31T09:05:42Z",
+              "completed_at": "2026-10-31T09:05:45Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T09:05:45Z",
+              "completed_at": "2026-10-31T09:05:45Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T09:05:45Z",
+              "completed_at": "2026-10-31T09:05:45Z"
+            }
+          ]
+        }
+      ]
+    },
+    "B-stale-attempt-2": {
+      "run": {
+        "id": 41186621744,
+        "run_attempt": 2,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-31T08:56:33Z",
+        "updated_at": "2026-10-31T09:06:19Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186621744"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124496662692,
+          "run_id": 41186621744,
+          "run_attempt": 2,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186621744-2",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T09:06:12Z",
+          "completed_at": "2026-10-31T09:06:18Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186621744/job/124496662692",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T09:06:13Z",
+              "completed_at": "2026-10-31T09:06:14Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T09:06:14Z",
+              "completed_at": "2026-10-31T09:06:15Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T09:06:15Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:16Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T09:06:16Z",
+              "completed_at": "2026-10-31T09:06:17Z"
+            }
+          ]
+        }
+      ]
+    },
+    "restore-original": {
+      "run": {
+        "id": 41187324619,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-31T09:06:43Z",
+        "updated_at": "2026-10-31T09:07:14Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41187324619"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124496785074,
+          "run_id": 41187324619,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41187324619-1",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T09:06:47Z",
+          "completed_at": "2026-10-31T09:07:13Z",
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41187324619/job/124496785074",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T09:06:48Z",
+              "completed_at": "2026-10-31T09:06:49Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T09:06:49Z",
+              "completed_at": "2026-10-31T09:06:50Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T09:06:50Z",
+              "completed_at": "2026-10-31T09:06:52Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T09:06:52Z",
+              "completed_at": "2026-10-31T09:06:53Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T09:06:53Z",
+              "completed_at": "2026-10-31T09:06:55Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-31T09:06:55Z",
+              "completed_at": "2026-10-31T09:07:01Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-10-31T09:07:01Z",
+              "completed_at": "2026-10-31T09:07:01Z"
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-10-31T09:07:01Z",
+              "completed_at": "2026-10-31T09:07:04Z"
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-31T09:07:04Z",
+              "completed_at": "2026-10-31T09:07:04Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-31T09:07:04Z",
+              "completed_at": "2026-10-31T09:07:04Z"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "cancel_window": {
+    "B_paused": {
+      "run": {
+        "id": 41186621744,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-31T08:56:33Z",
+        "updated_at": "2026-10-31T08:56:41Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186621744"
+      },
+      "total_jobs": 1,
+      "jobs": [
+        {
+          "id": 124494742113,
+          "run_id": 41186621744,
+          "run_attempt": 1,
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "name": "pages-publication-probe-41186621744-1",
+          "status": "in_progress",
+          "conclusion": null,
+          "started_at": "2026-10-31T08:56:40Z",
+          "completed_at": null,
+          "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186621744/job/124494742113",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-31T08:56:41Z",
+              "completed_at": "2026-10-31T08:56:43Z"
+            },
+            {
+              "name": "Checkout reviewed probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-31T08:56:43Z",
+              "completed_at": "2026-10-31T08:56:44Z"
+            },
+            {
+              "name": "Prepare or recover",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-31T08:56:44Z",
+              "completed_at": "2026-10-31T08:56:46Z"
+            },
+            {
+              "name": "Upload verified Pages files",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-31T08:56:46Z",
+              "completed_at": "2026-10-31T08:56:47Z"
+            },
+            {
+              "name": "Persist and read back pending",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-31T08:56:47Z",
+              "completed_at": "2026-10-31T08:56:50Z"
+            },
+            {
+              "name": "Publish Pages probe",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-31T08:56:50Z",
+              "completed_at": "2026-10-31T08:56:56Z"
+            },
+            {
+              "name": "Pause after successful B deploy",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7,
+              "started_at": "2026-10-31T08:56:56Z",
+              "completed_at": null
+            },
+            {
+              "name": "Confirm exact deploy and public bytes",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8,
+              "started_at": null,
+              "completed_at": null
+            },
+            {
+              "name": "Post Checkout reviewed probe",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16,
+              "started_at": null,
+              "completed_at": null
+            }
+          ]
+        }
+      ]
+    },
+    "queue": [
+      {
+        "label": "queued-A1",
+        "id": 41186718473,
+        "status": "pending",
+        "created_at": "2026-10-31T08:58:07Z",
+        "job_count": 0
+      },
+      {
+        "label": "queued-A2",
+        "id": 41186723574,
+        "status": "pending",
+        "created_at": "2026-10-31T08:58:11Z",
+        "job_count": 0
+      }
+    ],
+    "queued_A1": {
+      "run": {
+        "id": 41186718473,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "pending",
+        "conclusion": null,
+        "created_at": "2026-10-31T08:58:07Z",
+        "updated_at": "2026-10-31T08:58:08Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186718473"
+      },
+      "total_jobs": 0,
+      "jobs": []
+    },
+    "queued_A2": {
+      "run": {
+        "id": 41186723574,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "status": "pending",
+        "conclusion": null,
+        "created_at": "2026-10-31T08:58:11Z",
+        "updated_at": "2026-10-31T08:58:13Z",
+        "html_url": "https://github.com/dlubom/jktz-mapa/actions/runs/41186723574"
+      },
+      "total_jobs": 0,
+      "jobs": []
+    }
+  },
+  "ledger_snapshots": {
+    "A-native-confirmed": {
+      "contents_api_blob_sha": "123193eb743e1fd2a69d2da49a59706ad72875a5",
+      "raw_bytes": 4519,
+      "raw_sha256": "45f43dee5097492e3fbe21d261a4225312e848fdd3a7d8b6124bf5f35fa0a8c8",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "A",
+        "last": {
+          "confirmed_at": "2026-10-31T08:55:53.420378+00:00",
+          "created_at": "2026-10-31T08:55:30Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124494546306,
+          "job_name": "pages-publication-probe-41186555255-1",
+          "operation": "publish-A",
+          "run_attempt": 1,
+          "run_id": 41186555255,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "A"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "B-paused": {
+      "contents_api_blob_sha": "26bd11a0ead35fd826654a6cb82bbd1fb5f7c5cf",
+      "raw_bytes": 5580,
+      "raw_sha256": "ae90e0249cd25881c8a4e9bb0771ebd70c635f14ebe69907a800e341cbbf1cdd",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "A",
+        "last": {
+          "confirmed_at": "2026-10-31T08:55:53.420378+00:00",
+          "created_at": "2026-10-31T08:55:30Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124494546306,
+          "job_name": "pages-publication-probe-41186555255-1",
+          "operation": "publish-A",
+          "run_attempt": 1,
+          "run_id": 41186555255,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "A"
+        },
+        "pending": {
+          "archives": {
+            "A": {
+              "asset": "A.tar",
+              "asset_id": 694852572,
+              "bytes": 399360,
+              "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+              "release_id": 429817445,
+              "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+            },
+            "B": {
+              "asset": "B.tar",
+              "asset_id": 694852573,
+              "bytes": 399360,
+              "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+              "release_id": 429817445,
+              "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+            }
+          },
+          "from": "A",
+          "operation": {
+            "created_at": "2026-10-31T08:56:33Z",
+            "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+            "job_id": 124494742113,
+            "job_name": "pages-publication-probe-41186621744-1",
+            "operation": "publish-B",
+            "run_attempt": 1,
+            "run_id": 41186621744,
+            "step_name": "Publish Pages probe",
+            "step_number": 6
+          },
+          "to": "B"
+        },
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "B-cancelled-pending": {
+      "contents_api_blob_sha": "26bd11a0ead35fd826654a6cb82bbd1fb5f7c5cf",
+      "raw_bytes": 5580,
+      "raw_sha256": "ae90e0249cd25881c8a4e9bb0771ebd70c635f14ebe69907a800e341cbbf1cdd",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "A",
+        "last": {
+          "confirmed_at": "2026-10-31T08:55:53.420378+00:00",
+          "created_at": "2026-10-31T08:55:30Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124494546306,
+          "job_name": "pages-publication-probe-41186555255-1",
+          "operation": "publish-A",
+          "run_attempt": 1,
+          "run_id": 41186555255,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "A"
+        },
+        "pending": {
+          "archives": {
+            "A": {
+              "asset": "A.tar",
+              "asset_id": 694852572,
+              "bytes": 399360,
+              "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+              "release_id": 429817445,
+              "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+            },
+            "B": {
+              "asset": "B.tar",
+              "asset_id": 694852573,
+              "bytes": 399360,
+              "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+              "release_id": 429817445,
+              "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+            }
+          },
+          "from": "A",
+          "operation": {
+            "created_at": "2026-10-31T08:56:33Z",
+            "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+            "job_id": 124494742113,
+            "job_name": "pages-publication-probe-41186621744-1",
+            "operation": "publish-B",
+            "run_attempt": 1,
+            "run_id": 41186621744,
+            "step_name": "Publish Pages probe",
+            "step_number": 6
+          },
+          "to": "B"
+        },
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "recovered-B": {
+      "contents_api_blob_sha": "f8ca09b4a4aee30bc11046f8d701006c5257e9e9",
+      "raw_bytes": 4564,
+      "raw_sha256": "49fff07726e4bb950e70a34b38e374754d721d3e7eab40b4fe94821bbf1a6e9f",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "B",
+        "last": {
+          "confirmed_at": "2026-10-31T09:00:47.674072+00:00",
+          "created_at": "2026-10-31T08:56:33Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124494742113,
+          "job_name": "pages-publication-probe-41186621744-1",
+          "operation": "publish-B",
+          "run_attempt": 1,
+          "run_id": 41186621744,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "B"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "A": "2026-11-15T09:00:47.674072+00:00",
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "recovered-B-again": {
+      "contents_api_blob_sha": "f8ca09b4a4aee30bc11046f8d701006c5257e9e9",
+      "raw_bytes": 4564,
+      "raw_sha256": "49fff07726e4bb950e70a34b38e374754d721d3e7eab40b4fe94821bbf1a6e9f",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "B",
+        "last": {
+          "confirmed_at": "2026-10-31T09:00:47.674072+00:00",
+          "created_at": "2026-10-31T08:56:33Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124494742113,
+          "job_name": "pages-publication-probe-41186621744-1",
+          "operation": "publish-B",
+          "run_attempt": 1,
+          "run_id": 41186621744,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "B"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "A": "2026-11-15T09:00:47.674072+00:00",
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "rollback-A-confirmed": {
+      "contents_api_blob_sha": "f080c5b539fed79a4014722ba7a939d4e1392034",
+      "raw_bytes": 4565,
+      "raw_sha256": "1bf34fc6dd2a2094e840ffca3972c66cbd5764cea4ede5d10adc02bfe299aa95",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "A",
+        "last": {
+          "confirmed_at": "2026-10-31T09:05:43.605317+00:00",
+          "created_at": "2026-10-31T09:05:24Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124496515964,
+          "job_name": "pages-publication-probe-41187232608-1",
+          "operation": "rollback-A",
+          "run_attempt": 1,
+          "run_id": 41187232608,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "A"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "B": "2026-11-15T09:05:43.605317+00:00",
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "after-stale-B": {
+      "contents_api_blob_sha": "f080c5b539fed79a4014722ba7a939d4e1392034",
+      "raw_bytes": 4565,
+      "raw_sha256": "1bf34fc6dd2a2094e840ffca3972c66cbd5764cea4ede5d10adc02bfe299aa95",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "A",
+        "last": {
+          "confirmed_at": "2026-10-31T09:05:43.605317+00:00",
+          "created_at": "2026-10-31T09:05:24Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124496515964,
+          "job_name": "pages-publication-probe-41187232608-1",
+          "operation": "rollback-A",
+          "run_attempt": 1,
+          "run_id": 41187232608,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "A"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "B": "2026-11-15T09:05:43.605317+00:00",
+          "original": "2026-11-15T08:55:53.420378+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "restored-original": {
+      "contents_api_blob_sha": "04026583fb9cb7c8db18ce7ba1d1bdd95e12be17",
+      "raw_bytes": 4578,
+      "raw_sha256": "c6a8a0e0fcae6d1db5e12e2089cc65f440403b4490a96997f6b546edc0101387",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "original",
+        "last": {
+          "confirmed_at": "2026-10-31T09:07:02.594821+00:00",
+          "created_at": "2026-10-31T09:06:43Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124496785074,
+          "job_name": "pages-publication-probe-41187324619-1",
+          "operation": "restore-original",
+          "run_attempt": 1,
+          "run_id": 41187324619,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "original"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "A": "2026-11-15T09:07:02.594821+00:00",
+          "B": "2026-11-15T09:05:43.605317+00:00"
+        },
+        "schema": 1
+      }
+    },
+    "final-state": {
+      "contents_api_blob_sha": "04026583fb9cb7c8db18ce7ba1d1bdd95e12be17",
+      "raw_bytes": 4578,
+      "raw_sha256": "c6a8a0e0fcae6d1db5e12e2089cc65f440403b4490a96997f6b546edc0101387",
+      "state": {
+        "archives": {
+          "A": {
+            "asset": "A.tar",
+            "asset_id": 694852572,
+            "bytes": 399360,
+            "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+            "release_id": 429817445,
+            "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+          },
+          "B": {
+            "asset": "B.tar",
+            "asset_id": 694852573,
+            "bytes": 399360,
+            "manifest_sha256": "9d352ebeb6f8eb4f2bcf3281228d34f1a86c7776fd84ced9413aeacd99a8dbe1",
+            "release_id": 429817445,
+            "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+          },
+          "original": {
+            "asset": "original.tar",
+            "asset_id": 694852569,
+            "bytes": 399360,
+            "manifest_sha256": null,
+            "release_id": 429817445,
+            "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+          }
+        },
+        "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
+        "current": "original",
+        "last": {
+          "confirmed_at": "2026-10-31T09:07:02.594821+00:00",
+          "created_at": "2026-10-31T09:06:43Z",
+          "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+          "job_id": 124496785074,
+          "job_name": "pages-publication-probe-41187324619-1",
+          "operation": "restore-original",
+          "run_attempt": 1,
+          "run_id": 41187324619,
+          "step_name": "Publish Pages probe",
+          "step_number": 6,
+          "to": "original"
+        },
+        "pending": null,
+        "rejected_operations": [
+          {
+            "evidence_run_id": 41185758641,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:43:29Z",
+                "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+                "job_id": 124492241688,
+                "job_name": "pages-publication-probe-41185758641-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41185758641,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:50:10.510251+00:00"
+          },
+          {
+            "evidence_run_id": 41186232166,
+            "pages_status": {
+              "status": "deployment_failed"
+            },
+            "pending": {
+              "archives": {
+                "A": {
+                  "asset": "A.tar",
+                  "asset_id": 694852572,
+                  "bytes": 399360,
+                  "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+                  "release_id": 429817445,
+                  "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+                },
+                "original": {
+                  "asset": "original.tar",
+                  "asset_id": 694852569,
+                  "bytes": 399360,
+                  "manifest_sha256": null,
+                  "release_id": 429817445,
+                  "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+                }
+              },
+              "from": "original",
+              "operation": {
+                "created_at": "2026-10-31T08:50:33Z",
+                "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+                "job_id": 124493604633,
+                "job_name": "pages-publication-probe-41186232166-1",
+                "operation": "publish-A",
+                "run_attempt": 1,
+                "run_id": 41186232166,
+                "step_name": "Publish Pages probe",
+                "step_number": 6
+              },
+              "to": "A"
+            },
+            "public_readback": "original hashes matched; marker HTTP404",
+            "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+            "resolved_at": "2026-10-31T08:54:18.556308+00:00"
+          }
+        ],
+        "retired": {
+          "A": "2026-11-15T09:07:02.594821+00:00",
+          "B": "2026-11-15T09:05:43.605317+00:00"
+        },
+        "schema": 1
+      }
+    }
+  },
+  "terminal_rejections": {
+    "A-custom": {
+      "pages": {
+        "status": "deployment_failed"
+      },
+      "record": {
+        "pending": {
+          "archives": {
+            "A": {
+              "asset": "A.tar",
+              "asset_id": 694852572,
+              "bytes": 399360,
+              "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+              "release_id": 429817445,
+              "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+            },
+            "original": {
+              "asset": "original.tar",
+              "asset_id": 694852569,
+              "bytes": 399360,
+              "manifest_sha256": null,
+              "release_id": 429817445,
+              "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+            }
+          },
+          "from": "original",
+          "operation": {
+            "created_at": "2026-10-31T08:43:29Z",
+            "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+            "job_id": 124492241688,
+            "job_name": "pages-publication-probe-41185758641-1",
+            "operation": "publish-A",
+            "run_attempt": 1,
+            "run_id": 41185758641,
+            "step_name": "Publish Pages probe",
+            "step_number": 6
+          },
+          "to": "A"
+        },
+        "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+        "resolved_at": "2026-10-31T08:50:10.510251+00:00",
+        "pages_status": {
+          "status": "deployment_failed"
+        },
+        "public_readback": "original hashes matched; marker HTTP404",
+        "evidence_run_id": 41185758641
+      }
+    },
+    "A-prefix": {
+      "pages": {
+        "status": "deployment_failed"
+      },
+      "record": {
+        "pending": {
+          "archives": {
+            "A": {
+              "asset": "A.tar",
+              "asset_id": 694852572,
+              "bytes": 399360,
+              "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+              "release_id": 429817445,
+              "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+            },
+            "original": {
+              "asset": "original.tar",
+              "asset_id": 694852569,
+              "bytes": 399360,
+              "manifest_sha256": null,
+              "release_id": 429817445,
+              "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+            }
+          },
+          "from": "original",
+          "operation": {
+            "created_at": "2026-10-31T08:50:33Z",
+            "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+            "job_id": 124493604633,
+            "job_name": "pages-publication-probe-41186232166-1",
+            "operation": "publish-A",
+            "run_attempt": 1,
+            "run_id": 41186232166,
+            "step_name": "Publish Pages probe",
+            "step_number": 6
+          },
+          "to": "A"
+        },
+        "resolution": "rejected_after_confirmed_terminal_deployment_failed",
+        "resolved_at": "2026-10-31T08:54:18.556308+00:00",
+        "pages_status": {
+          "status": "deployment_failed"
+        },
+        "public_readback": "original hashes matched; marker HTTP404",
+        "evidence_run_id": 41186232166
+      }
+    }
+  },
+  "log_evidence": {
+    "queued-A1-failure-logs.txt": [
+      "pages-publication-probe-41186718473-1\tPrepare or recover\t2026-10-31T08:59:33.0702013Z     require(data[\"pending\"] is None, \"pending/unknown: run explicit recover before any new publish\")",
+      "pages-publication-probe-41186718473-1\tPrepare or recover\t2026-10-31T08:59:33.0706372Z RuntimeError: pending/unknown: run explicit recover before any new publish"
+    ],
+    "queued-A2-failure-logs.txt": [
+      "pages-publication-probe-41186723574-1\tPrepare or recover\t2026-10-31T08:59:44.2205427Z     require(data[\"pending\"] is None, \"pending/unknown: run explicit recover before any new publish\")",
+      "pages-publication-probe-41186723574-1\tPrepare or recover\t2026-10-31T08:59:44.2209002Z RuntimeError: pending/unknown: run explicit recover before any new publish"
+    ],
+    "B-attempt-2-logs.txt": [
+      "pages-publication-probe-41186621744-2\tPrepare or recover\t2026-10-31T09:06:16.7570365Z Stale/already confirmed operation: no deploy"
+    ]
+  },
+  "public_checks": {
+    "B-public-before-cancel.txt": "Public three base files and marker verified: B",
+    "B-public-after-recovery.txt": "Public three base files and marker verified: B",
+    "rollback-A-public.txt": "Public three base files and marker verified: A",
+    "A-public-after-stale-B.txt": "Public three base files and marker verified: A",
+    "restored-original-public.txt": "Public three base files and marker verified: original",
+    "legacy-original-public.txt": "Public three base files and marker verified: original"
+  },
+  "final": {
+    "pages": {
+      "url": "https://api.github.com/repos/dlubom/jktz-mapa/pages",
+      "status": "built",
+      "cname": null,
+      "custom_404": false,
+      "html_url": "https://dlubom.github.io/jktz-mapa/",
+      "build_type": "legacy",
+      "source": {
+        "branch": "gh-pages",
+        "path": "/"
+      },
+      "public": true,
+      "protected_domain_state": null,
+      "pending_domain_unverified_at": null,
+      "https_enforced": true
+    },
+    "policies": {
+      "total_count": 1,
+      "branch_policies": [
+        {
+          "id": 65003853,
+          "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k2NTAwMzg1Mw==",
+          "name": "gh-pages",
+          "type": "branch"
+        }
+      ]
+    },
+    "workflow": {
+      "id": 402595194,
+      "name": "Pages publication probe",
+      "path": ".github/workflows/pages-publication-probe.yml",
+      "state": "disabled_manually",
+      "html_url": "https://github.com/dlubom/jktz-mapa/blob/main/.github/workflows/pages-publication-probe.yml"
+    },
+    "main": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOVdilBq9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/refs/heads/main",
+      "object": {
+        "sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "type": "commit",
+        "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/commits/5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4"
+      }
+    },
+    "gh_pages": {
+      "ref": "refs/heads/gh-pages",
+      "node_id": "REF_kwDOVdilBrNyZWZzL2hlYWRzL2doLXBhZ2Vz",
+      "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/refs/heads/gh-pages",
+      "object": {
+        "sha": "12a6783bc09eda112f9f187f9df5825264bbf183",
+        "type": "commit",
+        "url": "https://api.github.com/repos/dlubom/jktz-mapa/git/commits/12a6783bc09eda112f9f187f9df5825264bbf183"
+      }
+    },
+    "prs": [],
+    "release": {
+      "id": 429817445,
+      "tag_name": "pages-publication-probe-20261031",
+      "name": "Pages publication probe 2026-10-31",
+      "draft": false,
+      "prerelease": false,
+      "created_at": "2026-10-31T08:41:08Z",
+      "html_url": "https://github.com/dlubom/jktz-mapa/releases/tag/pages-publication-probe-20261031"
+    },
+    "release_asset_readback": [
+      {
+        "name": "A",
+        "asset_id": 694852572,
+        "bytes": 399360,
+        "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+      },
+      {
+        "name": "B",
+        "asset_id": 694852573,
+        "bytes": 399360,
+        "sha256": "5c08535107ade4f176c7c226e1a042541497938839dcd36d94e48ed66d87bbcf"
+      },
+      {
+        "name": "original",
+        "asset_id": 694852569,
+        "bytes": 399360,
+        "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+      }
+    ],
+    "public_readback": [
+      {
+        "url": "https://dlubom.github.io/jktz-mapa/assets/index-Cq-JZLFy.js",
+        "http_status": 200,
+        "bytes": 382854,
+        "sha256": "68e3afe099dc9bc29fc3c228c3326907386dac252d0dddcf8a157a6a3b6f3ee2"
+      },
+      {
+        "url": "https://dlubom.github.io/jktz-mapa/assets/index-c_1sG1-7.css",
+        "http_status": 200,
+        "bytes": 5263,
+        "sha256": "3a2b8467811c3aa89ce93c07ec06cb0598e8c8c6e9570c10da44590ddfd08c77"
+      },
+      {
+        "url": "https://dlubom.github.io/jktz-mapa/index.html",
+        "http_status": 200,
+        "bytes": 1133,
+        "sha256": "47ec278c634efeb19b38d8f98bd470c6de9890f4edb52a225426b66ad76a586a"
+      },
+      {
+        "url": "https://dlubom.github.io/jktz-mapa/publication-probe.json",
+        "http_status": 404
+      }
+    ],
+    "state_blob_sha": "04026583fb9cb7c8db18ce7ba1d1bdd95e12be17",
+    "runs": [
+      {
+        "id": 41187324619,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41187232608,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41187188483,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41186880269,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41186723574,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "failure",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41186718473,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "failure",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41186621744,
+        "run_attempt": 2,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41186555255,
+        "run_attempt": 1,
+        "head_sha": "5dbf3f8f7a7842b2fc2fde8cf42a3bb413173cf4",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41186232166,
+        "run_attempt": 1,
+        "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+        "status": "completed",
+        "conclusion": "failure",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41185758641,
+        "run_attempt": 1,
+        "head_sha": "846a806ba1e9936efea869f6336ac18c81e0b9f6",
+        "status": "completed",
+        "conclusion": "failure",
+        "event": "workflow_dispatch"
+      },
+      {
+        "id": 41183308660,
+        "run_attempt": 1,
+        "head_sha": "12a6783bc09eda112f9f187f9df5825264bbf183",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "dynamic"
+      }
+    ]
+  },
+  "not_tested": [
+    "hard runner kill",
+    "interruption inside deploy POST without recorded step success",
+    "real Latest source selection and durable inputs manifests",
+    "cleanup or expiry after real 15 days",
+    "mobile browsers, memory, raster seams or resource release"
+  ]
+}

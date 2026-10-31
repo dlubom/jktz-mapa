@@ -1,8 +1,10 @@
 # Minimalna próba publikacji — aktualne API i ograniczenia
 
-Sprawdzenie: 2026-10-31. Tylko odczyty GitHuba, dokumentacji i kodu akcji.
-Nie zmieniono ustawień Pages, workflow ani gałęzi. Poniższa próba wymaga
-osobnej zgody; sprawdzenie API nie zalicza odzyskania po przerwaniu.
+Sprawdzenie: 2026-10-31, przed zgodą na próbę. Ten dokument zachowuje
+ówczesne odczyty GitHuba, dokumentacji i kodu akcji oraz przygotowany zakres.
+Późniejszą zgodę i rzeczywiste wyniki opisuje
+[raport próby GitHub](PAGES_PUBLICATION_GITHUB_TRIAL.md).
+Sam odczyt API nie zalicza odzyskania po przerwaniu.
 
 ## Fakty sprawdzone teraz
 

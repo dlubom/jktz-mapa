@@ -14,19 +14,22 @@ Najpierw przeczytaj obowiązujące AGENTS.md, jeśli istnieją, oraz:
 
 Starsze raporty wydajności/QGIS czytaj tylko dla potrzebnego kontekstu.
 
-**Uzupełnienie etapu 2026-10-31:** lokalną próbę opisaną niżej wykonano.
+**Etap zakończony 2026-10-31:** wykonano próbę lokalną, a po osobnej zgodzie
+użytkownika również ograniczoną próbę GitHub i przywrócenie sondy.
 Przed kontynuacją przeczytaj również [wyniki próby](doc/PAGES_PUBLICATION_PROBE.md),
 [aktualne ustalenia API](doc/PAGES_PUBLICATION_API_CHECK.md) oraz
-[konkretną próbę GitHub do zatwierdzenia](doc/probes/publication/GITHUB_TRIAL.md).
-Jej YAML znajduje się poza `.github/workflows` i nie został uruchomiony.
-Najbliższa decyzja dotyczy wyłącznie tej ograniczonej próby; brak zgody
-nadal blokuje zmiany publiczne. Ponowne wykonanie sondy lokalnej jest
-dozwolone. Poniższy opis zachowuje zakres i kryteria tego etapu.
+[raport rzeczywistej próby GitHub](doc/PAGES_PUBLICATION_GITHUB_TRIAL.md).
+[Procedura](doc/probes/publication/GITHUB_TRIAL.md) jest zapisem zatwierdzonej
+próby, nie poleceniem ponownej inicjalizacji. Workflow jest zainstalowany,
+lecz wyłączony w Actions. Release i gałąź ewidencji zostały zachowane.
+Ponowne wykonanie sondy lokalnej jest dozwolone. Kolejna zmiana publiczna
+i pełna aplikacja wymagają osobnego uzgodnienia.
 
 Stan przekazania: publiczna sonda TPN działa pod
 `https://dlubom.github.io/jktz-mapa/`, z osobnej gałęzi `gh-pages`.
-Jej commit to `12a6783bc09eda112f9f187f9df5825264bbf183`, wdrożenie
-`41183308660` zakończyło się sukcesem. To odrzucalna sonda, nie aplikacja
+Jej commit to `12a6783bc09eda112f9f187f9df5825264bbf183`. Pierwotna
+publikacja `41183308660` i końcowe przywrócenie paczki `41187324619`
+zakończyły się sukcesem. To odrzucalna sonda, nie aplikacja
 ani docelowy workflow danych. Chromium i desktopowy WebKit potwierdziły
 TPN w rzeczywistym EPSG:2180 bez proxy. Firefox nie wystartował w środowisku
 testowym; natywne Safari, iPhone 14 Pro i rzeczywisty Android nadal czekają
@@ -37,21 +40,21 @@ Pełny wariant podglądów i kafli WebP512 dla 814 planów zmierzono:
 ani pamięci procesu. Sumy archiwów i przypięte metadane sprawdzono;
 skrypty w `doc/probes/` są sondami, nie gotowymi importerami.
 
-**Najbliższy cel:** sprawdź prosty mechanizm publikacji, ponowień,
-współbieżności i odzyskania przerwania między deployem a zapisem ewidencji.
-Zacznij od konkretnej lokalnej próby stanów i kontrolowanych awarii:
-A→B→A, starszy build po rollbacku, brak przypięć przy Re-run, wersja bieżąca
-używana ponad 15 dni oraz wynik deployu `unknown`. Sprawdź proponowaną
-ochronę obu paczek i zakaz usuwania przy niejednoznacznym stanie.
-Atrapa API sprawdza logikę; nie dowodzi zachowania GitHub po przerwaniu runnera.
-Następnie przygotuj minimalną, recenzowalną próbę na GitHub, z dokładnym
-zakresem zmian i sposobem przywrócenia obecnej sondy. Nie kończ na ogólnym planie.
+**Potwierdzony wynik:** lokalnie 13/13 scenariuszy; na GitHub A→B→odzysk→A,
+dwie zachowane operacje w kolejce i ich blokada przez `pending`, bezczynny
+drugi odzysk, pominięty stary Re-run B oraz przywrócenie `original`.
+Odzysk potwierdzono po normalnym anulowaniu osobnego kroku oczekiwania
+**po zakończonym sukcesem deployu**. Nie dowodzi to odzysku po twardym
+zabiciu runnera ani utracie odpowiedzi wewnątrz POST. `unknown` nadal
+chroni obie paczki i blokuje kolejną publikację oraz kasowanie.
+Latest/przypięcia pełnych źródeł, długą retencję i cleanup sprawdzał tylko
+model lokalny. Nie zaliczaj ich jako testu produkcyjnego workflow.
 
 Możesz aktualizować dokumentację i wykonywać lokalne odrzucalne próby.
-Dotychczasowa zgoda publiczna dotyczyła tylko sondy TPN. Zmiana działających
-Pages, uruchomienie nowej próby publikacji oraz pełna aplikacja/produkcyjny
-workflow wymagają osobnego uzgodnienia. Przygotuj konkretny wynik przed
-pytaniem o zgodę. Sąsiednie repozytoria są tylko do odczytu; przyszły workflow
+Dotychczasowe zgody publiczne objęły sondę TPN oraz zakończoną ograniczoną
+próbę publikacji. Kolejna zmiana działających Pages, nowa próba oraz pełna
+aplikacja/produkcyjny workflow wymagają osobnego uzgodnienia. Przygotuj
+konkretny wynik przed pytaniem o zgodę. Sąsiednie repozytoria są tylko do odczytu; przyszły workflow
 ma działać bez lokalnych checkoutów. README pozostaje bez nowych informacji
 i linków do Pages; istniejące 3D pozostaje bez zmian.
 
@@ -70,8 +73,9 @@ swoje rekomendacje. Po uzgodnieniu implementacji ustal granice testów,
 stosuj `mattpocock-skills:tdd` dla istotnych zachowań
 i `mattpocock-skills:code-review` do zmian.
 
-Zakończ etap wynikiem lokalnych prób, przygotowaną próbą GitHub i krótką
-listą nadal brakujących dowodów. Nie zaliczaj brakującego testu przez
+Ten etap zakończono raportem lokalnym i raportem GitHub z dowodami.
+Przed następnym etapem uzgodnij jego konkretny zakres; nie rozpoczynaj
+pełnej aplikacji na podstawie zgody na sondę. Nie zaliczaj brakującego testu przez
 emulację, fallback ani brak zauważonej awarii. Poza publikacją pozostają
 szwy/gutter, nakładanie planów, zwalnianie zasobów i pamięć rzeczywistych
 telefonów; nie mieszaj tych luk z potwierdzonymi wynikami.

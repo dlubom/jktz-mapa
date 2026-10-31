@@ -1,7 +1,7 @@
 # Mapa JKTZ 2D — specyfikacja robocza po przeglądzie
 
-Aktualizacja: 2026-10-31. Etap: dopracowanie projektu i lokalne próby
-techniczne, przed pełną implementacją.
+Aktualizacja: 2026-10-31. Etap: dopracowanie projektu oraz lokalne
+i osobno zatwierdzone próby GitHub, przed pełną implementacją.
 Uzgodnione wymagania opisano oddzielnie od propozycji technicznych i kwestii
 wymagających dowodów. Dokument nie zatwierdza całej implementacji.
 
@@ -17,9 +17,16 @@ nie wdraża docelowego workflow danych i rollbacku.
 
 Lokalny model publikacji, retencji, rollbacku i odzysku sprawdzono następnie
 kontrolowanymi awariami. [Wyniki i przygotowana próba GitHub](PAGES_PUBLICATION_PROBE.md)
-oddzielają dowód lokalny od nadal niewykonanej próby Actions/Pages.
-Kandydat workflow pozostaje nieaktywny i wymaga osobnej zgody; pozostałe
-uzgodnienia i granice implementacji nie ulegają zmianie.
+oddzielają dowód lokalny od [osobno zatwierdzonej próby Actions/Pages](PAGES_PUBLICATION_GITHUB_TRIAL.md).
+Potwierdzono kolejkę dwóch oczekujących runów, blokadę przez `pending`
+oraz odzysk B po anulowaniu runu **po ukończonym kroku deployu**.
+Powtórny odzysk nie uruchomił deployu ani nie zmienił bajtów i SHA ewidencji.
+Rollback A zakończył się sukcesem, a ponowiony stary B pominięto bez deployu
+i zmiany ewidencji. Próbę zakończono wdrożeniem paczki oryginału,
+przywróceniem Pages do `legacy`, źródła `gh-pages:/` i pierwotnej reguły
+środowiska; workflow próby wyłączono. Publiczne pliki są zgodne, marker
+próby zwraca 404. Nie jest to gwarancja odzysku przerwania wewnątrz deployu.
+Pełna aplikacja i produkcyjny workflow nadal wymagają osobnej zgody.
 
 ## Uzgodniony zakres i miejsce projektu
 
@@ -535,6 +542,12 @@ wcześniejszy oczekujący rollback. Buildy mogą biec równolegle, ale zmiana
 strony i ewidencji jest szeregowa. Kolejność wejścia do grupy nie dowodzi
 kolejności uruchomienia workflow.
 
+W zatwierdzonej próbie GitHub dwa runy pozostały jednocześnie `pending`
+za trwającym B; po jego anulowaniu oba dotarły do wykonania i zatrzymały
+się przed deployem z powodu nieuzgodnionego `pending` ewidencji.
+To dowód zachowania tej kolejki i blokady, bez testu limitu 100 operacji
+ani zmian administracyjnych poza workflow. [Dziennik próby](PAGES_PUBLICATION_GITHUB_TRIAL.md).
+
 Pod blokadą porównujemy pierwotne `created_at` operacji z ostatnią zakończoną
 publikacją/rollbackiem. Starszy przebieg kończy się jawnym „pominięto —
 zastąpiony nowszą operacją”, bez publikacji. `run_id` nie jest udokumentowanym
@@ -562,20 +575,29 @@ strony. Przy sprzecznym/nieznanym wyniku zatrzymuje dalszą publikację
 i sprzątanie, zachowując paczki. Błąd testu adresu po potwierdzonym deployu
 nie zmienia historii zastąpienia i nie powoduje automatycznego rollbacku.
 
-**Niezamknięte ryzyko techniczne, uściślone 2026-10-31:** sprawdzone
+**Odzysk — potwierdzony zakres i pozostałe ryzyko, 2026-10-31:** sprawdzone
 `actions/deploy-pages` v5.0.1 nie ma outputu deployment ID; `page_url`
 powstaje przed końcowym sukcesem. SHA aplikacji także nie identyfikuje
-jednoznacznie wdrożenia danych lub rollbacku. Najpierw testujemy prostszą
-rekomendację: `pending` utrwala `run_id`, `run_attempt`, job i nazwę kroku;
+jednoznacznie wdrożenia danych lub rollbacku. Sprawdzona ścieżka używa
+`pending`, który utrwala `run_id`, `run_attempt`, numeryczne ID joba,
+head SHA oraz numer i nazwę kroku;
 po przerwaniu **po ukończeniu kroku deploy** Actions Jobs API potwierdza
 sukces tego konkretnego kroku, a odczyt strony zgodność paczki. Dopiero
 wtedy uzgadniamy ewidencję. Bez `continue-on-error` na kroku publikacji.
 
-Przerwanie **wewnątrz kroku**, timeout/cancel, brak historii lub sprzeczny
+W [próbie GitHub](PAGES_PUBLICATION_GITHUB_TRIAL.md) B anulowano podczas
+pauzy po udanym kroku 6. Mimo anulowanego joba historia tego kroku
+zachowała `success`; jawny odzysk potwierdził jego tożsamość, oba archiwa
+i publiczne bajty B, po czym uzgodnił ewidencję bez nowego deployu.
+Powtórny odzysk nie przesunął czasu ochrony. To test anulowania runu
+po sukcesie kroku, nie twardego zabicia runnera.
+
+Przerwanie **wewnątrz kroku**, timeout/cancel bez potwierdzonego sukcesu,
+brak historii lub sprzeczny
 odczyt pozostają `unknown`: obie paczki chronione, dalsza publikacja
 i usuwanie zatrzymane do rozpoznania. Nie ponawiamy POST w ciemno.
-Ta ścieżka wymaga rzeczywistej próby na GitHub; nie jest potwierdzoną
-gwarancją odzyskania. Potwierdzona awaria przed publikacją nie uruchamia
+Próba nie daje gwarancji odzyskania tych przypadków. Potwierdzona awaria
+przed publikacją nie uruchamia
 retencji poprzedniej wersji. [Kod, API i scenariusze](PAGES_PUBLICATION_RESEARCH.md).
 
 ### Limity publikacji i źródła kontraktu
@@ -675,8 +697,9 @@ Runda z 2026-10-30 i jej doprecyzowanie zapisały ustalenia użytkownika:
 Pozostałe uzupełnienia techniczne są rekomendacjami opartymi na wskazanych
 źródłach. Nie stanowią zatwierdzenia całej specyfikacji ani zgody na pełną
 implementację aplikacji. Użytkownik osobno dopuścił lokalne sondy,
-publikację konkretnej sondy TPN oraz zapis dokumentacji i sond w repo.
-Nowa próba publikacji i produkcyjny workflow wymagają osobnego uzgodnienia.
+publikację konkretnej sondy TPN, zapis dokumentacji i sond w repo oraz
+[ograniczoną próbę publikacji i odzysku na GitHubie](PAGES_PUBLICATION_GITHUB_TRIAL.md).
+Pełna aplikacja i produkcyjny workflow wymagają osobnego uzgodnienia.
 
 | Gałąź projektu | Co już ustalono/sprawdzono | Zależność i sposób zamknięcia |
 | --- | --- | --- |
@@ -686,7 +709,7 @@ Nowa próba publikacji i produkcyjny workflow wymagają osobnego uzgodnienia.
 | Czytelność | Wszystkie nazwy Best, bez ukrywania kolizji | Sprawdzić gęste widoki i wybór obiektu, zachowując decyzję. Układ panelu mobilnego pozostaje propozycją. |
 | Odbiór mobilny | iPhone 14 Pro wskazany; Android/Chrome nadal wymagany | Wskazać rzeczywisty Android; ustalić mierzalne progi po próbie referencyjnej. Brak urządzenia/pomiaru pozostaje brakiem dowodu. |
 | Jedno kliknięcie / Re-run | Nowy klik sprawdza aktualne Latest i wdraża dostępne nowe wydania; przypięcie i trwały manifest dotyczą pojedynczego runu oraz jego Re-run | Nowe Latest jednego źródła między kliknięciami; zmiana Latest podczas runu i przed Re-run; błędy zapisu, brak assetu i niezgodna suma. |
-| Rollback | Gotowa paczka, 15 dni od zastąpienia; ewidencja i wspólna blokada; propozycja odzysku przez konkretny krok Actions | Prawdziwe próby A→B→A, starego buildu po rollbacku, przerwania po deployu i długotrwałej wersji. Jobs API/manifest nadal nieprzetestowane; unknown chroni obie paczki. |
+| Publikacja i rollback | Na GitHubie potwierdzono A→B→A, kolejkę, blokadę `pending`, odzysk po anulowaniu za udanym krokiem deployu, idempotentny powtórny odzysk i pominięcie starego B po rollbacku. Przywrócono oryginalną paczkę i ustawienia Pages; workflow próby wyłączono. | Długotrwała retencja, twardy kill, unknown wewnątrz POST i kasowanie nadal bez dowodu integracyjnego. To nie test Latest ani pełnego workflow danych. |
 
 ### Kryteria gotowości do dalszych prac
 
@@ -696,8 +719,10 @@ Nowa próba publikacji i produkcyjny workflow wymagają osobnego uzgodnienia.
   ich wyniki nie zastępują odbioru. Minimalną paczkę TPN następnie
   zatwierdzono i opublikowano na publicznym Pages. To nadal sonda techniczna.
 - Dowód renderowania TPN na docelowym hostingu uzyskano dla badanych
-  silników desktopowych. Przed pełną implementacją pozostaje sprawdzenie
-  proponowanego odzyskiwania przerwanego deployu i osobna zgoda na ten etap. Próby
+  silników desktopowych. Potwierdzono także odzysk po anulowaniu runu
+  za ukończonym krokiem deployu, rollback i blokadę starego runu. Próbę
+  zakończono odczytem przywróconej oryginalnej paczki i ustawień Pages.
+  Pełna implementacja wymaga osobnej zgody. Próby
   uzasadniają format WebP512 jako rekomendację; jakość brzegów i gęstych
   widoków oraz pełny rozmiar strony nadal wymagają weryfikacji.
   Każdy wynik ma zawierać warunki testu i ograniczenia.

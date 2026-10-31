@@ -1,8 +1,9 @@
 # Lokalna próba publikacji i kandydat próby GitHub
 
-Data: 2026-10-31. Etap: odrzucalna sonda mechanizmu publikacji, przed
-implementacją aplikacji. Zdalne działania w tym etapie są tylko odczytami.
-Nie włączono workflow ani nie zmieniono działających Pages.
+Data: 2026-10-31. Ten raport zachowuje wynik lokalnego przygotowania,
+**sprzed zgody na próbę GitHub**. Na tym etapie zdalne działania były tylko
+odczytami. Późniejsze zatwierdzenie, wykonanie i przywrócenie opisuje
+[osobny raport GitHub](PAGES_PUBLICATION_GITHUB_TRIAL.md).
 
 ## Punkt wyjścia sprawdzony na żywo
 
@@ -70,14 +71,15 @@ publikacji, używając oryginalnej próby Actions i odczytu strony.
 Nie ma podstaw do automatycznego ponawiania deployu przy `unknown`.
 Utrata odpowiedzi zapisu ewidencji nie powinna oznaczać ponownej publikacji.
 
-## Konkretny kandydat GitHub — nieuruchomiony
+## Kandydat GitHub przygotowany do zatwierdzenia
 
 [Procedura do zatwierdzenia](probes/publication/GITHUB_TRIAL.md),
 [nieaktywny YAML](probes/publication/github-candidate.yml),
 [skrypt operacji](probes/publication/github_probe.py),
 [przygotowanie paczek](probes/publication/prepare_packages.py) i
 [przypięte sumy](probes/publication/packages.json) stanowią komplet do
-przeglądu. YAML jest w `doc/probes`, poza `.github/workflows`.
+przeglądu. W chwili przygotowania YAML był wyłącznie w `doc/probes`;
+po zgodzie zainstalowano jego kopię w `.github/workflows`.
 
 Minimalna próba używa obecnej sondy, bez buildu mapy i pobierania danych
 trzech repozytoriów. Paczki A i B zachowują HTML, JS, CSS oraz `.nojekyll`

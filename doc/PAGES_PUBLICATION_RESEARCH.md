@@ -1,19 +1,26 @@
 # Publikacja Pages — weryfikacja kontraktu
 
-**Uzupełnienie 2026-10-31:** wykonano lokalną sondę stanów i kontrolowanych
-awarii oraz przygotowano nieaktywny kandydat próby GitHub. Wyniki i granice:
-[raport próby](PAGES_PUBLICATION_PROBE.md). Aktualną semantykę API ponownie
-sprawdzono w [notatce API](PAGES_PUBLICATION_API_CHECK.md). Próba lokalna
-nie zalicza opisanych poniżej testów integracyjnych na GitHubie.
+**Uzupełnienie 2026-10-31:** po [lokalnej sondzie stanów](PAGES_PUBLICATION_PROBE.md)
+i [ponownym sprawdzeniu API](PAGES_PUBLICATION_API_CHECK.md) użytkownik
+zatwierdził ograniczoną [próbę GitHub](PAGES_PUBLICATION_GITHUB_TRIAL.md).
+Potwierdzono kolejkę dwóch oczekujących runów, blokadę przez `pending`,
+odzysk po anulowaniu B za ukończonym krokiem deployu i powtórny odzysk
+bez deployu oraz zmiany bajtów/SHA ewidencji. Potwierdzono także rollback A,
+pominięcie starego B po rollbacku i ponowny deploy oryginalnej paczki.
+Próbę zakończono przywróceniem ustawień Pages i odczytem publicznych plików;
+workflow próby wyłączono, a tymczasową regułę środowiska usunięto.
+Twardy kill i nieznany wynik wewnątrz POST pozostają odrębnymi lukami.
+To nie zgoda na pełną aplikację ani produkcyjny workflow.
 
-**Późniejszy stan z 2026-10-31:** po osobnej zgodzie opublikowano
+**Wcześniejszy etap z 2026-10-31:** po osobnej zgodzie opublikowano
 [minimalną sondę TPN](PAGES_BROWSER_PROBE.md) z gałęzi `gh-pages`.
 Poniższe odczyty i wnioski opisują badanie sprzed tej publikacji.
-Publikacja sondy nie testuje docelowego workflow, retencji ani odzysku
-przerwania i nie zmienia statusu poniższych scenariuszy integracyjnych.
+Sama publikacja TPN nie testowała docelowego workflow, retencji ani odzysku
+przerwania. Nowszy, wąski dowód odzysku pochodzi z osobnej próby powyżej.
 
-Data: 2026-10-31. Etap projektowy. Wykonano odczyty dokumentacji, kodu
-oficjalnej akcji i API; nie utworzono workflow, wydania ani strony.
+Pierwotne badanie z 2026-10-31 obejmowało odczyty dokumentacji, kodu
+oficjalnej akcji i API; na tamtym etapie nie utworzono workflow, wydania
+ani strony. Odczyty stanu repo poniżej są historyczne.
 
 **Wniosek:** wystarczą artefakt przypięć dla runu, gotowe paczki w Releases
 i jeden plik ewidencji. Zwykłe wdrożenie może pozostać jednym kliknięciem.
@@ -161,17 +168,49 @@ Odzyskiwanie wyłącznie przez SHA aplikacji byłoby niejednoznaczne.
 Nie wolno też mylić ogólnego deploymentu środowiska GitHub z identyfikatorem
 konkretnego wdrożenia Pages bez dowodu ich powiązania.
 
-### Najprostsza ścieżka do sprawdzenia
+### Odzysk po ukończonym kroku — potwierdzony zakres
 
-**Wniosek z kodu i API, jeszcze nie wynik testu:** przerwanie po udanym
-kroku deploy, lecz przed zapisem ewidencji można próbować uzgodnić bez
-forka akcji. [Jobs API dla konkretnej próby](https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt)
+**Wynik ograniczonej próby GitHub:** anulowanie runu po udanym kroku
+deployu, lecz przed zapisem ewidencji uzgodniono bez forka akcji.
+[Jobs API dla konkretnej próby](https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt)
 zwraca joby i `steps[].conclusion`. Trwały `pending` pozwala odszukać
 właściwy job/krok, sprawdzić jego `success` i porównać identyfikator oraz
 hash manifestu strony z oczekiwaną paczką. Zapisać późniejszy czas
 potwierdzenia, dzięki czemu okres ochrony się nie skróci. Publikacja musi
 być osobnym krokiem przypiętej akcji, bez `continue-on-error`; odnalezienie
 właściwego kroku nie może polegać na wyborze ostatniego zielonego joba.
+
+W [runie B 41186621744](https://github.com/dlubom/jktz-mapa/actions/runs/41186621744),
+próba 1, job `124494742113`, krok 6 `Publish Pages probe` zakończył się
+`success`. Następującą po nim pauzę anulowano; cały job/run był anulowany,
+a zapis potwierdzenia pominięty. Run odzysku
+[41186880269](https://github.com/dlubom/jktz-mapa/actions/runs/41186880269)
+potwierdził dokładną tożsamość kroku, oba archiwa oraz publiczny marker
+i trzy bazowe pliki, po czym ustawił `current=B` bez nowego deployu.
+Powtórny odzysk
+[41187188483](https://github.com/dlubom/jktz-mapa/actions/runs/41187188483)
+zachował identyczne bajty i blob SHA ewidencji, w tym czas ochrony.
+Przyszły krok deployu był też widoczny w Jobs API przed zapisem `pending`.
+
+Dwa runy oczekujące za B pozostały jednocześnie w kolejce `pending`;
+po anulowaniu B oba zatrzymała nierozwiązana operacja w ewidencji,
+bez nowego deployu. Szczegółowe ID i dowody są w
+[dzienniku próby](PAGES_PUBLICATION_GITHUB_TRIAL.md). To dowód kolejki
+i jawnego odzysku po ukończonym kroku; nie test nagłej utraty runnera,
+limitu kolejki ani automatycznego rozpoznania nieznanego wyniku POST.
+
+Rollback [41187232608](https://github.com/dlubom/jktz-mapa/actions/runs/41187232608)
+przywrócił A z gotowego archiwum. Ponowienie B `41186621744`, próba 2,
+pominęło deploy jako starszą operację; publiczne A i bajty/SHA ewidencji
+pozostały bez zmian. Run
+[41187324619](https://github.com/dlubom/jktz-mapa/actions/runs/41187324619)
+wdrożył oryginalną paczkę i pomyślnie sprawdził jej publiczne pliki.
+Następnie przywrócono Pages `legacy` ze źródłem `gh-pages:/`, wyłączono
+workflow próby i usunięto wyłącznie tymczasową regułę `main` ID `65006113`.
+Lista reguł jest identyczna jak przed próbą, z zachowaną regułą `gh-pages`
+ID `65003853`; trzy publiczne pliki są zgodne z oryginałem, a marker
+zwraca 404. Nie pozostały aktywne runy; Re-run starego dynamicznego
+workflow nie był potrzebny. Release, archiwa i gałęzie zachowano.
 
 Nie wystarcza zielony cały workflow ani sam manifest strony. Przerwanie
 wewnątrz kroku może nastąpić po zaakceptowanym POST, zanim ID lub sukces
@@ -191,22 +230,29 @@ pełne odzyskiwanie lub implementować własny orkiestrator publikacji.
 
 ## Testy przed uznaniem mechanizmu za gotowy
 
-Żadnego poniższego testu integracyjnego nie wykonano. Wymagają później
-osobno dopuszczonego workflow i testowego wdrożenia Pages.
+Poniżej rozdzielono potwierdzony zakres próby GitHub od scenariuszy,
+które nadal wymagają dowodów. Próby lokalne nie zaliczają brakujących
+scenariuszy integracyjnych. Ograniczona próba GitHub została zakończona;
+pełna implementacja i produkcyjny workflow wymagają osobnej zgody.
 
-| Próba | Wymagany wynik |
-| --- | --- |
-| Nowe Latest jednego źródła między kliknięciami | Nowy run pobiera je, zachowując aktualne Latest pozostałych źródeł. |
-| Latest zmienia się przed Re-run każdego rodzaju | Zero ponownych odczytów Latest; identyczne przypięcia. |
-| Przerwanie przed/po uploadzie przypięć, utrata odpowiedzi | Użycie wyłącznie kompletnego zapisu albo jawny nakaz nowego runu. |
-| Zmieniony/usunięty asset, niezgodny hash gotowej paczki | Błąd bez wyboru zastępstwa i bez deployu. |
-| Dwa buildy oraz rollback w odwrotnej kolejności ukończenia | Jedna publikacja naraz; stary run nie nadpisuje późniejszej zakończonej operacji. |
-| A działa 120 dni, potem A→B→A→B | A jest dostępne przez cały czas używania; każde zastąpienie daje nowe pełne 15 dni. |
-| Kill po sukcesie kroku deploy, przed aktualizacją ewidencji | Jobs API wskazuje dokładny krok/próbę; zgodny odczyt paczki pozwala uzgodnić stan. |
-| Kill wewnątrz deployu po POST; brak ID, timeout/cancel | Obie paczki zachowane; unknown blokuje publikację i usuwanie. |
-| Dwie paczki przy tym samym SHA aplikacji | Nigdy nie wybieramy wdrożenia wyłącznie po SHA. |
-| Konflikt/utrata odpowiedzi zapisu ewidencji; niedostępna historia | Odczyt i uzgodnienie albo zatrzymanie; brak skrócenia ochrony. |
+| Próba | Wymagany wynik | Dowód integracyjny |
+| --- | --- | --- |
+| Nowe Latest jednego źródła między kliknięciami | Nowy run pobiera je, zachowując aktualne Latest pozostałych źródeł. | Brak; próba używa wcześniej przypiętych A/B. |
+| Latest zmienia się przed Re-run każdego rodzaju | Zero ponownych odczytów Latest; identyczne przypięcia. | Brak. |
+| Przerwanie przed/po uploadzie przypięć, utrata odpowiedzi | Użycie wyłącznie kompletnego zapisu albo jawny nakaz nowego runu. | Brak. |
+| Zmieniony/usunięty asset, niezgodny hash gotowej paczki | Błąd bez wyboru zastępstwa i bez deployu. | Brak celowej mutacji assetów; poprawne archiwa zweryfikowano. |
+| Dwa oczekujące runy za aktywnym deployem | Oba zachowane; nierozwiązany `pending` blokuje kolejne publikacje. | Potwierdzone na GitHubie dla dwóch runów. |
+| Dwa buildy oraz rollback w odwrotnej kolejności ukończenia | Jedna publikacja naraz; stary run nie nadpisuje późniejszej zakończonej operacji. | Kolejka, rollback A i pominięcie starego Re-run B potwierdzone. Próba nie obejmuje równoległych buildów nowych danych. |
+| A działa 120 dni, potem A→B→A→B | A jest dostępne przez cały czas używania; każde zastąpienie daje nowe pełne 15 dni. | Brak próby długotrwałej; odzysk B zapisał ochronę A od czasu potwierdzenia. |
+| Anulowanie runu po sukcesie kroku deploy, przed aktualizacją ewidencji | Jobs API wskazuje dokładny krok/próbę; zgodny odczyt paczki pozwala uzgodnić stan. | Potwierdzone dla B; drugi recover bez deployu i zmiany ewidencji. |
+| Twardy kill runnera po sukcesie kroku | Uzgodnienie na podstawie trwałej historii i publicznych bajtów. | Brak; cancel runu nie zastępuje hard kill. |
+| Kill wewnątrz deployu po POST; brak ID, timeout/cancel | Obie paczki zachowane; unknown blokuje publikację i usuwanie. | Brak testu integracyjnego nieznanego wyniku POST. |
+| Dwie paczki przy tym samym SHA aplikacji | Nigdy nie wybieramy wdrożenia wyłącznie po SHA. | A i B użyły tego samego SHA; odzysk wskazał konkretny run/attempt/job/krok B. |
+| Konflikt/utrata odpowiedzi zapisu ewidencji; niedostępna historia | Odczyt i uzgodnienie albo zatrzymanie; brak skrócenia ochrony. | Brak kontrolowanej awarii GitHub API; tylko sonda lokalna. |
+| Usuwanie zastąpionych paczek | Brak usuwania bieżących i niejednoznacznych; pełne okno ochrony. | Brak; próba celowo nie usuwa paczek. |
 
 Próby lokalne z atrapą API mogą sprawdzić logikę stanów i retencji.
-Nie potwierdzą zachowania GitHub podczas zabicia runnera, zapisu wyników
-kroków, propagacji Pages ani czasu dostępności historii po awarii.
+Nie potwierdzą zachowania GitHub podczas zabicia runnera ani trwałości
+historii po dowolnej awarii. Wykonana część próby GitHub potwierdza
+zachowanie wyniku ukończonego kroku po anulowaniu i zgodny odczyt publicznej
+paczki w tym scenariuszu; nie rozszerza tego wyniku na inne awarie.

@@ -1,9 +1,13 @@
-# Nieaktywny kandydat próby GitHub
+# Procedura zatwierdzonej próby GitHub
 
-Stan przygotowania: 2026-10-31. **Nie uruchomiono próby.** YAML jest tutaj,
-poza `.github/workflows`. Poniższe polecenia zdalnego zapisu wolno wykonać
-dopiero po zgodzie na cały wymieniony zakres. Lokalna atrapa zaliczyła
-13 scenariuszy (`local-results.json`); to nie jest dowód zachowania GitHuba.
+Procedurę przygotowano i zatwierdzono 2026-10-31. Rzeczywisty przebieg,
+odstępstwa i wynik przywrócenia zapisano w
+[raporcie wykonania](../../PAGES_PUBLICATION_GITHUB_TRIAL.md).
+Kopia YAML została zainstalowana w `.github/workflows` do tej ograniczonej
+próby. Poniższe polecenia zachowują procedurę; nie należy ponownie
+inicjalizować istniejącego release ani ewidencji. Kolejna próba zmieniająca
+Pages wymaga nowego uzgodnienia. Lokalna atrapa zaliczyła 13 scenariuszy
+(`local-results.json`); jej wynik pozostaje odrębny od dowodu GitHub.
 
 ## Konkretny zakres do zatwierdzenia
 
@@ -67,7 +71,7 @@ attempt, head SHA, numeryczne job ID, unikalną nazwę joba i krok nr 6
 sprawdzenia tej liczby. Historia jest pobierana z paginowanego endpointu
 **konkretnej próby**. Zielony cały job nie jest warunkiem odzysku.
 
-Do sprawdzenia na GitHubie pozostaje widoczność przyszłego kroku nr 6
+Próba GitHub potwierdziła widoczność przyszłego kroku nr 6
 już w fazie zapisu `pending`. Runtime czeka na nią najwyżej sześć
 odczytów z odstępem pięciu sekund; brak/wieloznaczność zatrzymują próbę
 przed deployem. Odzysk ponownie sprawdza oba zachowane archiwa.
