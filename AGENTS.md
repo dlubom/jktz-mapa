@@ -19,7 +19,9 @@ Dane przygotowuje Python z GDAL; aplikacja działa bez backendu i QGIS.
 - Zachowuj źródłowe współrzędne, Z, metadane, niepewności i jawne relacje.
   Powiązania wynikają z ID, nie podobieństwa nazw. Pomiar identyfikuje para `(object_id, id)`.
   Mapa nie poprawia źródeł ani nie przesuwa planów do pozycji Best.
-- Początkowo: Best z wszystkimi nazwami, ciągi JKTZ i plany włączone;
+- Początkowo: Best, ciągi JKTZ i plany włączone; wszystkie punkty Best są widoczne,
+  kolidujące nazwy są ukrywane, a wybrany obiekt zawsze ma etykietę.
+  Opcja „Pokaż wszystkie nazwy” jest domyślnie wyłączona;
   pozostałe/odrzucone pomiary i różnice wyłączone. Podkład TPN 2020, zapasowo OSM.
   TPN korzysta z XYZ/Canvas bez `crossOrigin`; sprawdzaj jego działanie także na Pages.
 - Plany mają domyślnie 75% krycia i ładują się według skali oraz widoku.
