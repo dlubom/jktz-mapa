@@ -4,6 +4,8 @@ import TileLayer from 'ol/layer/Tile.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
 import XYZ from 'ol/source/XYZ.js';
+import TileWMS from 'ol/source/TileWMS.js';
+import {createXYZ} from 'ol/tilegrid.js';
 import OSM from 'ol/source/OSM.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import Feature from 'ol/Feature.js';
@@ -23,7 +25,7 @@ const pointStyle=(color:string,radius:number)=>new Style({image:new Circle({radi
 export class MapController {
   map:Map;plans:Plans;
   osm=new TileLayer({source:new OSM(),zIndex:0});
-  tpn=new TileLayer<XYZ>({zIndex:1,maxResolution:6});
+  tpn=new TileLayer<XYZ|TileWMS>({zIndex:1,maxResolution:6});
   best:VectorLayer; other:VectorLayer; rejected:VectorLayer; differences:VectorLayer;
   modelsEnabled=true;hiddenModels=new Set<string>();
   selectedId:string|null=null;
@@ -60,16 +62,26 @@ export class MapController {
     const old=this.tpn.getSource();
     this.tpn.setVisible(name!=='osm');this.report('','tpn');
     if(name==='osm'){this.tpn.setSource(null);old?.dispose();return;}
-    const source=new XYZ({url:`https://tpn.obliview.com/Data/${name}/{z}/{x}/{y}.jpg`,minZoom:15,maxZoom:20,projection:'EPSG:3857',wrapX:false,transition:0,attributions:'© <a href="https://tpn.gov.pl/" target="_blank" rel="noopener">Tatrzański Park Narodowy</a> / Obliview'});
+    const geology=name==='smgt_a_zakryta'||name==='smgt_b_odkryta';
+    const source=geology?new TileWMS({
+      url:`https://cbdgmapa.pgi.gov.pl/arcgis/services/kartografia/${name}/MapServer/WMSServer`,
+      // WMS 1.1.1 keeps easting/northing; 1.3.0 uses northing/easting for EPSG:2180.
+      params:{LAYERS:name==='smgt_a_zakryta'?'0,1,2,3,4,5':'0,1,2,3,4',VERSION:'1.1.1',FORMAT:'image/png',TRANSPARENT:true},
+      projection:'EPSG:2180',hidpi:false,wrapX:false,transition:0,
+      // SMGT is visible below scale 1:23623 (~6.6 m/px); keep every tile within it.
+      tileGrid:createXYZ({extent:[0,0,1000000,1000000],maxResolution:6,maxZoom:10}),
+      attributions:'© <a href="https://baza.pgi.gov.pl/cbdg/geoportal/uslugi/gis" target="_blank" rel="noopener">PIG-PIB · SMGT 1:10 000</a>'
+    }):new XYZ({url:`https://tpn.obliview.com/Data/${name}/{z}/{x}/{y}.jpg`,minZoom:15,maxZoom:20,projection:'EPSG:3857',wrapX:false,transition:0,attributions:'© <a href="https://tpn.gov.pl/" target="_blank" rel="noopener">Tatrzański Park Narodowy</a> / Obliview'});
+    this.tpn.setExtent(geology?[554473.3,144619.81,586394.36,163549.92]:undefined);
     source.on('tileloaderror',event=>{
       if(source!==this.tpn.getSource())return;
-      const coordinate=event.tile.getTileCoord();this.tpnFailures.set(coordinate.join('/'),source.getTileGrid()!.getTileCoordExtent(coordinate) as Extent);this.basemapWarning();
+      const coordinate=event.tile.getTileCoord();this.tpnFailures.set(coordinate.join('/'),transformExtent(source.getTileGrid()!.getTileCoordExtent(coordinate),source.getProjection()!,'EPSG:3857') as Extent);this.basemapWarning();
       if(this.tpnRetries<1&&!this.tpnTimer)this.tpnTimer=setTimeout(()=>{this.tpnTimer=undefined;this.tpnRetries++;this.setBasemap(name,true);},2000);
     });
     source.on('tileloadend',event=>{if(source!==this.tpn.getSource())return;this.tpnFailures.delete(event.tile.getTileCoord().join('/'));this.basemapWarning();});
     this.tpn.setSource(source);old?.dispose();
   }
-  private basemapWarning(){const extent=transformExtent(this.map.getView().calculateExtent(this.map.getSize()),'EPSG:2180','EPSG:3857') as Extent;const failed=this.tpnName!=='osm'&&this.map.getView().getResolution()!<6&&[...this.tpnFailures.values()].some(e=>intersects(e,extent));this.report(failed?'Część podkładu TPN jest niedostępna. W lukach widoczny jest OSM.':'','tpn');}
+  private basemapWarning(){const extent=transformExtent(this.map.getView().calculateExtent(this.map.getSize()),'EPSG:2180','EPSG:3857') as Extent;const failed=this.tpnName!=='osm'&&this.map.getView().getResolution()!<6&&[...this.tpnFailures.values()].some(e=>intersects(e,extent));const provider=this.tpnName.startsWith('smgt_')?'geologicznego PIG-PIB':'TPN';this.report(failed?`Część podkładu ${provider} jest niedostępna. W lukach widoczny jest OSM.`:'','tpn');}
   retryBasemap(){this.setBasemap(this.tpnName);}
   select(id:string,zoom=true){this.selectedId=id;this.best.changed();const o=this.catalog.objects.find(x=>x.id===id);if(zoom&&o?.coordinate)this.map.getView().animate({center:o.coordinate,resolution:Math.min(this.map.getView().getResolution()!,1),duration:350});}
   async toggleMeasurements(role:'other'|'rejected',visible:boolean){
