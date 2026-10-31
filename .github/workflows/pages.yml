@@ -47,6 +47,14 @@ jobs:
           npx playwright install --with-deps chromium firefox webkit
           npm run test:browser
           python scripts/publication.py package
+      - name: Save browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output/playwright/
+          retention-days: 15
+          if-no-files-found: warn
       - name: Archive and read back the complete static package
         if: steps.package.outputs.reused != 'true'
         run: python scripts/publication.py archive
