@@ -6,6 +6,24 @@ Statyczna mapa z polskim interfejsem w układzie PL-1992 (EPSG:2180): wyszukiwan
 obiektów, dostępna historia pomiarów, ciągi jaskiniowe i nakładanie planów
 na podkłady TPN, geologiczne PIG-PIB lub OpenStreetMap. Zbudowana w TypeScript i OpenLayers.
 
+## Zobacz mapę
+
+**Cały obszar** — rozmieszczenie obiektów w Tatrach Zachodnich na podkładzie OpenStreetMap.
+
+![Widok całego obszaru mapy z pozycjami Best i panelem warstw](docs/screenshots/caly-obszar.png)
+
+**Okolice Jaskini Miętusiej** — pozycje obiektów i ciągi JKTZ na ortofotomapie TPN z 2020 roku.
+
+![Jaskinia Miętusia i sąsiednie obiekty na ortofotomapie TPN](docs/screenshots/mietusia-ortofotomapa.png)
+
+**Piwnica Miętusia** — szczegół planu przy kryciu 75% na odkrytej mapie geologicznej Tatr PIG-PIB.
+
+![Plan Piwnicy Miętusiej na podkładzie geologicznym z panelem sterowania kryciem](docs/screenshots/piwnica-mietusia-geologia.png)
+
+Zrzuty z [publicznej mapy](https://dlubom.github.io/jktz-mapa/).
+Autorstwo podkładów jest widoczne na ilustracjach; pochodzenie i autorstwo planów
+można sprawdzić w mapie przyciskiem „Pochodzenie”.
+
 ## Dane
 
 Mapa łączy pełne katalogi z wydań trzech projektów:
