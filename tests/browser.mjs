@@ -40,6 +40,10 @@ try{
     await page.getByRole('heading',{name:'Warstwy i podkład'}).waitFor();
     const readyMs=Date.now()-started;
     assert.equal(await page.locator('#layer-best').isChecked(),true);assert.equal(await page.locator('#layer-other').isChecked(),false);assert.equal(await page.locator('#layer-rejected').isChecked(),false);assert.equal(await page.locator('#layer-differences').isChecked(),false);assert.equal(await page.locator('#layer-models').isChecked(),true);assert.equal(await page.locator('#layer-plans').isChecked(),true);
+    assert.equal(await page.locator('#all-names').isChecked(),false,'label collision avoidance is the default');
+    await page.locator('#all-names').check();
+    assert.equal(await page.locator('#all-names').isChecked(),true);
+    await page.locator('#all-names').uncheck();
     await page.waitForTimeout(150);
     assert.equal(requests.filter(u=>u.endsWith('.webp')).length,0,'no plan imagery before zoom');
     await page.locator('#search').fill('piwnica mietusia');
