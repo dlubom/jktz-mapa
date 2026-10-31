@@ -1,4 +1,4 @@
-# Publishing is manual. Initial Pages/environment setup requires separate approval.
+# Publishing is manual and uses the existing Pages environment and pages-state ledger.
 name: Pages — build and publish
 on:
   workflow_dispatch:

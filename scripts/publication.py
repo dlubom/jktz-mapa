@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Pages archives and the small publication ledger. Remote writes run only in Actions.
 
-The transport/deploy actions and exact-step recovery follow the successful
-2026-10-31 trial. An unknown deploy remains pending for manual diagnosis.
+An unknown deploy remains pending for manual diagnosis. Publication requires
+the existing pages-state ledger; this helper never initialises a new ledger.
 """
 import argparse
 import base64
@@ -299,7 +299,7 @@ def archive_phase():
 
 def read_state():
     response = api(f'{STATE_PATH}?ref={BRANCH}', missing_ok=True)
-    require(response is not None, 'Publication ledger missing; initialise before publishing')
+    require(response is not None, 'Missing pages-state/state.json; publication stopped. Restore the existing ledger before retrying.')
     data = json.loads(base64.b64decode(response['content']))
     validate_state(data)
     return data, response['sha']
@@ -316,25 +316,6 @@ def save_state(data, sha):
         print(f'Uncertain write response; readback only: {error}')
     actual, _ = read_state()
     require(actual == data, 'Ledger CAS/readback differs: stop, no deploy')
-
-
-def bootstrap_state():
-    if api(f'{STATE_PATH}?ref={BRANCH}', missing_ok=True) is not None:
-        return
-    # Preserve the already approved original site before replacing it for the first time.
-    catalog = json.loads((ROOT / 'doc/probes/publication/packages.json').read_bytes())
-    record = api(f'repos/{REPO}/releases/tags/{catalog["release_tag"]}')
-    asset = asset_named(record, 'original.tar')
-    meta = {**catalog['packages']['original'], 'files': catalog['files'], 'release_id': record['id'], 'asset_id': asset['id']}
-    path = BUILD / 'baseline.tar'
-    download_asset(asset, path)
-    verify_package(path, meta)
-    public_check(meta)
-    ref = api(f'repos/{REPO}/git/ref/heads/{BRANCH}', missing_ok=True)
-    if ref is None:
-        api(f'repos/{REPO}/git/refs', 'POST', {'ref': f'refs/heads/{BRANCH}', 'sha': os.environ['GITHUB_SHA']})
-    save_state({'schema': 1, 'current': 'probe-original', 'archives': {'probe-original': meta},
-                'retired': {}, 'pending': None, 'last': None}, None)
 
 
 def operation():
@@ -414,8 +395,6 @@ def full_metadata(record):
 
 def deploy_phase(phase, target):
     op = operation()
-    if phase == 'prepare':
-        bootstrap_state()
     data, sha = read_state()
     prepared_path = BUILD / 'prepared.json'
     if phase == 'prepare':
