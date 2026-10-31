@@ -1,0 +1,103 @@
+# Publishing is manual. Initial Pages/environment setup requires separate approval.
+name: Pages — build and publish
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BROWSERS: chromium,firefox,webkit
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Resolve new inputs or restore this run's immutable pins
+        id: inputs
+        run: python scripts/publication.py inputs
+      - name: Persist inputs before downloading sources
+        if: steps.inputs.outputs.upload == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: inputs-${{ github.run_id }}
+          path: .build/inputs.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Read back the newly saved pins
+        if: steps.inputs.outputs.upload == 'true'
+        run: python scripts/publication.py inputs-readback
+      - name: Reuse an already finished archive for this run
+        id: package
+        run: python scripts/publication.py reuse
+      - name: Test and build the whole catalogue
+        if: steps.package.outputs.reused != 'true'
+        run: |
+          npm test
+          python -m unittest discover -s tests -p 'test_*.py'
+          python scripts/pipeline.py fetch --lock .build/inputs.json --cache .build/inputs
+          python scripts/pipeline.py build --lock .build/inputs.json --cache .build/inputs --output public/data
+          npm run build
+          npx playwright install --with-deps chromium firefox webkit
+          npm run test:browser
+          python scripts/publication.py package
+      - name: Archive and read back the complete static package
+        if: steps.package.outputs.reused != 'true'
+        run: python scripts/publication.py archive
+  publish:
+    needs: build
+    name: publish-${{ github.run_id }}-${{ github.run_attempt }}
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: pages-production
+      cancel-in-progress: false
+      queue: max
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      actions: read
+      contents: write
+      pages: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PAGES_TARGET: pages-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Verify archives and prepare or reconcile
+        id: prepare
+        run: python3 scripts/publication.py prepare
+      - name: Upload verified static files
+        if: steps.prepare.outputs.ready == 'true'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          name: pages-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .build/publish-site
+          retention-days: 1
+          include-hidden-files: true
+      - name: Persist and read back pending
+        if: steps.prepare.outputs.ready == 'true'
+        run: python3 scripts/publication.py pending
+      - name: Publish Pages
+        id: deployment
+        if: steps.prepare.outputs.ready == 'true'
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Confirm the exact deployment and public entry files
+        if: steps.prepare.outputs.ready == 'true'
+        run: python3 scripts/publication.py confirm
+      - name: Clean up expired archives when the queue is idle
+        if: steps.prepare.outputs.ready == 'true'
+        run: python3 scripts/publication.py cleanup

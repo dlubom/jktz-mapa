@@ -1,0 +1,3 @@
+# GDAL and NumPy come from Ubuntu 24.04 apt in CI (or system GDAL locally).
+# The build report records exact Python/GDAL/PROJ/NumPy/PyYAML runtime versions.
+PyYAML==6.0.3

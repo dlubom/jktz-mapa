@@ -1,0 +1,80 @@
+import {createServer} from 'node:http';
+import {readFile,stat,mkdir,writeFile} from 'node:fs/promises';
+import {resolve,extname} from 'node:path';
+import assert from 'node:assert/strict';
+import {chromium,firefox,webkit} from 'playwright';
+
+const root=resolve('dist'),prefix='/jktz-mapa/';
+const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.geojson':'application/geo+json','.webp':'image/webp'};
+const server=createServer(async(req,res)=>{try{const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(!path.startsWith(prefix)){res.writeHead(404).end();return;}const file=resolve(root,path.slice(prefix.length)||'index.html');if(!file.startsWith(root+'/')){res.writeHead(403).end();return;}const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});res.end(data);}catch{res.writeHead(404).end('Not found');}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const url=`http://127.0.0.1:${server.address().port}${prefix}`;
+const catalog=JSON.parse(await readFile('dist/data/catalog.json','utf8'));
+await mkdir('output/playwright',{recursive:true});
+const results=[];
+try{
+ for(const name of (process.env.BROWSERS||'chromium').split(',')){
+  console.log(`Launching ${name}`);
+  const browser=await({chromium,firefox,webkit}[name]).launch({headless:true,timeout:30000});
+  try{
+   for(const mobile of [false,true]){
+    const context=await browser.newContext({viewport:mobile?{width:393,height:852}:{width:1440,height:960},deviceScaleFactor:mobile?3:1,hasTouch:mobile});
+    const page=await context.newPage(),errors=[],requests=[];
+    page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
+    // Controlled external outage pins fallback behaviour, independent of TPN uptime.
+    await page.route('https://tpn.obliview.com/**',r=>r.abort());
+    await page.route('https://*.tile.openstreetmap.org/**',r=>r.abort());
+    console.log(`Checking ${name} ${mobile?'mobile':'desktop'}`);
+    const started=Date.now();await page.goto(url);
+    await page.getByRole('heading',{name:'Warstwy i podkład'}).waitFor();
+    const readyMs=Date.now()-started;
+    assert.equal(await page.locator('#layer-best').isChecked(),true);assert.equal(await page.locator('#layer-other').isChecked(),false);assert.equal(await page.locator('#layer-rejected').isChecked(),false);assert.equal(await page.locator('#layer-differences').isChecked(),false);assert.equal(await page.locator('#layer-models').isChecked(),true);assert.equal(await page.locator('#layer-plans').isChecked(),true);
+    await page.waitForTimeout(150);
+    assert.equal(requests.filter(u=>u.endsWith('.webp')).length,0,'no plan imagery before zoom');
+    await page.locator('#search').fill('piwnica mietusia');
+    await page.locator('[data-object="MTZ-0017"]').first().click();
+    await page.getByRole('heading',{name:/Historia pomiarów/}).waitFor();
+    assert.match(await page.locator('#object-panel').innerText(),/Best/);
+    await page.locator('#tpn-message').waitFor({state:'visible'});
+    const mapBox=await page.locator('#map').boundingBox(),panelBox=await page.locator('#sidebar').boundingBox();
+    if(mobile)assert.ok(mapBox.y+mapBox.height<=panelBox.y+2,'map remains above mobile panel');
+    await page.getByRole('tab',{name:'Warstwy'}).click();
+    for(const id of ['other','rejected','differences'])await page.locator(`#layer-${id}`).check();
+    await page.waitForFunction(()=>performance.getEntriesByType('resource').some(r=>r.name.endsWith('measurements.geojson')));
+    await page.locator('#layer-plans').uncheck();
+    await page.getByRole('tab',{name:'Plany',exact:true}).click();
+    await page.locator('#plan-search').fill('001197');
+    await page.locator('#plan-list [data-plan-fit="001197"]').click();
+    const preview=catalog.plans.find(p=>p.id==='001197').preview.url;
+    await page.waitForFunction(path=>performance.getEntriesByType('resource').some(r=>r.name.endsWith(path)),preview);
+    await page.waitForTimeout(250);
+    await page.screenshot({path:`output/playwright/${name}-${mobile?'mobile':'desktop'}-whole-plan.png`});
+    if(mobile)await page.locator('#panel-toggle').click();
+    await page.getByRole('tab',{name:'Plany',exact:true}).click();
+    await page.locator('#plan-search').fill('001459');
+    await page.locator('#plan-list [data-plan-fit="001459-pza-2024"]').click();
+    await page.waitForFunction(path=>performance.getEntriesByType('resource').some(r=>r.name.endsWith(path)),catalog.plans.find(p=>p.id==='001459-pza-2024').preview.url);
+    for(let i=0;i<3;i++){await page.locator('.ol-zoom-in').click();await page.waitForTimeout(300);}
+    console.log('zoomed',name,mobile,await page.locator('#plan-status').innerText());
+    await page.screenshot({path:`output/playwright/${name}-${mobile?'mobile':'desktop'}-zoom-debug.png`});
+    await page.waitForFunction(()=>performance.getEntriesByType('resource').some(r=>r.name.includes('/001459-pza-2024/tiles/')));
+    await page.waitForTimeout(500);
+    await page.screenshot({path:`output/playwright/${name}-${mobile?'mobile':'desktop'}-detail.png`});
+    if(mobile)await page.locator('#panel-toggle').click();
+    await page.getByRole('tab',{name:'Plany',exact:true}).click();
+    const slider=page.locator('#plan-list [data-plan-opacity="001459-pza-2024"]');await slider.evaluate(el=>{el.value='45';el.dispatchEvent(new Event('input',{bubbles:true}));});assert.equal(await slider.inputValue(),'45');
+    await page.locator('#plan-list [data-plan-order="001459-pza-2024"][data-direction="-1"]').click();
+    await page.locator('#plan-list [data-plan-toggle="001459-pza-2024"]').uncheck();
+    assert.equal(await page.locator('#plan-list [data-plan-toggle="001459-pza-2024"]').isChecked(),false);
+    await page.locator('#plan-list [data-plan-info="001459-pza-2024"]').click();await page.getByText('Pochodzenie, transformacja i metadane planu',{exact:true}).waitFor();
+    await page.locator('#search').fill('C-0295');await page.locator('[data-cave="C-0295"]').click();await page.getByText('Brak jawnie przypisanego obiektu w tej migawce.',{exact:false}).waitFor();
+    await page.getByRole('tab',{name:'Źródła',exact:true}).click();assert.equal(await page.locator('.source-card').count(),3);
+    assert.equal(await page.locator('a[href="data/inputs.json"]').count(),1);
+    assert.deepEqual(errors,[],`${name}: no JS errors`);
+    results.push({engine:name,mobile,dpr:mobile?3:1,readyMs,planRequests:requests.filter(u=>u.endsWith('.webp')).length,errors});
+    await context.close();
+   }
+  }finally{await browser.close();}
+ }
+ await writeFile('output/playwright/results.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));
+}finally{server.close();}

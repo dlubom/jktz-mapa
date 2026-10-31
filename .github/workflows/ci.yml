@@ -1,0 +1,51 @@
+name: Map checks
+on:
+  push:
+    branches-ignore: [gh-pages, pages-state, pages-probe-state]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  map:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BROWSERS: chromium,firefox,webkit
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Unit and importer checks
+        run: |
+          npm test
+          python -m unittest discover -s tests -p 'test_*.py'
+      - name: Build the complete release catalogue
+        run: |
+          python scripts/pipeline.py resolve --lock .build/inputs.json
+          python scripts/pipeline.py fetch --lock .build/inputs.json --cache .build/inputs
+          python scripts/pipeline.py build --lock .build/inputs.json --cache .build/inputs --output public/data
+          npm run build
+      - name: Browser acceptance on the static build
+        run: |
+          npx playwright install --with-deps chromium firefox webkit
+          npm run test:browser
+      - name: Package and verify the preview
+        run: python scripts/publication.py package
+      - name: Save reviewable build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: preview-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .build/package/
+          retention-days: 15
+          if-no-files-found: error
+      - name: Save browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output/playwright/
+          retention-days: 15
+          if-no-files-found: warn
