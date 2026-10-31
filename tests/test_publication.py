@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import tarfile
 import subprocess
 import zipfile
 import unittest
@@ -77,6 +78,48 @@ class PublicationTests(unittest.TestCase):
             pub.download_asset(asset, target)
             self.assertEqual(target.read_bytes(), raw)
             self.assertIn('Accept: application/octet-stream', github.call_args.args[0])
+
+    def test_prepare_requires_existing_ledger_without_bootstrap(self):
+        with tempfile.TemporaryDirectory() as temp, \
+             patch.object(pub, 'ROOT', Path(temp)), \
+             patch.object(pub, 'operation', return_value=operation(2, 2)), \
+             patch.object(pub, 'api', return_value=None) as api, \
+             patch.object(pub, 'save_state') as save:
+            with self.assertRaisesRegex(RuntimeError, 'Missing pages-state/state.json'):
+                pub.deploy_phase('prepare', 'pages-B')
+            api.assert_called_once_with(f'{pub.STATE_PATH}?ref={pub.BRANCH}', missing_ok=True)
+            save.assert_not_called()
+
+    def test_prepare_rollback_uses_existing_ledger_without_documentation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            original = root / 'original.tar'
+            content = b'original static page'
+            with tarfile.open(original, 'w') as tar:
+                member = tarfile.TarInfo('index.html')
+                member.size = len(content)
+                tar.addfile(member, io.BytesIO(content))
+            legacy = {'release_id': 2, 'asset_id': 3, 'bytes': original.stat().st_size,
+                      'sha256': pub.digest(original.read_bytes()), 'manifest_sha256': None,
+                      'files': {'index.html': pub.digest(content)}}
+            data = state()
+            data['archives']['probe-original'] = legacy
+            data['retired']['probe-original'] = '2026-10-17T12:00:00Z'
+            with patch.object(pub, 'ROOT', root), patch.object(pub, 'BUILD', root / 'build'), \
+                 patch.object(pub, 'operation', return_value=operation(2, 2)), \
+                 patch.object(pub, 'read_state', return_value=(data, 'ledger-sha')), \
+                 patch.object(pub, 'api', side_effect=AssertionError('Unexpected bootstrap API request')), \
+                 patch.object(pub, 'verify_remote_archive', return_value=original) as download, \
+                 patch.object(pub, 'fetch_archive') as fetch, patch.object(pub, 'output') as output:
+                pub.deploy_phase('prepare', 'probe-original')
+            self.assertEqual((root / 'build/publish-site/index.html').read_bytes(), content)
+            prepared = json.loads((root / 'build/prepared.json').read_bytes())
+            self.assertEqual(prepared['sha'], 'ledger-sha')
+            self.assertEqual(prepared['state'], data)
+            self.assertEqual(prepared['transition']['pending']['to'], 'probe-original')
+            download.assert_any_call(legacy, 'target.tar.gz')
+            fetch.assert_not_called()
+            output.assert_called_once_with('ready', 'true')
 
     def test_retention_starts_at_replacement_not_build(self):
         data = pub.prepare_transition(state(), operation(2, 2), 'pages-B', archive(2))
