@@ -43,3 +43,9 @@ jest dostępna przy wyborze podkładu. Poza pokryciem usługi widoczny jest OSM.
 
 Instrukcje uruchomienia, testów i publikacji: [AGENTS.md](AGENTS.md).
 Publikacja na GitHub Pages jest uruchamiana ręcznie przez GitHub Actions.
+
+## Odnośniki do opisów jaskiń
+
+„Opis jaskini ↗” otwiera potwierdzony opis w nowej karcie. Wyjątki URL są w
+[słowniku mapy](src/data/cave-descriptions.json), pozostałe wersje i referencje PIG
+w źródłach. Brak linku nie oznacza nieobecności jaskini w PIG.

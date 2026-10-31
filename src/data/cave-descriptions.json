@@ -1,0 +1,17 @@
+{
+  "editions": {
+    "antkiewicz-ptasia-1999-2004": {
+      "url": "https://antkiewiczjaskinie.pl/system-ptasia-studnia-t-e-11-06t-e-11-10t-e-11-09/",
+      "title": "System Ptasia Studnia",
+      "author": "Anna Antkiewicz",
+      "source": "antkiewiczjaskinie.pl",
+      "scope": "system jaskiniowy",
+      "version": "1999/2004"
+    }
+  },
+  "caves": {
+    "C-0167": {"primary": "antkiewicz-ptasia-1999-2004"},
+    "C-0273": {"primary": "antkiewicz-ptasia-1999-2004"},
+    "C-0072": {"primary": "antkiewicz-ptasia-1999-2004"}
+  }
+}

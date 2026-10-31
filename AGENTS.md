@@ -29,6 +29,9 @@ Dane przygotowuje Python z GDAL; aplikacja działa bez backendu i QGIS.
   Zachowuj kolejność nakładania, anulowanie zbędnych pobrań i zwalnianie bitmap.
 - Build obejmuje pełne katalogi z wydań źródłowych; nie wymaga sąsiednich checkoutów.
   Pracuj w tym repozytorium; istniejące projekty 3D i źródłowe są osobne.
+- Wyjątki URL opisów jaskiń dodawaj w `src/data/cave-descriptions.json`:
+  opracowania w `editions`, przypisania po ID jaskini GPS w `caves` (`primary`,
+  opcjonalnie `otherEditions`). Zachowuj poprzednie wydania i referencje PIG.
 
 ## Uruchomienie i sprawdzenia
 
