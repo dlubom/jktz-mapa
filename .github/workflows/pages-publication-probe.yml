@@ -41,16 +41,14 @@ jobs:
       - name: Prepare or recover
         id: prepare
         run: python3 doc/probes/publication/github_probe.py prepare
-      - name: Upload exact prepared archive
+      - name: Upload verified Pages files
         if: steps.prepare.outputs.ready == 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           name: pages-probe-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/pages-probe/artifact.tar
-          if-no-files-found: error
+          path: ${{ runner.temp }}/pages-probe/site
           retention-days: 1
-          compression-level: 0
-          overwrite: false
+          include-hidden-files: true
       - name: Persist and read back pending
         if: steps.prepare.outputs.ready == 'true'
         run: python3 doc/probes/publication/github_probe.py pending

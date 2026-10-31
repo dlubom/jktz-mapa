@@ -81,7 +81,10 @@ with tempfile.TemporaryDirectory() as temp:
         GITHUB_REF='refs/heads/main', GITHUB_SHA='a' * 40, RUNNER_TEMP=temp,
         GITHUB_OUTPUT=str(output), PROBE_PAUSE='false')
     def context(rid, operation, timestamp):
-        os.environ.update(GITHUB_RUN_ID=str(rid), GITHUB_RUN_ATTEMPT='1', PROBE_OPERATION=operation)
+        runner_temp = Path(temp) / str(rid)
+        runner_temp.mkdir(exist_ok=True)
+        os.environ.update(GITHUB_RUN_ID=str(rid), GITHUB_RUN_ATTEMPT='1', PROBE_OPERATION=operation,
+                          RUNNER_TEMP=str(runner_temp))
         runs[rid] = {'head_sha': 'a' * 40, 'head_branch': 'main',
                     'event': 'workflow_dispatch', 'created_at': timestamp, 'run_attempt': 1}
         output.write_text('')
@@ -90,10 +93,9 @@ with tempfile.TemporaryDirectory() as temp:
         context(rid, operation, timestamp)
         m.workflow('prepare')
         assert output.read_text() == 'ready=true\n'
-        with tarfile.open(Path(temp) / 'pages-probe/artifact.tar') as tar:
-            members = tar.getmembers()
-            assert all(x.name.startswith('./') for x in members), 'Pages requires ./ in every TAR entry'
-            assert {x.name[2:]: tar.extractfile(x).read() for x in members} == fixture_files(label)
+        site = Path(os.environ['RUNNER_TEMP']) / 'pages-probe/site'
+        assert site.is_dir(), 'The official Pages action needs the verified static directory'
+        assert {str(p.relative_to(site)): p.read_bytes() for p in site.rglob('*') if p.is_file()} == fixture_files(label)
         m.workflow('pending')
         public = label
         m.workflow('confirm')

@@ -65,6 +65,25 @@ po poprawce. Kolejny commit pozwala też odróżnić endpoint statusu Pages
 od pierwszego nieudanego wdrożenia. Wynik następnej próby rozstrzygnie
 skuteczność poprawki na GitHubie.
 
+## Druga próba A — poprawiony prefiks nie wystarczył
+
+[Run 41186232166](https://github.com/dlubom/jktz-mapa/actions/runs/41186232166),
+commit `9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228`, job `124493604633`:
+zapis `pending` przeszedł; krok deployu ponownie otrzymał terminalny
+`deployment_failed`. Publiczny oryginał pozostał zgodny. Tę konkretną
+operację rozpoznano i zapisano osobno tak samo jak pierwszą, bez zmiany
+wersji i retencji. Obydwa dawne `pending` są w `rejected_operations`.
+
+**Rozstrzygnięcie:** nie ma dowodu, że brak prefiksu był jedyną przyczyną.
+Zamiast dodawać kolejne warianty własnej serializacji, następna próba
+użyje całej oficjalnej akcji `upload-pages-artifact` v5.0.0, SHA
+`fc324d3547104276b827a68afc52ff2a11cc49c9`. Runtime materializuje wyłącznie
+zweryfikowany inwentarz plików, a akcja przygotowuje natywny TAR i upload.
+`include-hidden-files=true` zachowuje `.nojekyll`. Zmiana obejmuje transport,
+bez nowych paczek, źródeł, zmian strony lub reguł odzyskiwania.
+To próba implementacji referencyjnej, nie twierdzenie o ustalonej przyczynie
+drugiego błędu. Lokalna kontrola potwierdza identyczne pliki original/A/B.
+
 Dowody robocze: `/private/tmp/jktz-publication-live-20261031-gwtjdqyu`.
 Po zakończeniu ograniczony zestaw dowodów i wynik przywrócenia trafią
 do repozytorium. Próba trwa; nie jest jeszcze zaliczona.

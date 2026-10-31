@@ -178,18 +178,17 @@ def archive_bytes(label, archive):
     return data
 
 
-def pages_transport(data):
-    """Add Pages-required ./ names to verified archive bytes; keep file contents."""
-    output = io.BytesIO()
+def prepare_site(data, directory):
+    """Materialize verified files for the official Pages artifact action."""
+    directory.mkdir(parents=True, exist_ok=False)
     allowed = set(CATALOG["files"]) | {"publication-probe.json"}
     with tarfile.open(fileobj=io.BytesIO(data)) as source:
-        with tarfile.open(fileobj=output, mode="w", format=tarfile.USTAR_FORMAT) as target:
-            for member in source.getmembers():
-                require(member.isfile() and member.name in allowed, "unsafe transport member")
-                content = source.extractfile(member)
-                member.name = "./" + member.name
-                target.addfile(member, content)
-    return output.getvalue()
+        for member in source.getmembers():
+            require(member.isfile() and member.name in allowed, "unsafe transport member")
+            target = directory / member.name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(source.extractfile(member).read())
+            target.chmod(0o644)
 
 
 def complete(data, sha):
@@ -235,7 +234,7 @@ def workflow(phase):
             archive_bytes(data["current"], data["archives"][data["current"]])
         package = archive_bytes(label, data["archives"][label])
         scratch.mkdir(parents=True, exist_ok=True)
-        (scratch / "artifact.tar").write_bytes(pages_transport(package))
+        prepare_site(package, scratch / "site")
         (scratch / "prepared.json").write_bytes(encoded({"sha": sha, "state": data, "operation": op, "to": label}))
         with open(os.environ["GITHUB_OUTPUT"], "a") as output:
             output.write("ready=true\n")

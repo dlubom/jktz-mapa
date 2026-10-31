@@ -47,13 +47,18 @@ identyczny z recenzowanym `packages.json`.
 
 Runtime pobiera asset po zapisanym ID, sprawdza SHA-256 i cały tar, po czym
 sprawdza również dostępność archiwum bieżącej strony (drogi powrotu).
-Transportowy `artifact.tar` dodaje wymagany przez Pages prefiks `./`
-do nazw wpisów, zachowując bajty plików i pozostałe metadane TAR.
-Archiwa w release pozostają niezmienne. Wymaganie znaleziono po pierwszej
-próbie integracyjnej: [wyjaśnienie GitHub](https://github.com/actions/deploy-pages/issues/203#issuecomment-1652804586).
+Zweryfikowane pliki trafiają do nowego katalogu `site`, z zachowaniem
+całego inwentarza, bajtów i `.nojekyll`. Transport tworzy przypięta
+oficjalna `actions/upload-pages-artifact` v5.0.0, z `include-hidden-files=true`.
+Archiwa w release pozostają niezmienne. Pierwsza własna serializacja nie
+miała wymaganego prefiksu `./`; sama jego korekta nie usunęła błędu Pages,
+dlatego transport przekazano implementacji referencyjnej.
+[Wymaganie i wskazanie implementacji](https://github.com/actions/deploy-pages/issues/203#issuecomment-1652804586).
 Artefakt Actions jest tylko transportem o retencji jednego dnia;
-rollback używa gotowego assetu release. `upload-artifact` i checkout mają
-pełne SHA odczytane z tagów v4.6.2/v4.2.2; `deploy-pages` v5.0.1 jest
+rollback używa gotowego assetu release. `upload-pages-artifact` v5.0.0 ma
+SHA `fc324d3547104276b827a68afc52ff2a11cc49c9` (wewnętrzny `upload-artifact`
+v7.0.0 także przypięty przez autora akcji), checkout v4.2.2 ma pełny SHA;
+`deploy-pages` v5.0.1 jest
 przypięte do `368f82528645a54fb793d4d04e342629a3f51346`.
 
 Przed deployem zapisuje się obie paczki, pierwotne `created_at`, run ID,
