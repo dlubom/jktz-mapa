@@ -29,6 +29,7 @@ export class MapController {
   best:VectorLayer; other:VectorLayer; rejected:VectorLayer; differences:VectorLayer;
   modelsEnabled=true;hiddenModels=new Set<string>();
   selectedId:string|null=null;
+  private allNames=false;
   private modelLayers=new globalThis.Map<string,VectorLayer>();
   private modelRequests=new globalThis.Map<string,AbortController>();
   private catalog:Catalog;
@@ -43,9 +44,9 @@ export class MapController {
   constructor(catalog:Catalog,select:(ids:string[])=>void,coordinates:(c:Coordinate)=>void,report:(message:string,kind:string)=>void,planReport:()=>void){
     this.catalog=catalog;this.report=report;
     const features=catalog.objects.filter(o=>o.coordinate).map(o=>new Feature({geometry:new Point(o.coordinate!),objectId:o.id,name:o.name}));
-    this.best=new VectorLayer({source:new VectorSource({features}),zIndex:30,declutter:false,style:feature=>{
+    this.best=new VectorLayer({source:new VectorSource({features}),zIndex:30,declutter:true,renderOrder:(a,b)=>Number(b.get('objectId')===this.selectedId)-Number(a.get('objectId')===this.selectedId),style:feature=>{
       const active=feature.get('objectId')===this.selectedId;
-      return new Style({image:new Circle({radius:active?7:4,fill:new Fill({color:active?'#e56f35':'#12675a'}),stroke:new Stroke({color:'#fff',width:1.5})}),text:new Text({text:feature.get('name'),font:`${active?'700':'500'} 12px system-ui`,offsetY:-13,fill:new Fill({color:active?'#873a13':'#183d35'}),stroke:new Stroke({color:'rgba(255,255,255,.95)',width:3}),overflow:true})});
+      return new Style({image:new Circle({radius:active?7:4,declutterMode:'none',fill:new Fill({color:active?'#e56f35':'#12675a'}),stroke:new Stroke({color:'#fff',width:1.5})}),text:new Text({text:feature.get('name'),declutterMode:this.allNames?'none':active?'obstacle':'declutter',padding:[2,4,2,4],font:`${active?'700':'500'} 11px system-ui`,offsetY:-13,fill:new Fill({color:active?'#873a13':'#183d35'}),stroke:new Stroke({color:'rgba(255,255,255,.95)',width:3}),overflow:true})});
     }});
     this.other=new VectorLayer({source:new VectorSource(),zIndex:25,visible:false,style:pointStyle('#3972b0',4)});
     this.rejected=new VectorLayer({source:new VectorSource(),zIndex:26,visible:false,style:pointStyle('#b44956',5)});
@@ -57,6 +58,7 @@ export class MapController {
     this.map.on('moveend',()=>{this.updateModels();this.basemapWarning();coordinates(this.map.getView().getCenter() as Coordinate);planReport();});
     this.map.getView().fit(catalog.extent,{padding:[45,45,45,45]});this.setBasemap('rgb_2020');this.updateModels();
   }
+  setAllNames(visible:boolean){this.allNames=visible;this.best.changed();}
   setBasemap(name:string,automatic=false){
     clearTimeout(this.tpnTimer);this.tpnTimer=undefined;if(!automatic)this.tpnRetries=0;this.tpnName=name;this.tpnFailures.clear();
     const old=this.tpn.getSource();
