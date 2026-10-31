@@ -34,57 +34,22 @@
       "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
     }
   },
-  "current": "probe-original",
-  "last": null,
-  "pending": {
-    "archives": {
-      "pages-41198442070": {
-        "app_sha": "4e70b8cbb6b5de57c4b93e4cd4ea02bd895f36e3",
-        "asset_id": 695272993,
-        "bytes": 290738903,
-        "manifest_sha256": "5cf4e91982d3113d8c9016b93c55cba788c633eb15054dbac38e021e06afa412",
-        "metadata_asset_id": 695273460,
-        "metadata_sha256": "ac97d48eedb8c9f2fdb580e13552717d4342c2b028035fa540d78c39e7916048",
-        "package_id": "pages-41198442070",
-        "public_files": {
-          "assets/index-DoRnizqW.js": "68e51afdd1058dea5f296a2699e5e3b621c3fde5b20d1dea4ff1b6d57cfa8adc",
-          "assets/index-DpGxH6Bu.css": "3126a5dc96332993f659473116bec9542cc93380490c7c98cc42cafd3098e7a4",
-          "data/catalog.json": "9b4382c45142f80c582066f94f285c61fca3aa254c61988c77a798aff5ff90aa",
-          "index.html": "28a61d993036bb7de9a74361b28a0abaa3d0195dd7d129330c0123eddee53b81",
-          "publication.json": "5cf4e91982d3113d8c9016b93c55cba788c633eb15054dbac38e021e06afa412"
-        },
-        "release_id": 429909865,
-        "sha256": "2a89f0f7bd267ac3fe29052aa90e2c2682378a8c38447fd29491b46514a58259",
-        "site_bytes": 309919725
-      },
-      "probe-original": {
-        "asset": "original.tar",
-        "asset_id": 694852569,
-        "bytes": 399360,
-        "files": {
-          ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "assets/index-Cq-JZLFy.js": "68e3afe099dc9bc29fc3c228c3326907386dac252d0dddcf8a157a6a3b6f3ee2",
-          "assets/index-c_1sG1-7.css": "3a2b8467811c3aa89ce93c07ec06cb0598e8c8c6e9570c10da44590ddfd08c77",
-          "index.html": "47ec278c634efeb19b38d8f98bd470c6de9890f4edb52a225426b66ad76a586a"
-        },
-        "manifest_sha256": null,
-        "release_id": 429817445,
-        "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
-      }
-    },
-    "from": "probe-original",
-    "operation": {
-      "created_at": "2026-10-31T11:49:25Z",
-      "head_sha": "4e70b8cbb6b5de57c4b93e4cd4ea02bd895f36e3",
-      "job_id": 124531965730,
-      "job_name": "publish-41198442070-1",
-      "run_attempt": 1,
-      "run_id": 41198442070,
-      "step_name": "Publish Pages",
-      "step_number": 6
-    },
+  "current": "pages-41198442070",
+  "last": {
+    "confirmed_at": "2026-10-31T12:03:57.273379+00:00",
+    "created_at": "2026-10-31T11:49:25Z",
+    "head_sha": "4e70b8cbb6b5de57c4b93e4cd4ea02bd895f36e3",
+    "job_id": 124531965730,
+    "job_name": "publish-41198442070-1",
+    "run_attempt": 1,
+    "run_id": 41198442070,
+    "step_name": "Publish Pages",
+    "step_number": 6,
     "to": "pages-41198442070"
   },
-  "retired": {},
+  "pending": null,
+  "retired": {
+    "probe-original": "2026-11-15T12:03:57.273379+00:00"
+  },
   "schema": 1
 }
