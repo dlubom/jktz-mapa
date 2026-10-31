@@ -7,11 +7,13 @@ Run: python3 doc/probes/publication/candidate_check.py
 import base64
 import copy
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import sys
 import tempfile
+import tarfile
 
 sys.dont_write_bytecode = True
 spec = importlib.util.spec_from_file_location('probe_review', Path(__file__).with_name('github_probe.py'))
@@ -52,7 +54,23 @@ def api(path, method='GET', payload=None, binary=False):
     raise AssertionError(path)
 
 m.api = api
-m.archive_bytes = lambda label, archive: (archive_reads.append(label) or b'fixture')
+def fixture_files(label):
+    files = {path: path.encode() for path in m.CATALOG['files']}
+    if label != 'original':
+        files['publication-probe.json'] = label.encode()
+    return files
+
+def archive_bytes(label, archive):
+    archive_reads.append(label)
+    output = io.BytesIO()
+    with tarfile.open(fileobj=output, mode='w', format=tarfile.USTAR_FORMAT) as tar:
+        for name, data in fixture_files(label).items():
+            entry = tarfile.TarInfo(name)
+            entry.size, entry.mode = len(data), 0o644
+            tar.addfile(entry, io.BytesIO(data))
+    return output.getvalue()
+
+m.archive_bytes = archive_bytes
 def check_public(label):
     assert label == public
 m.public_bytes = check_public
@@ -72,6 +90,10 @@ with tempfile.TemporaryDirectory() as temp:
         context(rid, operation, timestamp)
         m.workflow('prepare')
         assert output.read_text() == 'ready=true\n'
+        with tarfile.open(Path(temp) / 'pages-probe/artifact.tar') as tar:
+            members = tar.getmembers()
+            assert all(x.name.startswith('./') for x in members), 'Pages requires ./ in every TAR entry'
+            assert {x.name[2:]: tar.extractfile(x).read() for x in members} == fixture_files(label)
         m.workflow('pending')
         public = label
         m.workflow('confirm')

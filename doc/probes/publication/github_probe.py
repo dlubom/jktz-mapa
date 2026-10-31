@@ -178,6 +178,20 @@ def archive_bytes(label, archive):
     return data
 
 
+def pages_transport(data):
+    """Add Pages-required ./ names to verified archive bytes; keep file contents."""
+    output = io.BytesIO()
+    allowed = set(CATALOG["files"]) | {"publication-probe.json"}
+    with tarfile.open(fileobj=io.BytesIO(data)) as source:
+        with tarfile.open(fileobj=output, mode="w", format=tarfile.USTAR_FORMAT) as target:
+            for member in source.getmembers():
+                require(member.isfile() and member.name in allowed, "unsafe transport member")
+                content = source.extractfile(member)
+                member.name = "./" + member.name
+                target.addfile(member, content)
+    return output.getvalue()
+
+
 def complete(data, sha):
     pending = data["pending"]
     now = datetime.now(timezone.utc)
@@ -221,7 +235,7 @@ def workflow(phase):
             archive_bytes(data["current"], data["archives"][data["current"]])
         package = archive_bytes(label, data["archives"][label])
         scratch.mkdir(parents=True, exist_ok=True)
-        (scratch / "artifact.tar").write_bytes(package)
+        (scratch / "artifact.tar").write_bytes(pages_transport(package))
         (scratch / "prepared.json").write_bytes(encoded({"sha": sha, "state": data, "operation": op, "to": label}))
         with open(os.environ["GITHUB_OUTPUT"], "a") as output:
             output.write("ready=true\n")

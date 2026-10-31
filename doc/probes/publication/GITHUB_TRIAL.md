@@ -46,8 +46,11 @@ ze stałą kolejnością, mtime 0, uid/gid 0 i trybem 0644. Wynik musi być
 identyczny z recenzowanym `packages.json`.
 
 Runtime pobiera asset po zapisanym ID, sprawdza SHA-256 i cały tar, po czym
-sprawdza również dostępność archiwum bieżącej strony (drogi powrotu) i
-przekazuje **ten sam tar** jako `artifact.tar` do `upload-artifact`.
+sprawdza również dostępność archiwum bieżącej strony (drogi powrotu).
+Transportowy `artifact.tar` dodaje wymagany przez Pages prefiks `./`
+do nazw wpisów, zachowując bajty plików i pozostałe metadane TAR.
+Archiwa w release pozostają niezmienne. Wymaganie znaleziono po pierwszej
+próbie integracyjnej: [wyjaśnienie GitHub](https://github.com/actions/deploy-pages/issues/203#issuecomment-1652804586).
 Artefakt Actions jest tylko transportem o retencji jednego dnia;
 rollback używa gotowego assetu release. `upload-artifact` i checkout mają
 pełne SHA odczytane z tagów v4.6.2/v4.2.2; `deploy-pages` v5.0.1 jest
@@ -369,3 +372,5 @@ wszystkich awarii API/CAS ani bezpieczeństwa zmian administracyjnych
 poza blokadą. Te luki pozostają jawne po pomyślnym A → B → A.
 
 Źródła API i odczyty wersji: [PAGES_PUBLICATION_API_CHECK.md](../../PAGES_PUBLICATION_API_CHECK.md).
+Przebieg zatwierdzonej próby i poprawka transportu:
+[dziennik wykonania](../../PAGES_PUBLICATION_GITHUB_TRIAL.md).
