@@ -19,6 +19,25 @@
       "sha256": "2a89f0f7bd267ac3fe29052aa90e2c2682378a8c38447fd29491b46514a58259",
       "site_bytes": 309919725
     },
+    "pages-41207949826": {
+      "app_sha": "13611c96234b76766bd1d41a9ac6afb145cfcb56",
+      "asset_id": 695563880,
+      "bytes": 290742067,
+      "manifest_sha256": "99f113af40e0a6da039360cbc17566d2e87cd0ab553ff7abb1993854e4167254",
+      "metadata_asset_id": 695564433,
+      "metadata_sha256": "0927c95c35012468d968071536cef9b427096678cb21122757823b03b1fc9e9c",
+      "package_id": "pages-41207949826",
+      "public_files": {
+        "assets/index-DpGxH6Bu.css": "3126a5dc96332993f659473116bec9542cc93380490c7c98cc42cafd3098e7a4",
+        "assets/index-DxgSEhIL.js": "ddfaefd0487327de4bbb66d1ca3cff9652e10108fcebecd327a7c2e27bb0d947",
+        "data/catalog.json": "774f5eea5af2606c760e4473491126359f81b2872c1f56c8c1c32ba82ae3a8bb",
+        "index.html": "a3f1d3e2fb31e5ea18534395c6cb6861fc0a9cefddada5d977f40f458cc3c5d7",
+        "publication.json": "99f113af40e0a6da039360cbc17566d2e87cd0ab553ff7abb1993854e4167254"
+      },
+      "release_id": 429978009,
+      "sha256": "e715f302d8e9072fea98500578424546d1f7d215b9819f0ef8c7c229bfc90e34",
+      "site_bytes": 309925132
+    },
     "probe-original": {
       "asset": "original.tar",
       "asset_id": 694852569,
@@ -47,7 +66,60 @@
     "step_number": 6,
     "to": "pages-41198442070"
   },
-  "pending": null,
+  "pending": {
+    "archives": {
+      "pages-41198442070": {
+        "app_sha": "4e70b8cbb6b5de57c4b93e4cd4ea02bd895f36e3",
+        "asset_id": 695272993,
+        "bytes": 290738903,
+        "manifest_sha256": "5cf4e91982d3113d8c9016b93c55cba788c633eb15054dbac38e021e06afa412",
+        "metadata_asset_id": 695273460,
+        "metadata_sha256": "ac97d48eedb8c9f2fdb580e13552717d4342c2b028035fa540d78c39e7916048",
+        "package_id": "pages-41198442070",
+        "public_files": {
+          "assets/index-DoRnizqW.js": "68e51afdd1058dea5f296a2699e5e3b621c3fde5b20d1dea4ff1b6d57cfa8adc",
+          "assets/index-DpGxH6Bu.css": "3126a5dc96332993f659473116bec9542cc93380490c7c98cc42cafd3098e7a4",
+          "data/catalog.json": "9b4382c45142f80c582066f94f285c61fca3aa254c61988c77a798aff5ff90aa",
+          "index.html": "28a61d993036bb7de9a74361b28a0abaa3d0195dd7d129330c0123eddee53b81",
+          "publication.json": "5cf4e91982d3113d8c9016b93c55cba788c633eb15054dbac38e021e06afa412"
+        },
+        "release_id": 429909865,
+        "sha256": "2a89f0f7bd267ac3fe29052aa90e2c2682378a8c38447fd29491b46514a58259",
+        "site_bytes": 309919725
+      },
+      "pages-41207949826": {
+        "app_sha": "13611c96234b76766bd1d41a9ac6afb145cfcb56",
+        "asset_id": 695563880,
+        "bytes": 290742067,
+        "manifest_sha256": "99f113af40e0a6da039360cbc17566d2e87cd0ab553ff7abb1993854e4167254",
+        "metadata_asset_id": 695564433,
+        "metadata_sha256": "0927c95c35012468d968071536cef9b427096678cb21122757823b03b1fc9e9c",
+        "package_id": "pages-41207949826",
+        "public_files": {
+          "assets/index-DpGxH6Bu.css": "3126a5dc96332993f659473116bec9542cc93380490c7c98cc42cafd3098e7a4",
+          "assets/index-DxgSEhIL.js": "ddfaefd0487327de4bbb66d1ca3cff9652e10108fcebecd327a7c2e27bb0d947",
+          "data/catalog.json": "774f5eea5af2606c760e4473491126359f81b2872c1f56c8c1c32ba82ae3a8bb",
+          "index.html": "a3f1d3e2fb31e5ea18534395c6cb6861fc0a9cefddada5d977f40f458cc3c5d7",
+          "publication.json": "99f113af40e0a6da039360cbc17566d2e87cd0ab553ff7abb1993854e4167254"
+        },
+        "release_id": 429978009,
+        "sha256": "e715f302d8e9072fea98500578424546d1f7d215b9819f0ef8c7c229bfc90e34",
+        "site_bytes": 309925132
+      }
+    },
+    "from": "pages-41198442070",
+    "operation": {
+      "created_at": "2026-10-31T13:58:20Z",
+      "head_sha": "13611c96234b76766bd1d41a9ac6afb145cfcb56",
+      "job_id": 124560399245,
+      "job_name": "publish-41207949826-1",
+      "run_attempt": 1,
+      "run_id": 41207949826,
+      "step_name": "Publish Pages",
+      "step_number": 6
+    },
+    "to": "pages-41207949826"
+  },
   "retired": {
     "probe-original": "2026-11-15T12:03:57.273379+00:00"
   },
