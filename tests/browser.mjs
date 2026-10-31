@@ -51,9 +51,10 @@ try{
     if(mobile)assert.ok(mapBox.y+mapBox.height<=panelBox.y+2,'map remains above mobile panel');
     await page.getByRole('tab',{name:'Warstwy'}).click();
     // Geology uses native PL-1992 WMS requests; pin success/outage independently of PIG uptime.
-    let geologyOffline=false;const geologyRequests=[];
+    let geologyOffline=false;const geologyRequests=[],offlineAttempts=new Map();
     await page.route('https://cbdgmapa.pgi.gov.pl/**',route=>{
       geologyRequests.push(new URL(route.request().url()));
+      if(geologyOffline){const url=route.request().url();offlineAttempts.set(url,(offlineAttempts.get(url)||0)+1);}
       return geologyOffline?route.abort():route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#bc8dbc"/></svg>'});
     });
     for(const [value,service,layers] of [['smgt_a_zakryta','smgt_a_zakryta','0,1,2,3,4,5'],['smgt_b_odkryta','smgt_b_odkryta','0,1,2,3,4']]){
@@ -79,6 +80,13 @@ try{
     await page.locator('.ol-zoom-in').click();
     await page.locator('#tpn-message').waitFor({state:'visible'});
     assert.match(await page.locator('#tpn-message').innerText(),/geologiczn.*OSM/);
+    // Exhaust the automatic retry while offline before testing the manual retry.
+    // Otherwise a slow click can race the timer, which restores tiles and hides the button.
+    const retryDeadline=Date.now()+10000;
+    while(![...offlineAttempts.values()].some(count=>count>=2)){
+      assert.ok(Date.now()<retryDeadline,'geology automatically retries failed tiles');await page.waitForTimeout(50);
+    }
+    await page.locator('#tpn-message').waitFor({state:'visible'});
     geologyOffline=false;await page.locator('#retry-tpn').click();
     await waitForDownload(u=>u.includes('/kartografia/smgt_a_zakryta/')&&!beforeOutage.has(u),'geology recovered after retry');
     await page.locator('#tpn-message').waitFor({state:'hidden'});
