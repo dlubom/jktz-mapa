@@ -1,5 +1,11 @@
 # Publikacja Pages — weryfikacja kontraktu
 
+**Uzupełnienie 2026-10-31:** wykonano lokalną sondę stanów i kontrolowanych
+awarii oraz przygotowano nieaktywny kandydat próby GitHub. Wyniki i granice:
+[raport próby](PAGES_PUBLICATION_PROBE.md). Aktualną semantykę API ponownie
+sprawdzono w [notatce API](PAGES_PUBLICATION_API_CHECK.md). Próba lokalna
+nie zalicza opisanych poniżej testów integracyjnych na GitHubie.
+
 **Późniejszy stan z 2026-10-31:** po osobnej zgodzie opublikowano
 [minimalną sondę TPN](PAGES_BROWSER_PROBE.md) z gałęzi `gh-pages`.
 Poniższe odczyty i wnioski opisują badanie sprzed tej publikacji.

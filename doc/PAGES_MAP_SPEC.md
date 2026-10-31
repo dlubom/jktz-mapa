@@ -15,6 +15,12 @@ szczegółowy stan przeglądarek i urządzeń jest w raporcie. Nie jest to pełn
 aplikacja ani dowód jej gotowości. Tymczasowa publikacja z `gh-pages`
 nie wdraża docelowego workflow danych i rollbacku.
 
+Lokalny model publikacji, retencji, rollbacku i odzysku sprawdzono następnie
+kontrolowanymi awariami. [Wyniki i przygotowana próba GitHub](PAGES_PUBLICATION_PROBE.md)
+oddzielają dowód lokalny od nadal niewykonanej próby Actions/Pages.
+Kandydat workflow pozostaje nieaktywny i wymaga osobnej zgody; pozostałe
+uzgodnienia i granice implementacji nie ulegają zmianie.
+
 ## Uzgodniony zakres i miejsce projektu
 
 Polska, statyczna mapa pozycji obiektów, dostępnej historii pomiarów,

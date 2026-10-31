@@ -1,0 +1,236 @@
+{
+  "evidence": "mock API, not GitHub proof",
+  "passed": true,
+  "cases": [
+    {
+      "case": "retention_and_rollback",
+      "passed": true,
+      "observations": {
+        "current": "B",
+        "A_first_expiry_day": 135,
+        "A_renewed_expiry_day": 137,
+        "boundary": "kept until 137 days minus one second; eligible at day 137"
+      }
+    },
+    {
+      "case": "stale_and_equal_operations",
+      "passed": true,
+      "observations": {
+        "rejections": [
+          "stale operation",
+          "equal timestamp, different operations"
+        ],
+        "posts": 2,
+        "current": "A"
+      }
+    },
+    {
+      "case": "inputs_pinning",
+      "passed": true,
+      "observations": {
+        "latest_calls": [
+          "Latest:GPS",
+          "Latest:JKTZ",
+          "Latest:Georeferencer",
+          "Latest:GPS",
+          "Latest:JKTZ",
+          "Latest:Georeferencer"
+        ],
+        "existing_manifest_reused": true
+      }
+    },
+    {
+      "case": "invalid_and_interrupted_inputs",
+      "passed": true,
+      "observations": {
+        "latest_calls": 6,
+        "rerun_latest_calls": 0,
+        "rejected": [
+          "missing",
+          "corrupt",
+          "incomplete",
+          "empty_field",
+          "wrong_hash"
+        ],
+        "accepted": "complete upload after lost response"
+      }
+    },
+    {
+      "case": "unknown_and_restart",
+      "passed": true,
+      "observations": {
+        "posts": 1,
+        "pending": {
+          "from": "A",
+          "hash": "7524ffefd708a696c533330ed8bb8c1cd90a16dfd9f3dec5694e007df64869fe",
+          "operation": {
+            "created_at": 86400,
+            "job_id": 10,
+            "operation_id": "1",
+            "run_attempt": 1,
+            "run_id": 1,
+            "step_name": "Publish Pages"
+          },
+          "to": "B"
+        },
+        "page_alone_did_not_resolve": true
+      }
+    },
+    {
+      "case": "exact_step_recovery",
+      "passed": true,
+      "observations": {
+        "confirmed_day": 10,
+        "protected_until_day": 25,
+        "posts": 1,
+        "ledger": {
+          "archives": {
+            "A": {
+              "manifest_sha256": "b6c670798c99f69e616f18ce9796929d923b77627f42dc3b00a209ea72437666",
+              "sha256": "982d898dae50b4f491e3852aa8e3034fab7c9bf8762c34c3bb7d0149e7e7c93d"
+            },
+            "B": {
+              "manifest_sha256": "7524ffefd708a696c533330ed8bb8c1cd90a16dfd9f3dec5694e007df64869fe",
+              "sha256": "063753d889917c51746864e589fe3e78e876830fc9dfedea0c17a7d52c454ff1"
+            },
+            "C": {
+              "manifest_sha256": "df89f7906356dbd0f111681970a295fd26c6514df97f876a02cf831f72e24f81",
+              "sha256": "5de05ac0b46c3172d78cea3aff79a80aeac55e6e6237c32607100cb45fef5cfa"
+            },
+            "orphan": {
+              "manifest_sha256": "7e4fdada6bfc92a881b0e2727ac46643e1d3f8901a9ef32e5fcf60140bc90311",
+              "sha256": "c676ef42afac35be6c20c1f70aaf068a10af5530028a6c7c75972da778a6a6f5"
+            }
+          },
+          "candidates": [],
+          "current": "B",
+          "last": {
+            "created_at": 86400,
+            "job_id": 10,
+            "operation_id": "1",
+            "run_attempt": 1,
+            "run_id": 1,
+            "step_name": "Publish Pages"
+          },
+          "pending": null,
+          "retired": {
+            "A": 2160000
+          }
+        },
+        "repeated_recovery": "no POST, ledger write or retention reset"
+      }
+    },
+    {
+      "case": "insufficient_evidence",
+      "passed": true,
+      "observations": {
+        "rejected_step_fields": [
+          "run_id",
+          "run_attempt",
+          "job_id",
+          "step_name",
+          "conclusion"
+        ],
+        "rejected_page_variants": 3,
+        "still_pending": true
+      }
+    },
+    {
+      "case": "cas_reread",
+      "passed": true,
+      "observations": {
+        "conflict": {
+          "result": "reread differs: stop, no blind retry",
+          "events": [
+            "state.PUT",
+            "state.GET"
+          ]
+        },
+        "before_write": {
+          "result": "reread differs: stop, no blind retry",
+          "events": [
+            "state.PUT",
+            "state.GET"
+          ]
+        },
+        "after_write": {
+          "result": "confirmed by reread",
+          "events": [
+            "state.PUT",
+            "state.GET"
+          ]
+        }
+      }
+    },
+    {
+      "case": "changed_package_and_lock",
+      "passed": true,
+      "observations": {
+        "tampered_package_rejected": true,
+        "concurrent_deploy_and_cleanup_blocked": true,
+        "next_operation_after_release": "C",
+        "posts": 1
+      }
+    },
+    {
+      "case": "unreadable_ledger_blocks_cleanup",
+      "passed": true,
+      "observations": {
+        "rejected": [
+          "missing ledger/read failure",
+          "corrupt ledger"
+        ],
+        "packages_unchanged": true,
+        "expired_package_A_still_present": true
+      }
+    },
+    {
+      "case": "same_current_and_missing_archive",
+      "passed": true,
+      "observations": {
+        "same_current_has_expiry": false,
+        "missing_current_and_target_rejected": true,
+        "posts": 1,
+        "pending": null
+      }
+    },
+    {
+      "case": "candidate_survives_cleanup",
+      "passed": true,
+      "observations": {
+        "candidate": "B",
+        "expired_day": 17,
+        "cleanup_day": 30,
+        "retained": true,
+        "rollback_succeeded": true
+      }
+    },
+    {
+      "case": "malformed_state_blocks_mutation",
+      "passed": true,
+      "observations": {
+        "rejected_fields": [
+          "pending",
+          "pending",
+          "current",
+          "retired",
+          "last",
+          "candidates",
+          "archives"
+        ],
+        "live_package_B_preserved": true,
+        "posts": 3,
+        "additional_posts": 0,
+        "packages_unchanged": true
+      }
+    }
+  ],
+  "limitations": [
+    "Controlled exceptions and fresh clients, not an OS/runner kill.",
+    "Local flock contention, not GitHub concurrency/queue semantics.",
+    "Atomic local file replacement models API persistence; no filesystem power-loss guarantee.",
+    "Candidate protection uses explicitly registered fixtures, not discovery of the GitHub queue.",
+    "Jobs history, Pages propagation, retention and API errors are supplied by this mock.",
+    "No claim of automatic recovery for unknown POST outcome; it remains blocked."
+  ]
+}

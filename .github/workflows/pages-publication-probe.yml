@@ -1,0 +1,68 @@
+# INACTIVE: install as .github/workflows/pages-publication-probe.yml only after approval.
+name: Pages publication probe
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        required: true
+        options: [publish-A, publish-B, rollback-A, restore-original, recover]
+      pause_after_deploy:
+        description: Pause five minutes after successful B deploy, for operator cancellation
+        type: boolean
+        default: false
+permissions: {}
+concurrency:
+  group: pages-production
+  cancel-in-progress: false
+  queue: max
+jobs:
+  probe:
+    if: github.ref == 'refs/heads/main'
+    name: pages-publication-probe-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+    permissions:
+      actions: read
+      contents: write
+      pages: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PROBE_OPERATION: ${{ inputs.operation }}
+      PROBE_PAUSE: ${{ inputs.pause_after_deploy }}
+    steps:
+      - name: Checkout reviewed probe
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Prepare or recover
+        id: prepare
+        run: python3 doc/probes/publication/github_probe.py prepare
+      - name: Upload exact prepared archive
+        if: steps.prepare.outputs.ready == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pages-probe-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/pages-probe/artifact.tar
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+          overwrite: false
+      - name: Persist and read back pending
+        if: steps.prepare.outputs.ready == 'true'
+        run: python3 doc/probes/publication/github_probe.py pending
+      - name: Publish Pages probe
+        id: deployment
+        if: steps.prepare.outputs.ready == 'true'
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: pages-probe-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Pause after successful B deploy
+        if: steps.prepare.outputs.ready == 'true' && inputs.operation == 'publish-B' && inputs.pause_after_deploy
+        run: python3 -c 'import time; time.sleep(300)'
+      - name: Confirm exact deploy and public bytes
+        if: steps.prepare.outputs.ready == 'true'
+        run: python3 doc/probes/publication/github_probe.py confirm

@@ -14,6 +14,15 @@ Najpierw przeczytaj obowiązujące AGENTS.md, jeśli istnieją, oraz:
 
 Starsze raporty wydajności/QGIS czytaj tylko dla potrzebnego kontekstu.
 
+**Uzupełnienie etapu 2026-10-31:** lokalną próbę opisaną niżej wykonano.
+Przed kontynuacją przeczytaj również [wyniki próby](doc/PAGES_PUBLICATION_PROBE.md),
+[aktualne ustalenia API](doc/PAGES_PUBLICATION_API_CHECK.md) oraz
+[konkretną próbę GitHub do zatwierdzenia](doc/probes/publication/GITHUB_TRIAL.md).
+Jej YAML znajduje się poza `.github/workflows` i nie został uruchomiony.
+Najbliższa decyzja dotyczy wyłącznie tej ograniczonej próby; brak zgody
+nadal blokuje zmiany publiczne. Ponowne wykonanie sondy lokalnej jest
+dozwolone. Poniższy opis zachowuje zakres i kryteria tego etapu.
+
 Stan przekazania: publiczna sonda TPN działa pod
 `https://dlubom.github.io/jktz-mapa/`, z osobnej gałęzi `gh-pages`.
 Jej commit to `12a6783bc09eda112f9f187f9df5825264bbf183`, wdrożenie
