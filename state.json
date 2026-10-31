@@ -28,7 +28,39 @@
   "catalog_sha256": "60d4e7d45225dd2286fa1fb32c4e73e57b14135dbe695b2839d2ee2d815a90ab",
   "current": "original",
   "last": null,
-  "pending": null,
+  "pending": {
+    "archives": {
+      "A": {
+        "asset": "A.tar",
+        "asset_id": 694852572,
+        "bytes": 399360,
+        "manifest_sha256": "20257e05fb10d0bf55182e53fd7e816509a56aea6aeeb92512646317efd63ba3",
+        "release_id": 429817445,
+        "sha256": "64bc8cf8b553fbc05a8dfe0bd82ce557461413da97089c7b9392f5714e1f0562"
+      },
+      "original": {
+        "asset": "original.tar",
+        "asset_id": 694852569,
+        "bytes": 399360,
+        "manifest_sha256": null,
+        "release_id": 429817445,
+        "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
+      }
+    },
+    "from": "original",
+    "operation": {
+      "created_at": "2026-10-31T08:50:33Z",
+      "head_sha": "9d6bc4d27e4fc6cc05e089f0b2a0139ef49e2228",
+      "job_id": 124493604633,
+      "job_name": "pages-publication-probe-41186232166-1",
+      "operation": "publish-A",
+      "run_attempt": 1,
+      "run_id": 41186232166,
+      "step_name": "Publish Pages probe",
+      "step_number": 6
+    },
+    "to": "A"
+  },
   "rejected_operations": [
     {
       "evidence_run_id": 41185758641,
