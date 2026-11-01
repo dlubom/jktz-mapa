@@ -1,0 +1,140 @@
+# Mirror to dlubom/jktz-mapa-preview/.github/workflows/preview.yml.
+# The source PR is executed only in the read-only build job.
+name: Preview selected PR
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Numer otwartego PR w dlubom/jktz-mapa
+        required: true
+        type: number
+permissions: {}
+concurrency:
+  group: selected-pr-preview
+  cancel-in-progress: false
+jobs:
+  resolve:
+    if: github.repository == 'dlubom/jktz-mapa-preview' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      identity: ${{ steps.pr.outputs.identity }}
+      sha: ${{ steps.pr.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Pin the current PR merge candidate
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr }}
+        run: python3 scripts/preview.py resolve --pr "$PR_NUMBER"
+  build:
+    needs: resolve
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PREVIEW_IDENTITY: ${{ needs.resolve.outputs.identity }}
+      BROWSERS: chromium,firefox,webkit
+      TEST_BASE_PATH: /jktz-mapa-preview/
+    outputs:
+      artifact_url: ${{ steps.bundle.outputs.artifact-url }}
+    steps:
+      - name: Check out exactly the selected merge candidate
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: dlubom/jktz-mapa
+          ref: ${{ needs.resolve.outputs.sha }}
+          persist-credentials: false
+      - name: Read the publisher's bundle tools
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          path: .preview-tools
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Unit and importer checks
+        run: |
+          npm test
+          python -m unittest discover -s tests -p 'test_*.py'
+      - name: Build the complete source catalogues
+        run: |
+          python scripts/pipeline.py resolve --lock .build/inputs.json
+          python scripts/pipeline.py fetch --lock .build/inputs.json --cache .build/inputs
+          python scripts/pipeline.py build --lock .build/inputs.json --cache .build/inputs --output public/data
+          npm run build
+      - name: Browser acceptance on the preview path
+        run: |
+          npx playwright install --with-deps chromium firefox webkit
+          npm run test:browser
+      - name: Package complete review bundle
+        run: python .preview-tools/scripts/preview.py package --site dist --inputs .build/inputs.json --output .build/preview
+      - name: Save the complete ZIP
+        id: bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: selected-pr-${{ inputs.pr }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .build/preview/
+          include-hidden-files: true
+          compression-level: 0
+          retention-days: 15
+          if-no-files-found: error
+      - name: Save browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output/playwright/
+          retention-days: 15
+          if-no-files-found: warn
+  publish:
+    needs: [resolve, build]
+    if: github.repository == 'dlubom/jktz-mapa-preview' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PREVIEW_IDENTITY: ${{ needs.resolve.outputs.identity }}
+    steps:
+      - name: Check out trusted publisher only
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: selected-pr-${{ inputs.pr }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .build/site
+      - name: Verify complete bundle and unchanged PR
+        run: python3 scripts/preview.py verify --site .build/site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: .build/site
+          include-hidden-files: true
+          retention-days: 1
+      - name: Recheck PR and newest selection after the upload
+        run: python3 scripts/preview.py guard
+      - name: Publish the selected PR
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      - name: Read back the public identity and entry files
+        run: python3 scripts/preview.py confirm --site .build/site
+      - name: Link the page and ZIP
+        env:
+          ARTIFACT_URL: ${{ needs.build.outputs.artifact_url }}
+        run: |
+          python3 scripts/preview.py summary --site .build/site
+          echo '[Otwórz stronę testową](https://dlubom.github.io/jktz-mapa-preview/)' >> "$GITHUB_STEP_SUMMARY"

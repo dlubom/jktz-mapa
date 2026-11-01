@@ -4,6 +4,14 @@ To statyczna mapa 2D na GitHub Pages, łącząca trzy projekty wymienione
 w [README.md](README.md). Interfejs: TypeScript, OpenLayers, proj4 i Vite.
 Dane przygotowuje Python z GDAL; aplikacja działa bez backendu i QGIS.
 
+## Zasady Git
+
+- Nie commituj ani nie wysyłaj zmian bezpośrednio na `main`. Pracuj na osobnej
+  gałęzi i otwieraj PR; scalanie wymaga zielonego `map`.
+- Wyjątek wymaga wyraźnego polecenia użytkownika dotyczącego bezpośredniej zmiany
+  `main`. Nie traktuj zgody na implementację lub publikację podglądu jako wyjątku.
+  Jeżeli trzeba czasowo zmienić ochronę, zachowaj regułę i przywróć ją po operacji.
+
 ## Gdzie pracować
 
 - `src/` — mapa, polski interfejs, wyszukiwanie i zarządzanie obrazami planów.
@@ -70,3 +78,19 @@ Emulacja ekranu nie zastępuje odbioru na fizycznym telefonie.
   `pending/unknown` wymaga rozpoznania, a nie nadpisania stanu.
 - Bieżąca paczka nie wygasa, zastąpiona jest chroniona minimum 15 dni od zastąpienia;
   przypięcia wejść mają 90 dni retencji. Po deployu sprawdź publiczny manifest i mapę.
+
+## Podgląd PR
+
+- Pełny ZIP z CI ma 15 dni retencji. Zawiera gotową mapę, wszystkie plany,
+  `serve.py`, `inputs.json`, `preview.json` i `checksums.json`.
+- Wybrany otwarty PR można opublikować w osobnym repozytorium
+  `dlubom/jktz-mapa-preview`, workflow `Preview selected PR`, podając jego numer.
+  Każdy Run buduje aktualnego kandydata scalenia z pełnymi danymi i testami;
+  Re-run rozpoznaje aktualny PR ponownie. To nie jest archiwum produkcyjne.
+- Szablon workflow jest w `.github/preview-repository/preview.yml`; publikator
+  używa kopii `scripts/preview.py` i `scripts/preview-server.py` z repozytorium
+  podglądu. Ich aktualizacje przenoś tam osobnym PR, zanim będą potrzebne.
+- Kod PR wykonuj tylko w etapie budowy bez sekretów i z uprawnieniami do odczytu.
+  Etap publikacji wykonuje wyłącznie zaufany kod repozytorium podglądu.
+- Nie kieruj podglądu do produkcyjnego Pages ani do `pages-state`.
+  Instrukcja użytkownika: [docs/PR_PREVIEW.md](docs/PR_PREVIEW.md).
