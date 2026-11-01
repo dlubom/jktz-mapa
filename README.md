@@ -45,6 +45,8 @@ Instrukcje uruchomienia, testów i publikacji: [AGENTS.md](AGENTS.md).
 Publikacja na GitHub Pages jest uruchamiana ręcznie przez GitHub Actions.
 Zmiany przechodzą przez PR. [Paczki ZIP i strona testowa wybranego PR](docs/PR_PREVIEW.md)
 umożliwiają odbiór przed scaleniem.
+[Procesy i cache rastrów](docs/BUILD_PERFORMANCE.md)
+opisują szybszą budowę danych.
 
 ## Odnośniki do opisów jaskiń
 
