@@ -12,6 +12,7 @@ import Feature from 'ol/Feature.js';
 import Point from 'ol/geom/Point.js';
 import {Circle, Fill, Stroke, Style, Text} from 'ol/style.js';
 import {defaults as controls, ScaleLine} from 'ol/control.js';
+import {defaults as defaultInteractions} from 'ol/interaction/defaults.js';
 import {register} from 'ol/proj/proj4.js';
 import proj4 from 'proj4';
 import {transformExtent} from 'ol/proj.js';
@@ -67,7 +68,7 @@ export class MapController {
     this.other=new VectorLayer({source:new VectorSource(),zIndex:25,visible:false,style:pointStyle('#3972b0',4)});
     this.rejected=new VectorLayer({source:new VectorSource(),zIndex:26,visible:false,style:pointStyle('#b44956',5)});
     this.differences=new VectorLayer({source:new VectorSource(),zIndex:15,visible:false,style:feature=>new Style({stroke:new Stroke({color:'#bd6b35',width:1.5,lineDash:[5,4]}),text:new Text({text:`${Number(feature.get('differenceM')||0).toLocaleString('pl-PL',{maximumFractionDigits:1})} m`,font:'11px system-ui',fill:new Fill({color:'#783e1f'}),stroke:new Stroke({color:'#fff',width:3})})})});
-    this.map=new Map({target:'map',layers:[this.osm,this.tpn,this.differences,this.other,this.rejected,this.best],view:new View({projection:'EPSG:2180',center:[567000,154000],resolution:25,minResolution:.025,maxResolution:300}),controls:controls({rotate:false,zoomOptions:{zoomInTipLabel:'Przybliż',zoomOutTipLabel:'Oddal'},attributionOptions:{collapsible:false}}).extend([new ScaleLine({units:'metric'})]),maxTilesLoading:6});
+    this.map=new Map({target:'map',layers:[this.osm,this.tpn,this.differences,this.other,this.rejected,this.best],interactions:defaultInteractions({onFocusOnly:false}),view:new View({projection:'EPSG:2180',center:[567000,154000],resolution:25,minResolution:.025,maxResolution:300}),controls:controls({rotate:false,zoomOptions:{zoomInTipLabel:'Przybliż',zoomOutTipLabel:'Oddal'},attributionOptions:{collapsible:false}}).extend([new ScaleLine({units:'metric'})]),maxTilesLoading:6});
     this.osmTracking=this.trackBasemapSource(this.osm.getSource()!);
     this.plans=new Plans(this.map,catalog.plans,planReport);
     this.map.on('singleclick',event=>{const ids=new Set<string>();this.map.forEachFeatureAtPixel(event.pixel,f=>{if(f.get('objectId'))ids.add(f.get('objectId'));},{hitTolerance:8,layerFilter:l=>[this.best,this.other,this.rejected].includes(l as VectorLayer)});if(ids.size)select([...ids]);});

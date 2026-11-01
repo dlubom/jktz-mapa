@@ -44,6 +44,55 @@ try{
     };
     const setRange=async(locator,value)=>{if(await locator.getAttribute('id')==='active-plan-opacity')await openPlanSettings();await locator.evaluate((el,value)=>{el.value=String(value);el.dispatchEvent(new Event('input',{bubbles:true}));},value);};
     const waitForMapRender=()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const mapScale=()=>page.locator('.ol-scale-line-inner').evaluate(el=>`${el.textContent}|${el.style.width}`);
+    const checkMapNavigation=async()=>{
+      const map=page.locator('#map'),search=page.locator('#search'),panel=page.locator('.panel-scroll');
+      const changedScale=async(before,label)=>{
+        const deadline=Date.now()+3000;
+        while(await mapScale()===before){assert.ok(Date.now()<deadline,label);await page.waitForTimeout(50);}
+        await page.waitForTimeout(450); // Finish the wheel/key zoom animation before the next gesture.
+        assert.notEqual(await mapScale(),before,label);
+      };
+      const wheelOnMap=async(label)=>{
+        const box=await map.boundingBox(),point={x:box.x+box.width/2,y:box.y+box.height/2};
+        assert.equal(await page.evaluate(({x,y})=>!!document.elementFromPoint(x,y)?.closest('.ol-viewport'),point),true,'the wheel is aimed at exposed map content');
+        const before=await mapScale();
+        await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-240);
+        await changedScale(before,label);
+      };
+      assert.equal(await map.getAttribute('tabindex'),'0','the map remains in the keyboard tab order');
+      assert.equal(await map.evaluate(el=>el.contains(document.activeElement)),false,'the first wheel gesture precedes any map focus or click');
+      await wheelOnMap('the first wheel gesture zooms the map before any click');
+      await search.focus();
+      await wheelOnMap('wheel over the map zooms while the search input has focus');
+      assert.equal(await search.evaluate(el=>el===document.activeElement),true,'wheel zoom does not steal focus from the search input');
+
+      await page.locator('#layer-diagnostics > summary').click();
+      await panel.evaluate(el=>el.scrollTop=0);
+      assert.equal(await panel.evaluate(el=>el.scrollHeight>el.clientHeight),true,'the sidebar fixture has content to scroll');
+      const beforeScroll=await mapScale(),panelBox=await panel.boundingBox();
+      await page.mouse.move(panelBox.x+8,panelBox.y+Math.min(80,panelBox.height/2));
+      await page.mouse.wheel(0,350);
+      await page.waitForFunction(()=>document.querySelector('.panel-scroll').scrollTop>0);
+      await page.waitForTimeout(450);
+      assert.equal(await mapScale(),beforeScroll,'wheel over the sidebar scrolls its panel without zooming the map');
+      await page.locator('#layer-diagnostics > summary').click();
+      await panel.evaluate(el=>el.scrollTop=0);
+
+      await map.focus();
+      assert.equal(await map.evaluate(el=>el===document.activeElement),true,'the map can receive keyboard focus');
+      for(const key of ['+','-']){const before=await mapScale();await map.press(key);await changedScale(before,`${key} zooms the focused map`);}
+      const beforePan=await mapScale();
+      for(const key of ['ArrowRight','ArrowLeft','ArrowUp','ArrowDown']){
+        const before=await page.locator('#coordinates').innerText();
+        await map.press(key);
+        await page.waitForFunction(before=>document.querySelector('#coordinates').textContent!==before,before);
+        await page.waitForTimeout(150);
+      }
+      assert.equal(await mapScale(),beforePan,'arrow keys pan the focused map without changing its scale');
+      await page.getByRole('button',{name:'Cały obszar',exact:false}).click();
+      await page.waitForTimeout(450);await waitForMapRender();
+    };
     const basemapStatus=async()=>{
       assert.equal(await page.locator('#basemap-status').count(),1,'the layer panel has a persistent actual-basemap status');
       assert.equal(await page.locator('#quick-basemap-status').count(),1,'plan controls have the same persistent actual-basemap status');
@@ -157,11 +206,13 @@ try{
     assert.equal(await page.locator('#layer-diagnostics').evaluate(el=>el.open),false,'measurement diagnostics start closed');
     for(const [id,label] of [['best','Lokalizacje jaskiń'],['plans','Plany jaskiń'],['models','Ciągi pomiarowe']])assert.match(await page.locator(`#layer-${id}`).evaluate(el=>el.closest('label').textContent),new RegExp(label));
     assert.equal(await page.locator('#all-names').isChecked(),false,'label collision avoidance is the default');
+    await page.waitForTimeout(150);
+    assert.equal(requests.filter(u=>u.endsWith('.webp')).length,0,'no plan imagery before zoom');
+    // Keep this before every click/focus, including the otherwise unrelated label toggle.
+    await checkMapNavigation();
     await page.locator('#all-names').check();
     assert.equal(await page.locator('#all-names').isChecked(),true);
     await page.locator('#all-names').uncheck();
-    await page.waitForTimeout(150);
-    assert.equal(requests.filter(u=>u.endsWith('.webp')).length,0,'no plan imagery before zoom');
     for(const [value,label] of [['rgb_2020','Zdjęcia lotnicze'],['rgb_2018','Zdjęcia lotnicze'],['NMT','Rzeźba terenu'],['nmpt','Pokrycie terenu'],['smgt_a_zakryta','Geologia'],['smgt_b_odkryta','Geologia'],['osm','Mapa']]){
       assert.ok((await page.locator(`#basemap option[value="${value}"]`).innerText()).startsWith(label),`${value}: the selector names the kind of map in plain language`);
     }
