@@ -9,11 +9,13 @@ from __future__ import annotations
 import argparse
 import ast
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from datetime import datetime, timezone
 import hashlib
 import json
 import math
+import multiprocessing
+import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
@@ -25,6 +27,8 @@ import tempfile
 import time
 import urllib.parse
 import zipfile
+
+import raster_cache as raster_store
 
 PROFILE = 'map-data-v1-webp512-gutter1'
 REPOSITORIES = {
@@ -440,13 +444,64 @@ def write_webp(dataset, path, window=None):
     return path.stat().st_size
 
 
-def import_plans(cache, source, out, details):
+def raster_key(lock):
+    source = next(source for source in lock['sources'] if source['key'] == 'geo')
+    return raster_store.key(source, PROFILE, __file__)
+
+
+def render_plan(task):
+    """One independent process owns all GDAL datasets for one plan."""
+    from osgeo import gdal
+    gdal.UseExceptions()
+    gdal.SetCacheMax(128 * 1024**2)
+    archive, member, target = task
+    ds = gdal.Open('/vsizip/' + archive + '/' + member)
+    require(ds is not None, f'Unreadable TIFF: {member}')
+    extent, resolution, levels = raster_geometry(ds.GetGeoTransform(), ds.RasterXSize, ds.RasterYSize)
+    src = gdal.Translate('', ds, format='VRT', outputType=gdal.GDT_Byte, scaleParams=[[0, 1, 0, 255]])
+    ew, eh = extent[2] - extent[0], extent[3] - extent[1]
+    ratio = min(TILE_SIZE / max(ew, eh), 1 / resolution)
+    pw, ph = max(1, math.floor(ew * ratio)), max(1, math.floor(eh * ratio))
+    preview = gdal.Warp('', src, format='VRT', dstSRS='EPSG:2180', outputBounds=extent, width=pw, height=ph, resampleAlg='bilinear', dstAlpha=True, outputType=gdal.GDT_Byte)
+    write_webp(preview, Path(target) / 'preview.webp')
+    for level in levels:
+        warped = gdal.Warp('', src, format='VRT', dstSRS='EPSG:2180', outputBounds=level['extent'], width=level['width'], height=level['height'], resampleAlg='bilinear', dstAlpha=True, outputType=gdal.GDT_Byte)
+        for y in range(level['rows']):
+            for x in range(level['columns']):
+                path = Path(target) / 'tiles' / str(level['level']) / f'{x}-{y}.webp'
+                write_webp(warped, path, (x * TILE_SIZE - GUTTER, y * TILE_SIZE - GUTTER, TILE_SIZE + 2 * GUTTER, TILE_SIZE + 2 * GUTTER))
+    return member
+
+
+def render_plans(tasks, workers):
+    require(type(workers) is int and 1 <= workers <= 4, 'Workers must be between 1 and 4')
+    if workers == 1:
+        for task in tasks:
+            render_plan(task)
+    else:
+        # spawn avoids inheriting native handles/locks from the validating parent.
+        with ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context('spawn'),
+                                 initializer=configure_renderer, initargs=(raster_store.configuration(),)) as pool:
+            for index, _ in enumerate(pool.map(render_plan, tasks), 1):
+                if index % 50 == 0 or index == len(tasks):
+                    print(f'Rendered plans {index}/{len(tasks)} ({workers} workers)', flush=True)
+
+
+def configure_renderer(config):
+    from osgeo import gdal
+    for name, value in config.items():
+        gdal.SetConfigOption(name, value)
+
+
+def import_plans(cache, source, out, details, *, workers=None, raster_cache=None):
     from osgeo import gdal
     gdal.UseExceptions()
     gdal.SetCacheMax(128 * 1024**2)
     require(gdal.GetDriverByName('WEBP') is not None, 'GDAL WebP driver is required')
     archive_path = cache / source['assets'][0]['name']
-    plans, raster_bytes, tile_count = [], 0, 0
+    workers = min(4, os.cpu_count() or 1) if workers is None else workers
+    require(type(workers) is int and 1 <= workers <= 4, 'Workers must be between 1 and 4')
+    plans, tasks = [], []
     with zipfile.ZipFile(archive_path) as archive:
         names = safe_archive(archive)
         manifest = json_read(archive.read('manifest.json'))
@@ -488,20 +543,11 @@ def import_plans(cache, source, out, details):
                 if oid in details:
                     details[oid]['planIds'].append(pid)
             name = str(meta.get('cave', {}).get('name') or plan['measurement']['name_local'] or pid)
-            src = gdal.Translate('', ds, format='VRT', outputType=gdal.GDT_Byte, scaleParams=[[0, 1, 0, 255]])
             ew, eh = extent[2] - extent[0], extent[3] - extent[1]
             ratio = min(TILE_SIZE / max(ew, eh), 1 / resolution)
             pw, ph = max(1, math.floor(ew * ratio)), max(1, math.floor(eh * ratio))
-            preview = gdal.Warp('', src, format='VRT', dstSRS='EPSG:2180', outputBounds=extent, width=pw, height=ph, resampleAlg='bilinear', dstAlpha=True, outputType=gdal.GDT_Byte)
-            preview_path = out / 'plans' / pid / 'preview.webp'
-            raster_bytes += write_webp(preview, preview_path)
-            for level in levels:
-                warped = gdal.Warp('', src, format='VRT', dstSRS='EPSG:2180', outputBounds=level['extent'], width=level['width'], height=level['height'], resampleAlg='bilinear', dstAlpha=True, outputType=gdal.GDT_Byte)
-                for y in range(level['rows']):
-                    for x in range(level['columns']):
-                        path = out / 'plans' / pid / 'tiles' / str(level['level']) / f'{x}-{y}.webp'
-                        raster_bytes += write_webp(warped, path, (x * TILE_SIZE - GUTTER, y * TILE_SIZE - GUTTER, TILE_SIZE + 2 * GUTTER, TILE_SIZE + 2 * GUTTER))
-                        tile_count += 1
+            tasks.append((str(archive_path.resolve()), entry['archive_path'], str(out / 'plans' / pid)))
+            ds = None
             write_json(out / 'plans' / pid / 'details.json', {'plan': plan, 'meta': meta, **optional,
                        'computed': json_read(archive.read(mapping[(pid, 'computed.json')]['archive_path'])),
                        'worldFile': archive.read(mapping[(pid, 'image.tfw')]['archive_path']).decode(),
@@ -512,8 +558,22 @@ def import_plans(cache, source, out, details):
                           'preview': {'url': f'data/plans/{pid}/preview.webp', 'width': pw, 'height': ph, 'extent': extent},
                           'levels': levels, 'tileSize': TILE_SIZE, 'gutter': GUTTER, 'tileUrl': f'data/plans/{pid}/tiles/{{level}}/{{x}}-{{y}}.webp',
                           'detailUrl': f'data/plans/{pid}/details.json', 'orientationStatus': plan.get('orientation', {}).get('status', 'unknown')})
-            if index % 50 == 0:
-                print(f'Plans {index + 1}/{len(manifest["plans"])}: {pid}; {tile_count} tiles; {raster_bytes / 1024**2:.1f} MiB', flush=True)
+    expected = raster_store.expected_files(plans)
+    cache_key = raster_key({'sources': [source]}) if raster_cache is not None else None
+    reused = raster_cache is not None and raster_store.restore(raster_cache, cache_key, expected, out / 'plans')
+    if reused:
+        print(f'Raster cache hit: {len(plans)} plans, {len(expected)} raster files verified', flush=True)
+    else:
+        print(f'Raster cache miss; rendering {len(plans)} plans with {workers} workers', flush=True)
+        render_plans(tasks, workers)
+        if raster_cache is not None:
+            try:
+                raster_store.save(raster_cache, cache_key, expected, out / 'plans')
+            except OSError as error:
+                print(f'Raster cache save skipped: {error}', file=sys.stderr, flush=True)
+    webp = [name for name in expected if name.endswith('.webp')]
+    raster_bytes = sum((out / 'plans' / name).stat().st_size for name in webp)
+    tile_count = len(webp) - len(plans)
     return plans, {'plans': len(plans), 'tiles': tile_count, 'rasterBytes': raster_bytes}
 
 
@@ -538,8 +598,13 @@ def build_report(output, counts, seconds):
     raise ValueError('Build report size did not converge')
 
 
-def build(lock, cache, output):
+def build(lock, cache, output, *, workers=None, raster_cache=None):
     start = time.monotonic()
+    cache, output = cache.resolve(), output.resolve()
+    if raster_cache is not None:
+        destination = raster_cache.resolve()
+        require(not (destination == output or destination in output.parents or output in destination.parents), 'Raster cache and output must be separate')
+        require(not (destination == cache or destination in cache.parents or cache in destination.parents), 'Raster cache and inputs must be separate')
     # Revalidate pinned bytes even when fetch used an existing cache.
     fetch(lock, cache)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -548,7 +613,7 @@ def build(lock, cache, output):
         sources = {s['key']: s for s in lock['sources']}
         objects, details, counts = import_gps(cache, sources['gps'], staging)
         models = import_jktz(cache, sources['jktz'], staging, details)
-        plans, raster_counts = import_plans(cache, sources['geo'], staging, details)
+        plans, raster_counts = import_plans(cache, sources['geo'], staging, details, workers=workers, raster_cache=raster_cache)
         for obj in objects:
             detail = details[obj['id']]
             obj['modelIds'], obj['planIds'] = detail['modelIds'], detail['planIds']
@@ -581,17 +646,21 @@ def build(lock, cache, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['resolve', 'fetch', 'build'])
+    parser.add_argument('command', choices=['resolve', 'fetch', 'build', 'cache-key'])
     parser.add_argument('--lock', type=Path, required=True)
     parser.add_argument('--cache', type=Path, default=Path('.build/inputs'))
     parser.add_argument('--output', type=Path, default=Path('public/data'))
+    parser.add_argument('--workers', type=int, choices=range(1, 5))
+    parser.add_argument('--raster-cache', type=Path)
     args = parser.parse_args()
     if args.command == 'resolve':
         resolve(args.lock)
     elif args.command == 'fetch':
         fetch(read_lock(args.lock), args.cache)
+    elif args.command == 'cache-key':
+        print(raster_key(read_lock(args.lock)))
     else:
-        build(read_lock(args.lock), args.cache.resolve(), args.output.resolve())
+        build(read_lock(args.lock), args.cache.resolve(), args.output.resolve(), workers=args.workers, raster_cache=args.raster_cache)
 
 
 if __name__ == '__main__':

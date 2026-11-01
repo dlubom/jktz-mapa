@@ -36,13 +36,16 @@ jobs:
       - name: Reuse an already finished archive for this run
         id: package
         run: python scripts/publication.py reuse
-      - name: Test and build the whole catalogue
+      - name: Unit and importer checks
         if: steps.package.outputs.reused != 'true'
         run: |
           npm test
           python -m unittest discover -s tests -p 'test_*.py'
-          python scripts/pipeline.py fetch --lock .build/inputs.json --cache .build/inputs
-          python scripts/pipeline.py build --lock .build/inputs.json --cache .build/inputs --output public/data
+      - uses: ./.github/actions/data
+        if: steps.package.outputs.reused != 'true'
+      - name: Build and accept the complete static package
+        if: steps.package.outputs.reused != 'true'
+        run: |
           npm run build
           npx playwright install --with-deps chromium firefox webkit
           npm run test:browser

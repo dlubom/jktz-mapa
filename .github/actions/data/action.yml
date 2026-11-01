@@ -1,0 +1,41 @@
+name: Complete map data with verified raster cache
+description: Rebuild current metadata and reuse only content-bound, verified raster files
+inputs:
+  lock:
+    description: Existing immutable input lock
+    default: .build/inputs.json
+  save-cache:
+    description: Allow cache writes only in the intended workflow trust scope
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - name: Fingerprint pinned raster inputs and native renderer
+      id: key
+      shell: bash
+      env:
+        INPUT_LOCK: ${{ inputs.lock }}
+      run: |
+        key=$(python scripts/pipeline.py cache-key --lock "$INPUT_LOCK")
+        echo "key=$key" >> "$GITHUB_OUTPUT"
+    - name: Restore raster cache
+      id: rasters
+      continue-on-error: true
+      uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+      with:
+        path: .build/rasters
+        key: ${{ steps.key.outputs.key }}
+      env:
+        SEGMENT_DOWNLOAD_TIMEOUT_MINS: '2'
+    - name: Build current catalogue and verify or generate every raster
+      shell: bash
+      env:
+        INPUT_LOCK: ${{ inputs.lock }}
+      run: /usr/bin/time -v python scripts/pipeline.py build --lock "$INPUT_LOCK" --cache .build/inputs --output public/data --workers 4 --raster-cache .build/rasters
+    - name: Save complete raster cache in this branch scope
+      if: inputs.save-cache == 'true' && steps.rasters.outputs.cache-hit != 'true'
+      continue-on-error: true
+      uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+      with:
+        path: .build/rasters
+        key: ${{ steps.key.outputs.key }}
