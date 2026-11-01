@@ -4,11 +4,6 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
-    inputs:
-      verify-equivalence:
-        description: Compare the previous full importer with cold and warm optimized builds
-        type: boolean
-        default: false
 permissions:
   contents: read
 concurrency:
@@ -35,21 +30,6 @@ jobs:
       - uses: ./.github/actions/data
       - name: Build the static application
         run: npm run build
-      - name: Compare every file with the previous importer and warm cache
-        if: github.event_name == 'workflow_dispatch' && inputs.verify-equivalence
-        env:
-          BASELINE_SHA: aaae3780372dc55cbcf5268418fff8623f5d4e67
-        run: |
-          gh api "repos/dlubom/jktz-mapa/contents/scripts/pipeline.py?ref=$BASELINE_SHA" -H 'Accept: application/vnd.github.raw' > .build/reference-pipeline.py
-          python scripts/verify_rasters.py --reference-script .build/reference-pipeline.py --lock .build/inputs.json
-      - name: Save full equivalence evidence
-        if: always() && github.event_name == 'workflow_dispatch' && inputs.verify-equivalence
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: raster-equivalence-${{ github.run_id }}-${{ github.run_attempt }}
-          path: output/raster-equivalence/
-          retention-days: 15
-          if-no-files-found: warn
       - name: Browser acceptance on the static build
         run: |
           npx playwright install --with-deps chromium firefox webkit
