@@ -88,6 +88,18 @@ class PreviewTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'Missing|catalogue'):
                     preview.verify_bundle(bundle, identity())
 
+    def test_small_plan_is_complete_with_preview_and_no_tile_levels(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            site, pins = make_site(root)
+            path = site / 'data/catalog.json'
+            catalog = json.loads(path.read_text())
+            catalog['plans'][0]['levels'] = []
+            path.write_text(json.dumps(catalog))
+            (site / 'data/plans/one/tiles/0/0-0.webp').unlink()
+            preview.build_bundle(site, pins, root / 'bundle', identity())
+            preview.verify_bundle(root / 'bundle', identity())
+
     def test_older_selection_cannot_overwrite_newer_selection_even_on_rerun(self):
         runs = [{'id': 10, 'run_number': 1}, {'id': 20, 'run_number': 2}]
         with patch.object(preview, 'api', return_value={'workflow_runs': runs}), \

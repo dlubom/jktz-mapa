@@ -165,7 +165,7 @@ def verify_catalogue(site, files):
     for plan in catalog['plans']:
         asset(plan['preview']['url'])
         asset(plan['detailUrl'])
-        require(isinstance(plan.get('levels'), list) and plan['levels'], 'Missing catalogue tile levels')
+        require(isinstance(plan.get('levels'), list), 'Missing catalogue tile levels')
         for level in plan['levels']:
             columns, rows = level['columns'], level['rows']
             require(type(columns) is int and type(rows) is int and columns > 0 and rows > 0 and
