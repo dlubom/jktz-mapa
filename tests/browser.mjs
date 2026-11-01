@@ -31,6 +31,35 @@ try{
     await page.addInitScript(()=>{performance.setResourceTimingBufferSize(200);window.resourceTimingBufferFullCount=0;performance.addEventListener('resourcetimingbufferfull',()=>window.resourceTimingBufferFullCount++);});
     const waitForDownload=async(predicate,label)=>{const deadline=Date.now()+30000;while(![...finishedURLs].some(predicate)){assert.ok(Date.now()<deadline,`Timed out waiting for successful completed download: ${label}`);await page.waitForTimeout(50);}};
     const timing=()=>page.evaluate(()=>({entries:performance.getEntriesByType('resource').length,bufferFullEvents:window.resourceTimingBufferFullCount}));
+    const ensurePanelOpen=async()=>{if(mobile&&await page.locator('#panel-toggle').getAttribute('aria-expanded')==='false')await page.locator('#panel-toggle').click();};
+    const openObject=async(id)=>{
+      await ensurePanelOpen();await page.locator('#search').fill(id);
+      await page.locator(`[data-object="${id}"]`).first().click();
+      await page.locator('#object-primary-actions').waitFor();
+      assert.equal(new URL(page.url()).hash,`#obiekt=${id}`,'object selection retains its URL');
+    };
+    const openPlanSettings=async()=>{
+      await page.waitForFunction(()=>document.querySelector('#plan-tools').dataset.compact===String(document.querySelector('#map').clientHeight<420));
+      if(!await page.locator('#plan-tool-settings').evaluate(el=>el.open))await page.locator('#plan-tools-toggle').click();
+    };
+    const setRange=async(locator,value)=>{if(await locator.getAttribute('id')==='active-plan-opacity')await openPlanSettings();await locator.evaluate((el,value)=>{el.value=String(value);el.dispatchEvent(new Event('input',{bubbles:true}));},value);};
+    const waitForMapRender=()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const waitForPlanCount=async(predicate,label)=>{
+      const deadline=Date.now()+30000;
+      for(;;){const text=await page.locator('#plan-status').innerText(),match=text.match(/^(\d+) planów w widoku/);if(match&&predicate(Number(match[1])))return Number(match[1]);assert.ok(Date.now()<deadline,`${label}: ${text}`);await page.waitForTimeout(50);}
+    };
+    const checkPlanTools=async()=>{
+      const tools=page.getByRole('region',{name:'Sterowanie planem',exact:true});await tools.waitFor();await openPlanSettings();
+      assert.equal(await tools.getAttribute('id'),'plan-tools');
+      assert.equal(await tools.evaluate(el=>!!el.closest('.map-area')),true,'plan tools are on the map');
+      const box=await tools.boundingBox(),zoom=await page.locator('.ol-zoom').boundingBox();
+      assert.ok(box&&zoom&&!(box.x<zoom.x+zoom.width&&box.x+box.width>zoom.x&&box.y<zoom.y+zoom.height&&box.y+box.height>zoom.y),'plan tools leave zoom controls exposed');
+      for(const id of ['quick-basemap','active-plan-opacity','active-plan-fit','plan-solo','close-plan-tools']){
+        const control=tools.locator(`#${id}`);assert.equal(await control.isVisible(),true,`${id} remains visible`);
+        assert.equal(await control.evaluate(el=>{const r=el.getBoundingClientRect(),top=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return !!top&&(top===el||el.contains(top));}),true,`${id} can be reached without an overlay`);
+      }
+    };
+
     try{
     // Controlled external outage pins fallback behaviour, independent of TPN uptime.
     await page.route('https://tpn.obliview.com/**',r=>r.abort());
@@ -40,6 +69,8 @@ try{
     await page.getByRole('heading',{name:'Warstwy i podkład'}).waitFor();
     const readyMs=Date.now()-started;
     assert.equal(await page.locator('#layer-best').isChecked(),true);assert.equal(await page.locator('#layer-other').isChecked(),false);assert.equal(await page.locator('#layer-rejected').isChecked(),false);assert.equal(await page.locator('#layer-differences').isChecked(),false);assert.equal(await page.locator('#layer-models').isChecked(),true);assert.equal(await page.locator('#layer-plans').isChecked(),true);
+    assert.equal(await page.locator('#layer-diagnostics').evaluate(el=>el.open),false,'measurement diagnostics start closed');
+    for(const [id,label] of [['best','Lokalizacje jaskiń'],['plans','Plany jaskiń'],['models','Ciągi pomiarowe']])assert.match(await page.locator(`#layer-${id}`).evaluate(el=>el.closest('label').textContent),new RegExp(label));
     assert.equal(await page.locator('#all-names').isChecked(),false,'label collision avoidance is the default');
     await page.locator('#all-names').check();
     assert.equal(await page.locator('#all-names').isChecked(),true);
@@ -48,8 +79,48 @@ try{
     assert.equal(requests.filter(u=>u.endsWith('.webp')).length,0,'no plan imagery before zoom');
     await page.locator('#search').fill('piwnica mietusia');
     await page.locator('[data-object="MTZ-0017"]').first().click();
+    await page.locator('#object-primary-actions').waitFor();
+    assert.equal(await page.locator('#object-diagnostics').evaluate(el=>el.open),false,'object diagnostics start closed');
+    assert.equal(await page.locator('#object-primary-actions').getByRole('button',{name:'Pokaż plan',exact:true}).getAttribute('data-plan-fit'),'001459-pza-2024');
+    assert.equal(await page.getByRole('heading',{name:/Historia pomiarów/}).isVisible(),false,'history does not precede the main object actions');
+    assert.equal(await page.locator('#object-panel').evaluate(panel=>{
+      const diagnostics=panel.querySelector('#object-diagnostics'),actions=panel.querySelector('#object-primary-actions');
+      const plans=[...panel.querySelectorAll('h3')].find(el=>el.textContent.includes('Plany jaskini'));
+      const models=[...panel.querySelectorAll('h3')].find(el=>el.textContent.includes('Ciągi'));
+      return !!(plans&&models)&&[actions,plans,models].every(el=>!!(el.compareDocumentPosition(diagnostics)&Node.DOCUMENT_POSITION_FOLLOWING));
+    }),true,'actions, related plans and survey lines precede diagnostics');
+    await page.locator('#object-diagnostics > summary').click();
     await page.getByRole('heading',{name:/Historia pomiarów/}).waitFor();
-    assert.match(await page.locator('#object-panel').innerText(),/Best/);
+    await page.getByRole('heading',{name:'Wybrana pozycja Best',exact:true}).waitFor();
+    assert.match(await page.locator('#object-diagnostics').innerText(),/Best/);
+    await page.locator('#object-diagnostics > summary').click();
+    await page.locator('#object-primary-actions').getByRole('button',{name:'Pokaż plan',exact:true}).click();
+    await waitForDownload(u=>u.endsWith(catalog.plans.find(p=>p.id==='001459-pza-2024').preview.url),'primary action whole-plan preview');
+    await checkPlanTools();
+    if(mobile){
+      await page.setViewportSize({width:393,height:400});
+      await page.waitForFunction(()=>document.querySelector('#plan-tools').dataset.compact==='true');
+      assert.equal(await page.locator('#plan-tool-settings').evaluate(el=>el.open),false,'short screens start with compact plan controls');
+      await page.locator('#plan-tools-toggle').click();
+      await page.locator('#active-plan-fit').click();
+      assert.equal(await page.locator('#plan-tool-settings').evaluate(el=>el.open),false,'whole-plan fit makes room for the drawing on short screens');
+      assert.ok(await page.locator('#plan-tools').evaluate(el=>{const map=document.querySelector('#map').getBoundingClientRect(),tools=el.getBoundingClientRect();return map.height-(tools.bottom-map.top+15)-35;} )>80,'compact tools leave room to see the fitted plan');
+      await page.screenshot({path:`output/playwright/${caseName}-short-map.png`});
+      await page.setViewportSize({width:393,height:852});
+      await page.waitForFunction(()=>document.querySelector('#plan-tools').dataset.compact==='false');
+      await checkPlanTools();
+    }
+    if(mobile)assert.equal(await page.locator('#panel-toggle').getAttribute('aria-expanded'),'false','showing an object plan collapses the mobile panel');
+    assert.match(await page.locator('#active-plan-name').innerText(),/Piwnica Miętusia/);
+    await ensurePanelOpen();
+    await page.locator('#center-object').click();
+    await page.locator('#plan-tools').waitFor({state:'hidden'});
+    assert.equal(await page.locator('#plan-tools').isVisible(),false,'showing the location ends plan viewing so the point is exposed');
+    await ensurePanelOpen();
+    await page.locator('#object-primary-actions').getByRole('button',{name:'Pokaż plan',exact:true}).click();
+    await checkPlanTools();
+    await page.locator('#close-plan-tools').click();await page.locator('#plan-tools').waitFor({state:'hidden'});
+    await ensurePanelOpen();
     await page.locator('#tpn-message').waitFor({state:'visible'});
     const mapBox=await page.locator('#map').boundingBox(),panelBox=await page.locator('#sidebar').boundingBox();
     if(mobile)assert.ok(mapBox.y+mapBox.height<=panelBox.y+2,'map remains above mobile panel');
@@ -97,8 +168,81 @@ try{
     await page.locator('#basemap').selectOption('osm');
     assert.equal(await page.locator('#base-opacity-value').innerText(),'45%');
     await page.locator('#basemap').selectOption('rgb_2020');
+    await page.locator('#layer-diagnostics > summary').click();
     for(const id of ['other','rejected','differences'])await page.locator(`#layer-${id}`).check();
     await waitForDownload(u=>u.endsWith('measurements.geojson'),'measurements');
+    // Three explicitly related, overlapping source plans exercise temporary isolation
+    // without treating relation names as identity or discarding the user's choices.
+    const multiple=catalog.objects.find(o=>o.id==='KSZ-0064');
+    assert.ok(multiple&&['001349','001351','010935'].every(id=>multiple.planIds.includes(id)),'the pinned source has the related Mylna plans');
+    await openObject(multiple.id);
+    const primary=page.locator('#object-primary-actions'),objectPanel=page.locator('#object-panel');
+    assert.equal(await page.locator('#object-diagnostics').evaluate(el=>el.open),false,'a newly selected object has closed diagnostics');
+    assert.equal(await primary.locator('[data-plan-fit]').count(),0,'multiple plans require an explicit choice');
+    await primary.getByRole('button',{name:/^Wybierz plan/}).click();
+    const relatedHeading=objectPanel.getByRole('heading',{name:/Plany jaskini/});
+    assert.equal(await relatedHeading.evaluate(el=>{const heading=el.getBoundingClientRect(),panel=el.closest('.panel-scroll').getBoundingClientRect();return heading.bottom>panel.top&&heading.top<panel.bottom;}),true,'plan choice brings the related plans into view');
+    assert.equal(await page.locator('#plan-tools').isVisible(),false,'choosing from several plans does not pick one implicitly');
+    for(const id of ['001349','001351','010935'])assert.equal(await objectPanel.locator(`[data-plan-card="${id}"]`).count(),1);
+    await objectPanel.locator('[data-plan-toggle="010935"]').uncheck();
+    await setRange(objectPanel.locator('[data-plan-opacity="001351"]'),38);
+    await objectPanel.locator('[data-plan-fit="001351"]').click();await ensurePanelOpen();
+    await page.getByRole('tab',{name:'Obiekt',exact:true}).click();
+    await objectPanel.locator('[data-plan-fit="001349"]').click();
+    await waitForDownload(u=>u.endsWith(catalog.plans.find(p=>p.id==='001349').preview.url),'Mylna whole-plan preview');
+    await checkPlanTools();
+    assert.equal(await page.locator('#plan-solo').getAttribute('aria-pressed'),'false');
+    assert.equal(await page.locator('#active-plan-opacity').inputValue(),'75');
+    const optionValues=locator=>locator.locator('option').evaluateAll(options=>options.map(option=>option.value));
+    assert.deepEqual(await optionValues(page.locator('#quick-basemap')),await optionValues(page.locator('#basemap')),'both basemap selectors expose the same sources');
+    await openPlanSettings();await page.locator('#quick-basemap').selectOption('osm');
+    assert.equal(await page.locator('#basemap').inputValue(),'osm','quick selection updates the layer panel');
+    await ensurePanelOpen();await page.getByRole('tab',{name:'Warstwy',exact:true}).click();
+    await page.locator('#basemap').selectOption('rgb_2018');
+    assert.equal(await page.locator('#quick-basemap').inputValue(),'rgb_2018','layer selection updates quick controls');
+    await openPlanSettings();await page.locator('#quick-basemap').selectOption('rgb_2020');
+    await page.getByRole('tab',{name:'Obiekt',exact:true}).click();
+    await setRange(page.locator('#active-plan-opacity'),45);
+    assert.equal(await objectPanel.locator('[data-plan-opacity="001349"]').inputValue(),'45','quick opacity updates the related plan card');
+    assert.equal(await objectPanel.locator('[data-plan-opacity="001349"]').evaluate(el=>el.parentElement.querySelector('output').textContent),'45%');
+    await setRange(objectPanel.locator('[data-plan-opacity="001349"]'),54);
+    assert.equal(await page.locator('#active-plan-opacity').inputValue(),'54','card opacity updates quick controls');
+    assert.equal(await page.locator('#active-plan-opacity-value').innerText(),'54%');
+    const planOrder=()=>page.locator('#plan-list [data-plan-card]').evaluateAll(cards=>cards.map(card=>card.dataset.planCard));
+    const orderBeforeMove=await planOrder();
+    await objectPanel.locator('[data-plan-order="001351"][data-direction="-1"]').click();
+    assert.notDeepEqual(await planOrder(),orderBeforeMove,'the stored stack order can be adjusted before isolation');
+    const planFormState=()=>objectPanel.locator('[data-plan-card]').evaluateAll(cards=>cards.map(card=>({id:card.dataset.planCard,visible:card.querySelector('[data-plan-toggle]').checked,opacity:card.querySelector('[data-plan-opacity]').value})).sort((a,b)=>a.id.localeCompare(b.id)));
+    const savedForms=await planFormState(),savedOrder=await planOrder();
+    if(mobile){await page.locator('#panel-toggle').click();assert.equal(await page.locator('#panel-toggle').getAttribute('aria-expanded'),'false');}
+    await checkPlanTools();
+    await page.locator('#active-plan-fit').click();
+    // The status from the previous viewport can still satisfy n>1 until OL renders
+    // the refitted view. Let that frame and its status callback finish first.
+    await waitForMapRender();
+    assert.equal(await page.locator('#active-plan-opacity').inputValue(),'54','whole-plan refit retains opacity');
+    const beforeSolo=await waitForPlanCount(n=>n>1,'overlapping plans are visible before solo');
+    await page.locator('#plan-solo').click();
+    assert.equal(await page.locator('#plan-solo').getAttribute('aria-pressed'),'true');
+    await waitForPlanCount(n=>n===1,'solo renders only the active plan');
+    assert.deepEqual(await planFormState(),savedForms,'solo leaves user visibility and opacity choices intact');
+    assert.deepEqual(await planOrder(),savedOrder,'solo preserves stacking order');
+    await page.screenshot({path:`output/playwright/${caseName}-plan-tools-solo.png`});
+    await page.locator('#plan-solo').click();
+    assert.equal(await page.locator('#plan-solo').getAttribute('aria-pressed'),'false');
+    await waitForPlanCount(n=>n===beforeSolo,'second solo click restores the previous set');
+    assert.deepEqual(await planFormState(),savedForms);assert.deepEqual(await planOrder(),savedOrder);
+    await page.locator('#plan-solo').click();await waitForPlanCount(n=>n===1,'solo before ending the session');
+    await page.locator('#close-plan-tools').click();await page.locator('#plan-tools').waitFor({state:'hidden'});
+    await waitForPlanCount(n=>n===beforeSolo,'closing plan tools restores the previous set');
+    assert.deepEqual(await planFormState(),savedForms,'ending the session retains hidden plans and opacity');
+    assert.deepEqual(await planOrder(),savedOrder,'ending the session retains order');
+    await ensurePanelOpen();
+    const withoutPlan=catalog.objects.find(o=>!o.planIds.length&&o.coordinate);assert.ok(withoutPlan);
+    await openObject(withoutPlan.id);
+    assert.equal(await page.locator('#object-primary-actions [data-plan-fit]').count(),0,'an object without a plan has no unavailable plan action');
+    assert.equal(await page.locator('#object-primary-actions').getByRole('button',{name:/^Wybierz plan/}).count(),0);
+    await page.getByRole('tab',{name:'Warstwy',exact:true}).click();
     await page.locator('#layer-plans').uncheck();
     await page.getByRole('tab',{name:'Plany',exact:true}).click();
     await page.locator('#plan-search').fill('001197');
@@ -139,7 +283,7 @@ try{
         assert.equal(await primary.getAttribute('target'),'_blank');
         assert.equal(await primary.getAttribute('rel'),'noopener noreferrer');
         const nearTitle=await primary.evaluate(el=>el.getBoundingClientRect().top-el.closest('#object-panel').querySelector('h2').getBoundingClientRect().bottom);
-        assert.ok(nearTitle>=0&&nearTitle<150,'description link is near the title');
+        assert.ok(nearTitle>=0&&nearTitle<200,'description link follows the main object actions near the title');
       }
       if(expectedUrl===descriptionUrl){
         const description=panel.locator('.cave-description');

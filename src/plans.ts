@@ -13,6 +13,8 @@ export class Plans {
   opacity=new globalThis.Map<string,number>();
   order:string[]=[];
   enabled=true;
+  focusId:string|null=null;
+  isolated=false;
   private canvas=document.createElement('canvas');
   private source:ImageCanvasSource;
   layer:ImageLayer<ImageCanvasSource>;
@@ -22,8 +24,11 @@ export class Plans {
   private plans:PlanEntry[];
   private map:Map;
   private report:()=>void;
-  constructor(map:Map,plans:PlanEntry[],report:()=>void){
-    this.map=map;this.plans=plans;this.report=report;this.order=plans.map(p=>p.id);
+  fitPadding:()=>number[];
+  private reportQueued=false;
+  private disposed=false;
+  constructor(map:Map,plans:PlanEntry[],report:()=>void,fitPadding:()=>number[]=()=>[35,35,35,35]){
+    this.map=map;this.plans=plans;this.report=report;this.fitPadding=fitPadding;this.order=plans.map(p=>p.id);
     this.pool=new ImagePool(6,64*1024*1024,undefined,()=>{this.source.changed();report();});
     this.source=new ImageCanvasSource({projection:'EPSG:2180',ratio:1,canvasFunction:(extent,resolution,pixelRatio,size)=>this.render(extent as Extent,resolution,pixelRatio,size)});
     this.layer=new ImageLayer({source:this.source,zIndex:5});map.addLayer(this.layer);
@@ -48,10 +53,12 @@ export class Plans {
     return out;
   }
   private render(extent:Extent,resolution:number,pixelRatio:number,size:number[]):HTMLCanvasElement {
+    const previousActive=this.active,previousReduced=this.reduced;
     this.canvas.width=Math.round(size[0]);this.canvas.height=Math.round(size[1]);
     const ctx=this.canvas.getContext('2d')!;
-    if(!this.enabled){this.pool.clear();this.active=[];return this.canvas;}
-    const eligible=eligiblePlans(this.plans,extent,resolution,this.selected,this.hidden);
+    if(!this.enabled){this.pool.clear();this.active=[];this.reduced=false;this.reportAfterRender(previousActive,previousReduced);return this.canvas;}
+    const eligible=eligiblePlans(this.plans,extent,resolution,this.selected,this.hidden)
+      .filter(plan=>!this.isolated||plan.id===this.focusId);
     eligible.sort((a,b)=>this.order.indexOf(a.id)-this.order.indexOf(b.id));
     this.active=eligible.map(p=>p.id);
     // Use CSS scale for eligibility, actual device pixels for detail. A shared budget
@@ -79,11 +86,39 @@ export class Plans {
       }
     });
     ctx.globalAlpha=1;
+    this.reportAfterRender(previousActive,previousReduced);
     return this.canvas;
   }
+  private reportAfterRender(previousActive:string[],previousReduced:boolean){
+    if(previousReduced===this.reduced&&previousActive.length===this.active.length&&previousActive.every((id,i)=>id===this.active[i]))return;
+    if(this.reportQueued)return;
+    this.reportQueued=true;
+    // Reporting after the canvas callback keeps UI changes outside the draw and
+    // also updates status when all requested bitmaps came from the cache.
+    queueMicrotask(()=>{this.reportQueued=false;if(!this.disposed)this.report();});
+  }
   refresh(){this.source.changed();this.report();}
-  toggle(id:string,visible:boolean){if(visible){this.hidden.delete(id);this.selected.add(id);if(!this.order.includes(id))this.order.push(id);}else{this.hidden.add(id);this.selected.delete(id);}this.refresh();}
-  show(plan:PlanEntry){this.order=this.order.filter(id=>id!==plan.id).concat(plan.id);this.enabled=true;this.layer.setVisible(true);this.toggle(plan.id,true);this.map.getView().fit(plan.preview.extent||plan.extent,{padding:[35,35,35,35],duration:0,maxZoom:24});this.wholePreview.set(plan.id,this.map.getView().getResolution()!);this.refresh();}
+  setIsolation(enabled:boolean){this.isolated=enabled&&this.focusId!==null;this.refresh();}
+  endFocus(){this.isolated=false;this.focusId=null;this.refresh();}
+  toggle(id:string,visible:boolean){
+    if(visible){this.hidden.delete(id);this.selected.add(id);if(!this.order.includes(id))this.order.push(id);}
+    else{this.hidden.add(id);this.selected.delete(id);if(this.focusId===id){this.endFocus();return;}}
+    this.refresh();
+  }
+  show(plan:PlanEntry){
+    this.focusId=plan.id;
+    this.order=this.order.filter(id=>id!==plan.id).concat(plan.id);
+    this.enabled=true;this.layer.setVisible(true);
+    // Report focus before fitting so the toolbar can provide its current padding.
+    this.toggle(plan.id,true);
+    this.fit(plan);
+  }
+  fit(plan:PlanEntry){
+    this.map.getView().cancelAnimations();
+    this.map.getView().fit(plan.preview.extent||plan.extent,{padding:this.fitPadding(),duration:0,maxZoom:24});
+    this.wholePreview.set(plan.id,this.map.getView().getResolution()!);
+    this.refresh();
+  }
   move(id:string,direction:number){if(!this.order.includes(id))this.order.push(id);const i=this.order.indexOf(id),j=Math.max(0,Math.min(this.order.length-1,i+direction));[this.order[i],this.order[j]]=[this.order[j],this.order[i]];this.refresh();}
-  dispose(){this.pool.dispose();this.layer.dispose();this.source.dispose();this.canvas.width=this.canvas.height=0;}
+  dispose(){this.disposed=true;this.pool.dispose();this.layer.dispose();this.source.dispose();this.canvas.width=this.canvas.height=0;}
 }
