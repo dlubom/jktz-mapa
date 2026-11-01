@@ -4,7 +4,7 @@ import {resolve,extname} from 'node:path';
 import assert from 'node:assert/strict';
 import {chromium,firefox,webkit} from 'playwright';
 
-const root=resolve('dist'),prefix='/jktz-mapa/';
+const root=resolve('dist'),prefix=process.env.TEST_BASE_PATH||'/jktz-mapa/';
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.geojson':'application/geo+json','.webp':'image/webp'};
 const server=createServer(async(req,res)=>{try{const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(!path.startsWith(prefix)){res.writeHead(404).end();return;}const file=resolve(root,path.slice(prefix.length)||'index.html');if(!file.startsWith(root+'/')){res.writeHead(403).end();return;}const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});res.end(data);}catch{res.writeHead(404).end('Not found');}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));

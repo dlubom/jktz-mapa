@@ -33,14 +33,21 @@ jobs:
           npx playwright install --with-deps chromium firefox webkit
           npm run test:browser
       - name: Package and verify the preview
-        run: python scripts/publication.py package
+        run: python scripts/preview.py package
       - name: Save reviewable build
+        id: preview
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: preview-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .build/package/
+          path: .build/preview/
+          include-hidden-files: true
+          compression-level: 0
           retention-days: 15
           if-no-files-found: error
+      - name: Link the complete ZIP and selected-PR preview
+        env:
+          ARTIFACT_URL: ${{ steps.preview.outputs.artifact-url }}
+        run: python scripts/preview.py summary --site .build/preview
       - name: Save browser evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

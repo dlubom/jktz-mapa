@@ -43,6 +43,8 @@ jest dostępna przy wyborze podkładu. Poza pokryciem usługi widoczny jest OSM.
 
 Instrukcje uruchomienia, testów i publikacji: [AGENTS.md](AGENTS.md).
 Publikacja na GitHub Pages jest uruchamiana ręcznie przez GitHub Actions.
+Zmiany przechodzą przez PR. [Paczki ZIP i strona testowa wybranego PR](docs/PR_PREVIEW.md)
+umożliwiają odbiór przed scaleniem.
 
 ## Odnośniki do opisów jaskiń
 
