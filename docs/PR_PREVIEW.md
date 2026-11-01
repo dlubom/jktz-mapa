@@ -43,7 +43,10 @@ Jeden adres pokazuje jeden wybrany PR. Kolejny udany Run zastępuje podgląd;
 nieudany build lub test pozostawia poprzednią stronę. Numer PR i skrót commita
 widać na mapie, pełną tożsamość pod `preview.json`. Po zmianie PR lub `main`
 uruchom podgląd ponownie. Wdrożenie odrzuca PR zamknięty, konfliktowy lub zmieniony
-od przypięcia kandydata. W tym samym Run dostępny jest również pełny ZIP.
+od przypięcia kandydata. Ponowna kontrola odbywa się po wysłaniu paczki, tuż
+przed wdrożeniem. Starszy wybór nie może nadpisać nowszego: jeżeli uruchomiono
+nowszy Run, starszy Run i jego Re-run nie opublikują strony. Aby ponownie wybrać
+wcześniejszy PR, użyj nowego **Run workflow**. W tym samym Run dostępny jest pełny ZIP.
 
 Podgląd niezależnie buduje pełne dane, więc jego migawka źródeł może różnić się
 od wcześniejszego ZIP z CI źródła. Porównuj `inputs.json`. Każdy Run/Re-run

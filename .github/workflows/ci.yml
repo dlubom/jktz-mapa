@@ -1,11 +1,14 @@
 name: Map checks
 on:
   push:
-    branches-ignore: [gh-pages, pages-state]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: map-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   map:
     runs-on: ubuntu-24.04

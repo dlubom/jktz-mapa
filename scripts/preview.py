@@ -2,6 +2,7 @@
 """Portable review bundles and the separate, selected-PR Pages publisher."""
 import argparse
 import hashlib
+from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -65,7 +66,7 @@ def event_identity():
 
 
 def candidate_identity(pr, commit):
-    require(pr['state'] == 'open' and pr.get('mergeable') is not False, 'PR closed or conflicted')
+    require(pr['state'] == 'open' and pr.get('mergeable') is True, 'PR closed, conflicted or mergeability unknown')
     require(pr['base']['repo']['full_name'] == SOURCE and pr['base']['ref'] == 'main', 'PR must target source main')
     value = validate_identity(dict(schema=1, repository=SOURCE, pr=pr['number'], head_sha=pr['head']['sha'],
                                    base_sha=pr['base']['sha'], merge_sha=pr.get('merge_commit_sha')))
@@ -93,6 +94,20 @@ def resolve_candidate(number):
     return candidate_identity(pr, commit)
 
 
+def guard_selection():
+    require(os.environ.get('GITHUB_REPOSITORY') == TARGET and
+            os.environ.get('GITHUB_REF') == 'refs/heads/main', 'Preview repository main required')
+    runs = api(f'repos/{TARGET}/actions/workflows/preview.yml/runs?event=workflow_dispatch&branch=main&per_page=100')['workflow_runs']
+    current = [run for run in runs if str(run['id']) == os.environ['GITHUB_RUN_ID']]
+    require(len(current) == 1 and current[0]['run_number'] == max(run['run_number'] for run in runs),
+            'A newer selection exists; start a fresh Run for the intended PR')
+
+
+def guard_current(identity):
+    guard_selection()
+    require(resolve_candidate(identity['pr']) == identity, 'PR changed since build; select it again')
+
+
 def safe_name(name):
     path = PurePosixPath(name)
     require(isinstance(name, str) and name and not path.is_absolute() and
@@ -116,6 +131,53 @@ def inventory(site):
         else:
             require(path.is_dir(), 'Only regular files and directories are accepted')
     return files
+
+
+class EntryAssets(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.scripts = []
+        self.styles = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'script' and attrs.get('src'):
+            self.scripts.append(attrs['src'])
+        if tag == 'link' and attrs.get('rel') == 'stylesheet' and attrs.get('href'):
+            self.styles.append(attrs['href'])
+
+
+def verify_catalogue(site, files):
+    def asset(name):
+        safe_name(name)
+        require(name in files, f'Missing catalogue/runtime asset: {name}')
+
+    asset('data/catalog.json')
+    asset('data/inputs.json')
+    require(files['data/inputs.json'] == files['inputs.json'], 'Catalogue input checksum differs')
+    catalog = read_json(site / 'data/catalog.json')
+    require(catalog.get('schemaVersion') == 1 and catalog.get('crs') == 'EPSG:2180', 'Invalid catalogue schema')
+    for kind, field in (('objects', 'detailUrl'), ('caves', 'detailUrl'), ('models', 'url')):
+        require(isinstance(catalog.get(kind), list), f'Missing catalogue {kind}')
+        for entry in catalog[kind]:
+            asset(entry[field])
+    require(isinstance(catalog.get('plans'), list), 'Missing catalogue plans')
+    for plan in catalog['plans']:
+        asset(plan['preview']['url'])
+        asset(plan['detailUrl'])
+        require(isinstance(plan.get('levels'), list) and plan['levels'], 'Missing catalogue tile levels')
+        for level in plan['levels']:
+            columns, rows = level['columns'], level['rows']
+            require(type(columns) is int and type(rows) is int and columns > 0 and rows > 0 and
+                    columns * rows <= len(files), 'Missing catalogue tiles or invalid dimensions')
+            for x in range(columns):
+                for y in range(rows):
+                    asset(plan['tileUrl'].replace('{level}', str(level['level'])).replace('{x}', str(x)).replace('{y}', str(y)))
+    entry = EntryAssets()
+    entry.feed((site / 'index.html').read_text())
+    require(entry.scripts and entry.styles, 'Missing runtime JavaScript or CSS')
+    for name in entry.scripts + entry.styles:
+        asset(name.removeprefix('./'))
 
 
 def banner(identity):
@@ -175,11 +237,12 @@ def verify_bundle(site, identity):
     require(validate_identity(manifest) == expected, 'Preview identity differs')
     require(manifest['inputs_sha256'] == actual['inputs.json'], 'Input checksum differs')
     require(banner(expected) in (site / 'index.html').read_text(), 'Missing preview identity banner')
+    verify_catalogue(site, actual)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase', choices=['package', 'resolve', 'verify', 'confirm', 'summary'])
+    parser.add_argument('phase', choices=['package', 'resolve', 'verify', 'guard', 'confirm', 'summary'])
     parser.add_argument('--pr', type=int)
     parser.add_argument('--site', type=Path, default=ROOT / 'dist')
     parser.add_argument('--inputs', type=Path, default=ROOT / '.build/inputs.json')
@@ -192,10 +255,11 @@ def main():
             handle.write('sha=' + value['merge_sha'] + '\n')
     elif args.phase == 'package':
         build_bundle(args.site, args.inputs, args.output, event_identity())
-    elif args.phase == 'verify':
+    elif args.phase in ('verify', 'guard'):
         identity = validate_identity(json.loads(os.environ['PREVIEW_IDENTITY']))
-        require(resolve_candidate(identity['pr']) == identity, 'PR changed since build; select it again')
-        verify_bundle(args.site, identity)
+        guard_current(identity)
+        if args.phase == 'verify':
+            verify_bundle(args.site, identity)
     elif args.phase == 'confirm':
         expected = (args.site / 'preview.json').read_bytes()
         checksums = read_json(args.site / 'checksums.json')

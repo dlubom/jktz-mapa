@@ -125,6 +125,8 @@ jobs:
           path: .build/site
           include-hidden-files: true
           retention-days: 1
+      - name: Recheck PR and newest selection after the upload
+        run: python3 scripts/preview.py guard
       - name: Publish the selected PR
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
