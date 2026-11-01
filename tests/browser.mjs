@@ -44,6 +44,85 @@ try{
     };
     const setRange=async(locator,value)=>{if(await locator.getAttribute('id')==='active-plan-opacity')await openPlanSettings();await locator.evaluate((el,value)=>{el.value=String(value);el.dispatchEvent(new Event('input',{bubbles:true}));},value);};
     const waitForMapRender=()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const basemapStatus=async()=>{
+      assert.equal(await page.locator('#basemap-status').count(),1,'the layer panel has a persistent actual-basemap status');
+      assert.equal(await page.locator('#quick-basemap-status').count(),1,'plan controls have the same persistent actual-basemap status');
+      const {text,quick}=await page.locator('#basemap-status').evaluate(el=>({text:el.textContent.trim(),quick:document.querySelector('#quick-basemap-status').textContent.trim()}));
+      assert.equal(quick,text,'layer and plan controls report the same actual basemap');
+      assert.match(text,/^Wybrano: .+\. Widoczne: /,'status distinguishes the selection from the visible map');
+      return {text,visible:text.split('Widoczne: ')[1]};
+    };
+    const waitForBasemapStatus=async(predicate,label)=>{
+      const deadline=Date.now()+15000;
+      for(;;){const status=await basemapStatus();if(predicate(status.visible))return status;assert.ok(Date.now()<deadline,`${label}: ${status.text}`);await page.waitForTimeout(50);}
+    };
+    const checkCatalogSearch=async()=>{
+      const search=page.locator('#search'),list=page.locator('#search-results'),options=list.locator('.result');
+      assert.equal(await search.getAttribute('role'),'combobox');
+      assert.equal(await list.getAttribute('role'),'listbox');
+      const active=async(index)=>{
+        assert.equal(await search.evaluate(el=>el===document.activeElement),true,'keyboard navigation keeps focus in the combobox');
+        const rows=await options.evaluateAll(nodes=>nodes.map(el=>({id:el.id,selected:el.getAttribute('aria-selected'),active:el.classList.contains('is-active')})));
+        assert.equal(await search.getAttribute('aria-activedescendant'),rows[index].id,'active descendant identifies the selected visible row');
+        assert.ok(rows[index].id);
+        assert.deepEqual(rows.map(row=>row.selected),rows.map((_,i)=>String(i===index)),'exactly one result is selected');
+        assert.deepEqual(rows.map(row=>row.active),rows.map((_,i)=>i===index),'the active row is also visibly marked');
+      };
+      const materials=async(kind,id,expected)=>{
+        const row=list.locator(`[data-${kind}="${id}"]`);
+        assert.deepEqual(await row.locator('.result-materials .badge').allTextContents(),expected,`${kind} ${id}: badges follow explicit plan and survey IDs`);
+        assert.equal(await row.locator('.result-type').textContent(),kind==='cave'?'Jaskinia':'Otwór / lokalizacja','caves and opening/localization objects have distinct labels');
+      };
+      assert.ok(catalog.objects.find(o=>o.id==='MTZ-0017')?.searchText.includes('C-0172'),'fixture has an incidental cave ID in object metadata');
+      await search.fill('C-0172');
+      assert.equal(await search.getAttribute('aria-expanded'),'true');
+      assert.equal(await search.getAttribute('aria-controls'),'search-results');
+      assert.equal(await options.first().getAttribute('data-cave'),'C-0172','an exact cave ID ranks above incidental object metadata');
+      assert.equal(await options.count(),2,'the same query exposes cave and object results');
+      assert.equal(await list.getByRole('option').count(),2,'visible results are exposed as accessible listbox options');
+      for(const [kind,id] of [['cave','C-0172'],['object','MTZ-0017']])await materials(kind,id,['Plan']);
+      await search.press('Enter');
+      await page.getByText('Metadane jaskini i źródła',{exact:true}).waitFor();
+      assert.equal(new URL(page.url()).hash,'#jaskinia=C-0172','Enter without arrow navigation opens the first ranked cave');
+      assert.equal(await search.getAttribute('aria-expanded'),'false');
+      assert.equal(await list.isVisible(),false);
+      await search.fill('C-0172');
+      await search.press('ArrowUp');await active(0);
+      await search.press('ArrowUp');await active(0);
+      await search.press('ArrowDown');await active(1);
+      await search.press('ArrowDown');await active(1);
+      await page.screenshot({path:`output/playwright/${caseName}-search-keyboard.png`});
+      await search.press('Enter');await page.locator('#object-primary-actions').waitFor();
+      assert.equal(new URL(page.url()).hash,'#obiekt=MTZ-0017','Enter opens the active object rather than the first cave');
+      await search.fill('MTZ-0017');
+      assert.equal(await options.first().getAttribute('data-object'),'MTZ-0017','an exact object ID ranks first across both result kinds');
+      await search.press('Enter');await page.locator('#object-primary-actions').waitFor();
+      assert.equal(new URL(page.url()).hash,'#obiekt=MTZ-0017');
+      await search.fill('C-0269');
+      for(const [kind,id] of [['cave','C-0269'],['object','BYW-0013']])await materials(kind,id,['Plan','Ciąg']);
+      await search.press('ArrowDown');await active(0);
+      await search.press('Escape');
+      assert.equal(await list.isVisible(),false);
+      assert.equal(await search.getAttribute('aria-expanded'),'false');
+      assert.ok(!await search.getAttribute('aria-activedescendant'),'Escape clears the active result');
+      assert.equal(await search.evaluate(el=>el===document.activeElement),true,'Escape restores input focus');
+      await search.press('Enter');
+      assert.equal(new URL(page.url()).hash,'#obiekt=MTZ-0017','Enter after Escape cannot activate a hidden stale result');
+      const unrelated=catalog.caves.find(c=>c.id==='C-0295');
+      assert.equal(unrelated.objectIds.length,0);
+      assert.ok(catalog.plans.some(p=>p.name.includes(unrelated.name)),'fixture has a similarly named plan without an explicit object relation');
+      await search.fill(unrelated.id);await materials('cave',unrelated.id,[]);
+      assert.match(await options.first().innerText(),/Brak jawnie powiązanego planu i ciągu/,'name similarity does not create material badges');
+      await search.fill('nieistniejaca-jaskinia-acceptance-7c93');
+      assert.equal(await options.count(),0);
+      assert.equal(await list.isVisible(),true,'an empty result is communicated while the combobox stays open');
+      assert.match(await list.innerText(),/0 wyników|Brak wyników/);
+      for(const key of ['ArrowDown','ArrowUp','Enter'])await search.press(key);
+      assert.equal(await search.evaluate(el=>el===document.activeElement),true,'no-match navigation keeps keyboard focus');
+      assert.ok(!await search.getAttribute('aria-activedescendant'));
+      assert.equal(new URL(page.url()).hash,'#obiekt=MTZ-0017','no-match Enter does not change the selected object');
+      await search.press('Escape');
+    };
     const waitForPlanCount=async(predicate,label)=>{
       const deadline=Date.now()+30000;
       for(;;){const text=await page.locator('#plan-status').innerText(),match=text.match(/^(\d+) planów w widoku/);if(match&&predicate(Number(match[1])))return Number(match[1]);assert.ok(Date.now()<deadline,`${label}: ${text}`);await page.waitForTimeout(50);}
@@ -58,12 +137,18 @@ try{
         const control=tools.locator(`#${id}`);assert.equal(await control.isVisible(),true,`${id} remains visible`);
         assert.equal(await control.evaluate(el=>{const r=el.getBoundingClientRect(),top=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return !!top&&(top===el||el.contains(top));}),true,`${id} can be reached without an overlay`);
       }
+      assert.equal(await page.locator('#quick-basemap-status').isVisible(),true,'plan controls expose the actual basemap status');
+      await basemapStatus();
     };
 
     try{
     // Controlled external outage pins fallback behaviour, independent of TPN uptime.
     await page.route('https://tpn.obliview.com/**',r=>r.abort());
-    await page.route('https://*.tile.openstreetmap.org/**',r=>r.abort());
+    let osmMockRequests=0;
+    await page.route(/^https:\/\/(?:[a-z]+\.)?tile\.openstreetmap\.org\//,r=>{
+      osmMockRequests++;
+      return r.fulfill({contentType:'image/svg+xml',headers:{'access-control-allow-origin':'*'},body:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#e4e9df"/></svg>'});
+    });
     console.log(`Checking ${name} ${mobile?'mobile':'desktop'}`);
     const started=Date.now();await page.goto(url);
     await page.getByRole('heading',{name:'Warstwy i podkład'}).waitFor();
@@ -77,6 +162,12 @@ try{
     await page.locator('#all-names').uncheck();
     await page.waitForTimeout(150);
     assert.equal(requests.filter(u=>u.endsWith('.webp')).length,0,'no plan imagery before zoom');
+    for(const [value,label] of [['rgb_2020','Zdjęcia lotnicze'],['rgb_2018','Zdjęcia lotnicze'],['NMT','Rzeźba terenu'],['nmpt','Pokrycie terenu'],['smgt_a_zakryta','Geologia'],['smgt_b_odkryta','Geologia'],['osm','Mapa']]){
+      assert.ok((await page.locator(`#basemap option[value="${value}"]`).innerText()).startsWith(label),`${value}: the selector names the kind of map in plain language`);
+    }
+    assert.match((await waitForBasemapStatus(visible=>/^OpenStreetMap.*przybliż/.test(visible),'initial zoomed-out view reports OSM and its scale condition')).text,/Zdjęcia lotnicze.*2020/);
+    assert.ok(osmMockRequests>0,'the OSM fallback is controlled by the fixture, including the bare tile host');
+    await checkCatalogSearch();
     await page.locator('#search').fill('piwnica mietusia');
     await page.locator('[data-object="MTZ-0017"]').first().click();
     await page.locator('#object-primary-actions').waitFor();
@@ -141,12 +232,40 @@ try{
       const bbox=request.searchParams.get('BBOX').split(',').map(Number);
       assert.ok(bbox[0]>550000&&bbox[0]<590000&&bbox[1]>140000&&bbox[1]<170000,'WMS 1.1.1 uses easting/northing');
       await page.locator('#tpn-message').waitFor({state:'hidden'});
+      await waitForBasemapStatus(visible=>visible.startsWith('PIG-PIB')&&!/wczytywanie|niedostępn/.test(visible),`${service}: completed service tiles are actually visible`);
       assert.ok(await page.locator('.ol-attribution').getByText('PIG-PIB',{exact:false}).count());
       const legend=new URL(await page.locator('#geology-legend').getAttribute('href'));
       assert.ok(legend.pathname.includes(`/kartografia/${service}/MapServer/WMSServer`));
       assert.equal(legend.searchParams.get('request'),'GetLegendGraphic');
       assert.equal(legend.searchParams.get('layer'),'0');
     }
+    // Returning quickly must describe cached tiles too, even when OpenLayers
+    // does not call the source again for the already decoded current view.
+    const dragMap=async(right)=>{
+      const box=await page.locator('#map').boundingBox(),left=box.x+box.width*.05,rightEdge=box.x+box.width*.95,y=box.y+box.height*.45;
+      await page.mouse.move(right?left:rightEdge,y);await page.mouse.down();
+      await page.mouse.move(right?rightEdge:left,y,{steps:3});
+      // Release after kinetic sampling has stopped, so the return drag really
+      // returns to the same view rather than leaving a momentum animation.
+      await page.waitForTimeout(110);await page.mouse.up();await waitForMapRender();
+    };
+    for(const right of [false,false,true,true])await dragMap(right);
+    await waitForBasemapStatus(visible=>visible.startsWith('PIG-PIB')&&!/wczytywanie|niedostępn/.test(visible),'returning to cached service tiles restores the visible provider');
+    // Exercise scale and service coverage with the public map controls.
+    for(let i=0;i<12&&!/przybliż/.test((await basemapStatus()).visible);i++){
+      await page.locator('.ol-zoom-out').click();await page.waitForTimeout(300);
+    }
+    await waitForBasemapStatus(visible=>/^OpenStreetMap.*przybliż/.test(visible),'zooming out explains the OSM scale fallback');
+    await page.screenshot({path:`output/playwright/${caseName}-basemap-scale.png`});
+    await page.locator('.ol-zoom-in').click();
+    await waitForBasemapStatus(visible=>visible.startsWith('PIG-PIB')&&!/wczytywanie|niedostępn/.test(visible),'zooming back in restores the selected provider');
+    for(let i=0;i<80&&!/poza zasięgiem/.test((await basemapStatus()).visible);i++){
+      await page.locator('#map').press('ArrowUp');await page.waitForTimeout(150);
+    }
+    await waitForBasemapStatus(visible=>/^OpenStreetMap.*poza zasięgiem/.test(visible),'panning outside the geology coverage reports actual OSM');
+    await page.screenshot({path:`output/playwright/${caseName}-basemap-outside-coverage.png`});
+    await openObject('MTZ-0017');await page.getByRole('tab',{name:'Warstwy',exact:true}).click();
+    await waitForBasemapStatus(visible=>visible.startsWith('PIG-PIB')&&!/wczytywanie|niedostępn/.test(visible),'returning to the object restores geology coverage');
     await page.locator('#basemap-opacity').evaluate(el=>{el.value='45';el.dispatchEvent(new Event('input',{bubbles:true}));});
     assert.equal(await page.locator('#base-opacity-value').innerText(),'45%');
     const beforeOutage=new Set(finishedURLs);
@@ -155,6 +274,7 @@ try{
     await page.locator('.ol-zoom-in').click();
     await page.locator('#tpn-message').waitFor({state:'visible'});
     assert.match(await page.locator('#tpn-message').innerText(),/geologiczn.*OSM/);
+    await waitForBasemapStatus(visible=>/OpenStreetMap/.test(visible)&&/niedostępn/.test(visible),'an outage reports OSM or mixed coverage rather than an unqualified provider');
     // Exhaust the automatic retry while offline before testing the manual retry.
     // Otherwise a slow click can race the timer, which restores tiles and hides the button.
     const retryDeadline=Date.now()+10000;
@@ -165,7 +285,14 @@ try{
     geologyOffline=false;await page.locator('#retry-tpn').click();
     await waitForDownload(u=>u.includes('/kartografia/smgt_a_zakryta/')&&!beforeOutage.has(u),'geology recovered after retry');
     await page.locator('#tpn-message').waitFor({state:'hidden'});
+    await waitForBasemapStatus(visible=>visible.startsWith('PIG-PIB')&&!/wczytywanie|niedostępn/.test(visible),'retry restores the actual provider status');
     await page.locator('#basemap').selectOption('osm');
+    assert.equal((await basemapStatus()).visible,'OpenStreetMap (krycie 45%).','explicit OSM selection reports the map and preserved opacity actually shown');
+    await page.locator('#basemap-opacity').evaluate(el=>{el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}));});
+    assert.match((await basemapStatus()).visible,/brak podkładu.*krycie.*0%/,'zero opacity does not report an invisible OSM basemap as shown');
+    assert.equal(await page.locator('#tpn-message').isVisible(),false,'zero opacity is not reported as a service outage');
+    await page.locator('#basemap-opacity').evaluate(el=>{el.value='45';el.dispatchEvent(new Event('input',{bubbles:true}));});
+    assert.equal((await basemapStatus()).visible,'OpenStreetMap (krycie 45%).');
     assert.equal(await page.locator('#base-opacity-value').innerText(),'45%');
     await page.locator('#basemap').selectOption('rgb_2020');
     await page.locator('#layer-diagnostics > summary').click();
@@ -195,11 +322,14 @@ try{
     assert.equal(await page.locator('#active-plan-opacity').inputValue(),'75');
     const optionValues=locator=>locator.locator('option').evaluateAll(options=>options.map(option=>option.value));
     assert.deepEqual(await optionValues(page.locator('#quick-basemap')),await optionValues(page.locator('#basemap')),'both basemap selectors expose the same sources');
+    assert.deepEqual(await page.locator('#quick-basemap option').allTextContents(),await page.locator('#basemap option').allTextContents(),'both selectors use the same readable source labels');
     await openPlanSettings();await page.locator('#quick-basemap').selectOption('osm');
     assert.equal(await page.locator('#basemap').inputValue(),'osm','quick selection updates the layer panel');
+    assert.equal((await basemapStatus()).visible,'OpenStreetMap (krycie 45%).');
     await ensurePanelOpen();await page.getByRole('tab',{name:'Warstwy',exact:true}).click();
     await page.locator('#basemap').selectOption('rgb_2018');
     assert.equal(await page.locator('#quick-basemap').inputValue(),'rgb_2018','layer selection updates quick controls');
+    assert.match((await basemapStatus()).text,/^Wybrano: Zdjęcia lotnicze.*2018/);
     await openPlanSettings();await page.locator('#quick-basemap').selectOption('rgb_2020');
     await page.getByRole('tab',{name:'Obiekt',exact:true}).click();
     await setRange(page.locator('#active-plan-opacity'),45);

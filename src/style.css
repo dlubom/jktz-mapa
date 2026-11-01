@@ -41,3 +41,17 @@
 #plan-tools-toggle{display:none;font-size:12px;min-height:30px}
 .plan-tools[data-compact=true] #plan-tools-toggle{display:list-item}
 .plan-tools[data-compact=true] .plan-tool-fields{margin-top:8px}
+
+/* Ranked search keeps type, identity and linked materials readable. */
+.result.is-active{background:#edf4df;box-shadow:inset 3px 0 #26745d;outline:2px solid #26745d;outline-offset:-2px}
+.result .result-type{font-size:10px;color:#42674d;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.result strong{color:#243b35}
+.result .result-identity{color:#62715f;overflow-wrap:anywhere}
+.result .result-materials{display:flex;gap:6px;flex-wrap:wrap;color:#62715f}
+.result-materials .badge{display:inline-block;margin:0;background:#e8f0df;color:#355637}
+.basemap-status{font-size:11px;line-height:1.5;color:#365843;border-left:3px solid #90ab6d;padding:7px 9px;background:#f0f4e9;margin:8px 0;overflow-wrap:anywhere}
+.plan-tool-fields .basemap-status{font-size:10px;margin:0;padding:5px 7px}
+.quick-basemap-label,.quick-legend{font-size:11px}
+.quick-basemap-label{font-weight:650}
+.quick-legend{line-height:1.5;min-height:24px}
+@media(max-width:700px){.search-results{max-height:min(28dvh,230px)}.result{padding:10px 12px}.result .result-materials{font-size:10px}.plan-tool-fields{gap:6px}}
