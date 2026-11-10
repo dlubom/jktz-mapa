@@ -4,7 +4,6 @@ import errno
 import io
 import json
 import math
-import sqlite3
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -40,7 +39,7 @@ class InputContractTests(unittest.TestCase):
             calls.append(path)
             repo = path.split('/')[2]
             if path.endswith('/releases/latest'):
-                names = {'Georeferencer': ['geotiff-tatry-v2.zip'], 'gps-kataster-obiektow-tatr': ['katalog.sqlite.zip', 'metadata.json'], 'Jaskiniowy-Kataster-Tatr-Zachodnich': ['JKTZ-v2.zip']}[repo]
+                names = {'Georeferencer': ['geotiff-tatry-v2.zip'], 'gps-kataster-obiektow-tatr': ['katalog.dump', 'metadata.json'], 'Jaskiniowy-Kataster-Tatr-Zachodnich': ['JKTZ-v2.zip']}[repo]
                 return {'draft': False, 'prerelease': False, 'tag_name': 'v2', 'id': 1, 'published_at': '2026-01-01', 'html_url': 'https://example.test/release', 'assets': [{'id': i, 'name': n, 'size': 3, 'digest': 'sha256:' + p.digest(b'abc'), 'browser_download_url': 'https://example.test/' + n} for i, n in enumerate(names)]}
             if '/git/ref/' in path:
                 return {'object': {'sha': 'a' * 40, 'type': 'tag'}}
@@ -55,6 +54,13 @@ class InputContractTests(unittest.TestCase):
             lock = p.read_lock(path)
             self.assertEqual('b' * 40, lock['sources'][0]['commit'])
             self.assertEqual([], calls)
+            gps = next(source for source in lock['sources'] if source['key'] == 'gps')
+            self.assertEqual(['katalog.dump', 'metadata.json'], [a['name'] for a in gps['assets']])
+            gps['assets'][0]['name'] = 'katalog.sqlite.zip'
+            legacy = Path(directory) / 'legacy.json'
+            p.write_json(legacy, lock)
+            with self.assertRaisesRegex(ValueError, 'GPS.*katalog.dump.*resolve'):
+                p.read_lock(legacy)
             with self.assertRaisesRegex(ValueError, 'already pinned'):
                 p.resolve(path)
             p.resolve(Path(directory) / 'new-run.json')
@@ -63,15 +69,15 @@ class InputContractTests(unittest.TestCase):
     def test_new_pin_refreshes_same_named_asset_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             cache = Path(directory)
-            (cache / 'katalog.sqlite.zip').write_bytes(b'old')
-            asset = {'id': 99, 'name': 'katalog.sqlite.zip', 'size': 3, 'digest': 'sha256:' + p.digest(b'new')}
+            (cache / 'katalog.dump').write_bytes(b'old')
+            asset = {'id': 99, 'name': 'katalog.dump', 'size': 3, 'digest': 'sha256:' + p.digest(b'new')}
             lock = {'sources': [{'key': 'gps', 'repository': p.REPOSITORIES['gps'], 'commit': 'a' * 40, 'assets': [asset], 'files': []}]}
             def download(command, stdout, check):
                 self.assertIn('repos/dlubom/gps-kataster-obiektow-tatr/releases/assets/99', command)
                 stdout.write(b'new')
             with patch.object(p.subprocess, 'run', download):
                 p.fetch(lock, cache)
-            self.assertEqual(b'new', (cache / 'katalog.sqlite.zip').read_bytes())
+            self.assertEqual(b'new', (cache / 'katalog.dump').read_bytes())
             with patch.object(p.subprocess, 'run', side_effect=AssertionError('Unnecessary download')):
                 p.fetch(lock, cache)
 
@@ -111,57 +117,79 @@ class InputContractTests(unittest.TestCase):
 
 class GPSContractTests(unittest.TestCase):
     def test_history_uses_composite_keys_and_preserves_rejected_records(self):
+        def measurement(object_id, mid, x, y, status, accuracy, notes):
+            return dict(object_id=object_id, id=mid, x_1992=x, y_1992=y,
+                        verification_status=status, source='PIG', horizontal_accuracy_m=accuracy, notes=notes)
+        tables = {
+            'objects': [dict(id='A', name_local='Otwór A', cave_id='C', membership_ordinal=2),
+                        dict(id='B', name_local='Otwór B', cave_id='C', membership_ordinal=1)],
+            'caves': [dict(id='C', name='Jaskinia', system_name='System', length_m=34, citations=[{'publication_id': 'PUB'}]),
+                      dict(id='C-orphan', name='Bez otworu', system_name=None, notes='source note')],
+            'best_measurements': [dict(object_id='A', measurement_id='m-1', mode='auto'),
+                                  dict(object_id='B', measurement_id='m-1', mode='manual',
+                                       computed_best_measurement_id='m-1', reason='source decision')],
+            'measurements': [
+                measurement('A', 'm-1', 150000, 560000, 'nieweryfikowany', None, 'original'),
+                {**measurement('A', 'm-2', 150003, 560004, 'odrzucony', 7, 'rejected note'),
+                 'elevation_m': 913.4, 'elevation_datum': 'Kronstadt86', 'input_srid': 2180, 'tags': ['source']},
+                measurement('B', 'm-1', 160000, 570000, 'zweryfikowany', 1, 'second object'),
+            ],
+            'object_external_refs': [],
+            'cave_external_refs': [{'cave_id': 'C', 'external_id': 'PIG-id'}],
+            'relations': [],
+            'attachments': [],
+            'metadata': {'engine': 'PostgreSQL/PostGIS'},
+            'validation_flags': [],
+        }
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            db = root / 'source.sqlite'
-            con = sqlite3.connect(db)
-            con.executescript("""
-                create table metadata (key text, value text);
-                insert into metadata values ('schema_version','1');
-                create table caves (id text, name text, system_name text, notes text);
-                insert into caves values ('C','Jaskinia','System','alias'),('C-orphan','Bez otworu',null,'source note');
-                create table objects (id text,name_local text,cave_id text,best_measurement_id text,notes text);
-                insert into objects values ('A','Otwór A','C','m-1',null),('B','Otwór B','C','m-1',null);
-                create table best_measurements (object_id text,measurement_id text);
-                insert into best_measurements values ('A','m-1'),('B','m-1');
-                create table measurements (object_id text,id text,x_1992 real,y_1992 real,verification_status text,source text,horizontal_accuracy_m real,notes text);
-                insert into measurements values ('A','m-1',150000,560000,'nieweryfikowany','PIG',null,'original'),('A','m-2',150003,560004,'odrzucony','GPS',7,'rejected note'),('B','m-1',160000,570000,'zweryfikowany','GPS',1,'second object');
-                create table object_external_refs (object_id text,external_id text);
-                create table cave_external_refs (cave_id text,external_id text);
-                create table relations (from_object_id text,to_object_id text);
-                create table attachments (object_id text);
-                create table validation_flags (code text);
-            """)
-            con.commit()
-            con.close()
-            with zipfile.ZipFile(root / 'katalog.sqlite.zip', 'w') as archive:
-                archive.write(db, 'katalog.sqlite')
-            p.write_json(root / 'metadata.json', {'metadata_schema_version': 1, 'data_schema_version': 1})
-            objects, details, counts = p.import_gps(root, {}, root / 'out')
-            self.assertEqual(3, counts['measurements'])
-            caves = p.json_read((root / 'out' / 'caves.json').read_bytes())
-            orphan = next(c for c in caves if c['id'] == 'C-orphan')
-            self.assertEqual([], orphan['objectIds'])
-            self.assertNotIn('coordinate', orphan)
-            self.assertIn('source note', orphan['searchText'])
-            self.assertTrue((root / 'out' / 'caves' / 'C-orphan.json').exists())
-            self.assertEqual([560000,150000], objects[0]['coordinate'])
-            rejected = details['A']['measurements'][1]
-            self.assertEqual('rejected', rejected['role'])
-            self.assertEqual('rejected note', rejected['notes'])
-            self.assertEqual(5, rejected['differenceM'])
-            self.assertEqual(7, rejected['horizontal_accuracy_m'])
-            self.assertEqual('second object', details['B']['measurements'][0]['notes'])
-            self.assertIsNone(details['A']['measurements'][0]['horizontal_accuracy_m'])
-            # A Best id is scoped to its object, not satisfied by another object's row.
-            con = sqlite3.connect(db)
-            con.execute("update best_measurements set measurement_id='m-2' where object_id='B'")
-            con.commit()
-            con.close()
-            with zipfile.ZipFile(root / 'katalog.sqlite.zip', 'w') as archive:
-                archive.write(db, 'katalog.sqlite')
-            with self.assertRaisesRegex(ValueError, 'Invalid Best reference: B'):
-                p.import_gps(root, {}, root / 'out')
+            (root / 'katalog.dump').write_bytes(b'archive')
+            p.write_json(root / 'metadata.json', {
+                'metadata_schema_version': 1, 'data_schema_version': 1,
+                'counts': {'objects': 2, 'caves': 2, 'measurements': 3, 'relations': 0, 'validation_errors': 0},
+            })
+            assets = []
+            for name in ('katalog.dump', 'metadata.json'):
+                data = (root / name).read_bytes()
+                assets.append({'name': name, 'size': len(data), 'digest': 'sha256:' + p.digest(data)})
+            source = {'tag': 'v2.0.2', 'assets': assets}
+            with patch.object(p, 'read_gps_dump', return_value=tables) as read_dump:
+                objects, details, counts = p.import_gps(root, source, root / 'out')
+                read_dump.assert_called_once_with(b'archive')
+                self.assertEqual(3, counts['sourceMeasurements'])
+                caves = p.json_read((root / 'out' / 'caves.json').read_bytes())
+                self.assertEqual(['B', 'A'], next(c for c in caves if c['id'] == 'C')['objectIds'])
+                orphan = next(c for c in caves if c['id'] == 'C-orphan')
+                self.assertEqual([], orphan['objectIds'])
+                self.assertNotIn('coordinate', orphan)
+                self.assertIn('source note', orphan['searchText'])
+                self.assertTrue((root / 'out' / 'caves' / 'C-orphan.json').exists())
+                self.assertEqual([560000, 150000], objects[0]['coordinate'])
+                self.assertEqual('PIG-id', details['A']['caveExternalRefs'][0]['external_id'])
+                self.assertEqual(34, details['A']['cave']['length_m'])
+                self.assertEqual('PUB', details['A']['cave']['citations'][0]['publication_id'])
+                rejected = details['A']['measurements'][1]
+                self.assertEqual('rejected', rejected['role'])
+                self.assertEqual('rejected note', rejected['notes'])
+                self.assertEqual(5, rejected['differenceM'])
+                self.assertEqual(7, rejected['horizontal_accuracy_m'])
+                self.assertEqual(913.4, rejected['elevation_m'])
+                self.assertEqual('Kronstadt86', rejected['elevation_datum'])
+                self.assertEqual(['source'], rejected['tags'])
+                self.assertEqual('second object', details['B']['measurements'][0]['notes'])
+                self.assertIsNone(details['A']['measurements'][0]['horizontal_accuracy_m'])
+                self.assertEqual('source decision', details['B']['best']['reason'])
+                self.assertEqual('m-1', details['B']['best']['computed_best_measurement_id'])
+                # A Best id is scoped to its object, not satisfied by another object's row.
+                tables['best_measurements'][1]['measurement_id'] = 'm-2'
+                with self.assertRaisesRegex(ValueError, 'Invalid Best reference: B'):
+                    p.import_gps(root, source, root / 'out')
+                # Never pass bytes to pg_restore after a cache replacement.
+                (root / 'katalog.dump').write_bytes(b'changed')
+                read_dump.reset_mock()
+                with self.assertRaisesRegex(ValueError, 'ASSET_HASH_MISMATCH'):
+                    p.import_gps(root, source, root / 'out')
+                read_dump.assert_not_called()
 
 
 class BuildPublicationTests(unittest.TestCase):
