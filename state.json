@@ -133,6 +133,25 @@
       "sha256": "48dbef9024014d59b9f501f5119dc325ba0de8837a9bdf3b408015ad8b15583d",
       "site_bytes": 309989757
     },
+    "pages-42777134098": {
+      "app_sha": "aa4f86ade03f5f6f7caa5b3f32cd1c479c2a3497",
+      "asset_id": 730596663,
+      "bytes": 290833149,
+      "manifest_sha256": "73a75ea0112a34fae70f08a1aa55243a6cac7daaada437ede3f800ba6e3f66d1",
+      "metadata_asset_id": 730597004,
+      "metadata_sha256": "61f12049fc0fe1b5d8e73205136fcba2f17f087eb65294fc85c6cf0f08b0e163",
+      "package_id": "pages-42777134098",
+      "public_files": {
+        "assets/index-B4fyyndr.js": "75e94f7a070cbb7d1e32b51cac7ccc0cc2f8c0f0cbeb43d8edc0d2ca5d24e344",
+        "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
+        "data/catalog.json": "d40be99fcd9aaf09d52de3e48c92a3b5ca3cc4c5adc260de680e9d4994353259",
+        "index.html": "ffd28ac974e6e17efb5ac57b54fe83fd085654d9df50f107da117196cebe8a29",
+        "publication.json": "73a75ea0112a34fae70f08a1aa55243a6cac7daaada437ede3f800ba6e3f66d1"
+      },
+      "release_id": 440078563,
+      "sha256": "0afadf9aaff73cf936a3a570abc8f8cf8aec2c79d299122e9a7e22cc6089c29d",
+      "site_bytes": 312119072
+    },
     "probe-original": {
       "asset": "original.tar",
       "asset_id": 694852569,
@@ -161,7 +180,60 @@
     "step_number": 6,
     "to": "pages-41824829082"
   },
-  "pending": null,
+  "pending": {
+    "archives": {
+      "pages-41824829082": {
+        "app_sha": "990a78732e2d33674c8001c84e1f090f7e7d3c7d",
+        "asset_id": 709370888,
+        "bytes": 290764171,
+        "manifest_sha256": "b54177b654654f658fe24cc28cf64789a12725bfc21ef547cb2bf3f7303fd569",
+        "metadata_asset_id": 709371593,
+        "metadata_sha256": "82d6807e7141c673e5173104b5800cbfcd072e30624ff7f6e9fd9e8a0621c4c4",
+        "package_id": "pages-41824829082",
+        "public_files": {
+          "assets/index-B4fyyndr.js": "75e94f7a070cbb7d1e32b51cac7ccc0cc2f8c0f0cbeb43d8edc0d2ca5d24e344",
+          "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
+          "data/catalog.json": "280cfccaa700670f4f31de0657566279f032a63843ebbfd75d177233d9d6cc15",
+          "index.html": "ffd28ac974e6e17efb5ac57b54fe83fd085654d9df50f107da117196cebe8a29",
+          "publication.json": "b54177b654654f658fe24cc28cf64789a12725bfc21ef547cb2bf3f7303fd569"
+        },
+        "release_id": 433870277,
+        "sha256": "48dbef9024014d59b9f501f5119dc325ba0de8837a9bdf3b408015ad8b15583d",
+        "site_bytes": 309989757
+      },
+      "pages-42777134098": {
+        "app_sha": "aa4f86ade03f5f6f7caa5b3f32cd1c479c2a3497",
+        "asset_id": 730596663,
+        "bytes": 290833149,
+        "manifest_sha256": "73a75ea0112a34fae70f08a1aa55243a6cac7daaada437ede3f800ba6e3f66d1",
+        "metadata_asset_id": 730597004,
+        "metadata_sha256": "61f12049fc0fe1b5d8e73205136fcba2f17f087eb65294fc85c6cf0f08b0e163",
+        "package_id": "pages-42777134098",
+        "public_files": {
+          "assets/index-B4fyyndr.js": "75e94f7a070cbb7d1e32b51cac7ccc0cc2f8c0f0cbeb43d8edc0d2ca5d24e344",
+          "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
+          "data/catalog.json": "d40be99fcd9aaf09d52de3e48c92a3b5ca3cc4c5adc260de680e9d4994353259",
+          "index.html": "ffd28ac974e6e17efb5ac57b54fe83fd085654d9df50f107da117196cebe8a29",
+          "publication.json": "73a75ea0112a34fae70f08a1aa55243a6cac7daaada437ede3f800ba6e3f66d1"
+        },
+        "release_id": 440078563,
+        "sha256": "0afadf9aaff73cf936a3a570abc8f8cf8aec2c79d299122e9a7e22cc6089c29d",
+        "site_bytes": 312119072
+      }
+    },
+    "from": "pages-41824829082",
+    "operation": {
+      "created_at": "2026-11-10T07:42:13Z",
+      "head_sha": "aa4f86ade03f5f6f7caa5b3f32cd1c479c2a3497",
+      "job_id": 129703860582,
+      "job_name": "publish-42777134098-1",
+      "run_attempt": 1,
+      "run_id": 42777134098,
+      "step_name": "Publish Pages",
+      "step_number": 6
+    },
+    "to": "pages-42777134098"
+  },
   "retired": {
     "pages-41198442070": "2026-11-15T14:15:14.412255+00:00",
     "pages-41207949826": "2026-11-15T15:14:12.630208+00:00",
