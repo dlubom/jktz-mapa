@@ -1,6 +1,25 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ImagePool} from '../src/resources.ts';
+import {setImmediate} from 'node:timers/promises';
+
+test('an image rejected by the memory budget loads when the view frees capacity', async () => {
+  const attempts:string[]=[],closed:string[]=[];
+  const pool=new ImagePool(1,16,async url=>{
+    attempts.push(url);
+    return {width:2,height:2,close(){closed.push(url);}} as ImageBitmap;
+  });
+  try{
+    pool.want(['a','b']);await setImmediate();
+    assert.ok(pool.get('a'));assert.equal(pool.get('b'),undefined);
+    pool.want(['a','b']);await setImmediate();
+    assert.deepEqual(attempts,['a','b'],'an unchanged over-budget view must not loop downloads');
+    pool.want(['b']);await setImmediate();
+    assert.ok(pool.get('b'),'navigation frees a slot without requiring a manual network retry');
+    assert.equal(pool.bytes,16);assert.equal(pool.stats.failed,0);
+    assert.deepEqual(closed,['b','a']);
+  }finally{pool.dispose();}
+});
 
 test('image pool bounds concurrency, aborts obsolete fetches and disposes decoded images', async () => {
   let active=0, max=0, closed=0;

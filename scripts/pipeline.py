@@ -612,6 +612,8 @@ def build_report(output, counts, seconds):
 def build(lock, cache, output, *, workers=None, raster_cache=None):
     start = time.monotonic()
     cache, output = cache.resolve(), output.resolve()
+    require(not (cache == output or cache in output.parents or output in cache.parents), 'Inputs and output must be separate')
+    require(not output.exists() or output.is_dir(), 'Output must be a directory')
     if raster_cache is not None:
         destination = raster_cache.resolve()
         require(not (destination == output or destination in output.parents or output in destination.parents), 'Raster cache and output must be separate')
@@ -619,7 +621,8 @@ def build(lock, cache, output, *, workers=None, raster_cache=None):
     # Revalidate pinned bytes even when fetch used an existing cache.
     fetch(lock, cache)
     output.parent.mkdir(parents=True, exist_ok=True)
-    staging = Path(tempfile.mkdtemp(prefix='map-data-', dir=cache.parent))
+    # Keep promotion on the destination filesystem even when inputs live elsewhere.
+    staging = Path(tempfile.mkdtemp(prefix='map-data-', dir=output.parent))
     try:
         sources = {s['key']: s for s in lock['sources']}
         objects, details, counts = import_gps(cache, sources['gps'], staging)
@@ -646,9 +649,23 @@ def build(lock, cache, output, *, workers=None, raster_cache=None):
         report = build_report(staging, counts, time.monotonic() - start)
         require(report['bytes'] < 850_000_000, f"Data exceeds 850 MB budget: {report['bytes']}")
         write_json(staging / 'build-report.json', report)
-        if output.exists():
-            shutil.rmtree(output)
-        staging.replace(output)
+        backup = Path(tempfile.mkdtemp(prefix='map-data-previous-', dir=output.parent))
+        previous = backup / 'data'
+        try:
+            if output.exists():
+                output.replace(previous)
+            try:
+                staging.replace(output)
+            except BaseException:
+                if previous.exists():
+                    previous.replace(output)
+                raise
+        finally:
+            # A failed restore must leave the previous dataset available for recovery.
+            if not previous.exists():
+                backup.rmdir()
+        if previous.exists():
+            shutil.rmtree(backup)
         print(json.dumps(report, ensure_ascii=False, indent=2), flush=True)
     finally:
         if staging.exists():

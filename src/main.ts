@@ -15,7 +15,7 @@ const display=(v:unknown)=>v===null||v===undefined||v===''?'Nie podano':typeof v
 const record=(data:SourceRecord,keys:string[])=>`<dl class="facts">${keys.map(k=>`<div><dt>${e(labels[k]||k)}</dt><dd>${e(display(data[k]))}</dd></div>`).join('')}</dl>`;
 const raw=(data:unknown,label='Wszystkie pola źródłowe')=>`<details class="raw"><summary>${label}</summary><pre>${e(JSON.stringify(data,null,2))}</pre></details>`;
 const link=(url:unknown,label:unknown)=>typeof url==='string'&&(/^https?:\/\//.test(url)||/^data\/[a-z0-9-]+\.json$/.test(url))?`<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${e(label)} ↗</a>`:e(label);
-let catalog:Catalog,controller:MapController,detailAbort:AbortController|undefined,planAbort:AbortController|undefined,currentObject:string|undefined;
+let catalog:Catalog,controller:MapController,detailAbort:AbortController|undefined,planAbort:AbortController|undefined;
 let planLimit=40,toolLayoutFrame:number|undefined;
 let searchUI:ReturnType<typeof mountCatalogSearch>|undefined;
 const basemapOptions=BASEMAPS.map(base=>`<option value="${e(base.id)}">${e(base.label)}</option>`).join('');
@@ -72,7 +72,7 @@ function report(message:string,kind:string){if(kind==='basemap'){for(const id of
 function planStatus(){if(!controller)return;const stats=controller.plans.pool.stats;$('#plan-status').textContent=!controller.plans.enabled?'Plany wyłączone':stats.failed?'Niektóre obrazy planów są niedostępne.':stats.loading?`Wczytywanie planów… ${stats.loading} pobrań`:controller.plans.active.length?`${controller.plans.active.length} planów w widoku${controller.plans.reduced?' · lżejszy podgląd (limit pamięci)':''}`:'Przybliż mapę, aby zobaczyć plany, lub wybierz „Pokaż cały plan”.';$('#retry-plans').hidden=!stats.failed;syncPlanTools();}
 function choose(ids:string[]){
   if(ids.length===1){void openObject(ids[0],false);return;}
-  detailAbort?.abort();currentObject=undefined;controller.selectedId=null;controller.best.changed();
+  detailAbort?.abort();controller.selectedId=null;controller.best.changed();
   tab('object');$('#object-panel').innerHTML=`<p class="eyebrow">W TYM MIEJSCU</p><h2>Wybierz obiekt</h2><div class="result-list">${ids.map(id=>{const o=catalog.objects.find(o=>o.id===id);return `<button class="result" data-object="${e(id)}"><strong>${e(o?.name||id)}</strong><span>${e(id)}</span></button>`;}).join('')}</div>`;
 }
 function planCard(p:PlanEntry){const checked=!controller.plans.hidden.has(p.id),opacity=Math.round((controller.plans.opacity.get(p.id)??.75)*100);return `<article class="plan-card" data-plan-card="${e(p.id)}"><div class="plan-heading"><label><input type="checkbox" data-plan-toggle="${e(p.id)}" ${checked?'checked':''}><strong>${e(p.name)}</strong></label><span class="mono">${e(p.id)}</span></div><p class="muted">${e(orientationLabel(p.orientationStatus))}${!p.objectIds.length?' · brak jawnego powiązania z obiektem GPS':''}</p><div class="button-row"><button data-plan-fit="${e(p.id)}">Pokaż cały plan</button><button class="text-button" data-plan-info="${e(p.id)}">Pochodzenie</button></div><div class="opacity-row"><label>Krycie <output>${opacity}%</output><input aria-label="Krycie planu ${e(p.name)}" type="range" min="0" max="100" value="${opacity}" data-plan-opacity="${e(p.id)}"></label><button data-plan-order="${e(p.id)}" data-direction="1" title="Przenieś wyżej" aria-label="Plan ${e(p.name)} wyżej">↑</button><button data-plan-order="${e(p.id)}" data-direction="-1" title="Przenieś niżej" aria-label="Plan ${e(p.name)} niżej">↓</button></div></article>`;}
@@ -92,7 +92,7 @@ function renderPlans(){
 }
 function measurement(m:Measurement){return `<details class="measurement" ${m.role==='best'?'open':''}><summary><span class="badge ${m.role}">${m.role==='best'?'Best':m.role==='rejected'?'Odrzucony':'Pozostały'}</span><strong>${e(m.source||'Nieznane źródło')}</strong><span>${e(m.observed_at||m.observed_date||m.source_date||'Brak daty')} · ${e(m.id)}</span></summary><p class="coordinate">${m.coordinate?e(formatCoordinate(m.coordinate)):'Brak współrzędnych'}</p>${m.role!=='best'&&m.differenceM!==null?`<p>Różnica pozioma względem Best: <strong>${Number(m.differenceM).toLocaleString('pl-PL',{maximumFractionDigits:2})} m</strong></p>`:''}${record(m,['verification_status','horizontal_accuracy_m','vertical_accuracy_m','method','device','source_ref','elevation_m','elevation_datum','elevation_source','observed_at','observed_date','source_date','verified_by','notes','created_by'])}${raw(m)}</details>`;}
 async function openObject(id:string,zoom=true){
-  currentObject=id;const o=catalog.objects.find(o=>o.id===id);if(!o)return;
+  const o=catalog.objects.find(o=>o.id===id);if(!o)return;
   detailAbort?.abort();detailAbort=new AbortController();const signal=detailAbort.signal;
   controller.plans.endFocus();controller.select(id,zoom);tab('object');searchUI?.close();
   $('#object-panel').innerHTML=`<p class="eyebrow">OBIEKT ${e(id)}</p><h2>${e(o.name)}</h2><p role="status">Wczytywanie informacji o jaskini…</p>`;
@@ -114,7 +114,7 @@ async function openObject(id:string,zoom=true){
 async function openCave(id:string){
   const cave=catalog.caves.find(c=>c.id===id);if(!cave)return;
   detailAbort?.abort();detailAbort=new AbortController();const signal=detailAbort.signal;
-  currentObject=undefined;controller.plans.endFocus();controller.selectedId=null;controller.best.changed();tab('object');searchUI?.close();
+  controller.plans.endFocus();controller.selectedId=null;controller.best.changed();tab('object');searchUI?.close();
   history.replaceState(null,'',`#jaskinia=${encodeURIComponent(id)}`);
   $('#object-panel').innerHTML=`<h2>${e(cave.name)}</h2><p role="status">Wczytywanie jaskini…</p>`;
   try{const data=await readJson<{cave:SourceRecord;externalRefs:SourceRecord[]}>(cave.detailUrl,signal);if(signal.aborted)return;

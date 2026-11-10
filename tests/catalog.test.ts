@@ -1,13 +1,18 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {normalize, searchCatalog, eligiblePlans, formatCoordinate} from '../src/catalog.ts';
+import {normalize, searchCatalogEntries, eligiblePlans, formatCoordinate} from '../src/catalog.ts';
+import type {Catalog, ObjectEntry} from '../src/types.ts';
+
+const searchObjects=(objects:Partial<ObjectEntry>[],query:string)=>searchCatalogEntries({
+  objects:objects.map(object=>({planIds:[],modelIds:[],...object})),caves:[],plans:[],models:[],
+} as unknown as Catalog,query).map(result=>result.entry);
 
 test('search finds Polish names and identifiers without diacritics', () => {
   const objects = [{id:'T.A-01',name:'Żółta Jaskinia',searchText:'Żółta Jaskinia 001197'}];
   assert.equal(normalize(' ŁÓDŹ '), 'lodz');
-  assert.equal(searchCatalog(objects as never, 'zolta')[0].id, 'T.A-01');
-  assert.equal(searchCatalog(objects as never, '001197')[0].id, 'T.A-01');
-  assert.equal(searchCatalog(objects as never, 'brak').length, 0);
+  assert.equal(searchObjects(objects, 'zolta')[0].id, 'T.A-01');
+  assert.equal(searchObjects(objects, '001197')[0].id, 'T.A-01');
+  assert.equal(searchObjects(objects, 'brak').length, 0);
 });
 test('whole-plan exception applies only to chosen visible plan, no arbitrary catalog cap', () => {
   const plans = Array.from({length:30},(_,i)=>({id:String(i),extent:[0,0,200,200]}));
@@ -21,5 +26,5 @@ test('display labels use northing as X, easting as Y', () => {
 });
 test('name matches rank above incidental mentions in source notes',()=>{
   const objects=[{id:'a',name:'Awen',searchText:'uwaga: Miętusia'},{id:'b',name:'Piwnica Miętusia',searchText:''}];
-  assert.equal(searchCatalog(objects as never,'mietusia')[0].id,'b');
+  assert.equal(searchObjects(objects,'mietusia')[0].id,'b');
 });

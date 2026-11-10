@@ -355,8 +355,16 @@ def exact_step(op, success=False):
 
 
 def public_check(metadata):
-    files = metadata.get('public_files', metadata.get('files', {}))
-    names = [name for name in files if name == 'index.html' or name == 'publication.json'
+    # Older compact ledger records omit inputs.json from public_files. Use the
+    # checksum-pinned full inventory without rewriting historical ledger entries.
+    metadata = full_metadata(metadata)
+    files = metadata.get('files')
+    required = {'index.html'}
+    # The original probe archive predates publication manifests and the catalog.
+    if metadata.get('manifest_sha256') is not None:
+        required.update(('publication.json', 'inputs.json', 'data/catalog.json'))
+    require(isinstance(files, dict) and required <= files.keys(), 'Incomplete public file inventory')
+    names = [name for name in files if name in ('index.html', 'publication.json', 'inputs.json')
              or name == 'data/catalog.json' or name.startswith('assets/')]
     last_error = None
     for attempt in range(6):

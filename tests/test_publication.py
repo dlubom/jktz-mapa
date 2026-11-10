@@ -200,6 +200,53 @@ class PublicationTests(unittest.TestCase):
         pub.validate_state(result)
         self.assertNotIn('files', result['archives']['pages-B'])
 
+    def test_public_check_rejects_missing_required_inventory(self):
+        contents = {'index.html': b'map', 'publication.json': b'{}',
+                    'inputs.json': b'{}', 'data/catalog.json': b'{}'}
+        files = {name: pub.digest(raw) for name, raw in contents.items()}
+        for missing in (None, *contents):
+            metadata = {'manifest_sha256': files['publication.json']}
+            if missing is not None:
+                metadata['files'] = {name: sha for name, sha in files.items() if name != missing}
+            with self.subTest(missing=missing), \
+                 patch.object(pub.urllib.request, 'urlopen', side_effect=lambda request, **kwargs:
+                              io.BytesIO(contents[request.full_url.removeprefix(pub.PUBLIC).split('?')[0]])), \
+                 patch.object(pub.time, 'sleep'):
+                with self.assertRaisesRegex(RuntimeError, 'inventory'):
+                    pub.public_check(metadata)
+        with self.assertRaisesRegex(RuntimeError, 'inventory'):
+            pub.public_check({'files': {}})
+
+    def test_public_check_reads_pinned_full_inventory_and_rejects_stale_inputs(self):
+        contents = {'index.html': b'map', 'publication.json': b'{"package_id":"pages-123"}',
+                    'inputs.json': b'{"sources":["new"]}', 'data/catalog.json': b'{}',
+                    'assets/app.js': b'console.log("map")'}
+        metadata = {'schema': 1, 'package_id': 'pages-123', 'app_sha': 'a' * 40,
+                    'bytes': 100, 'sha256': 'b' * 64, 'site_bytes': 200,
+                    'manifest_sha256': pub.digest(contents['publication.json']),
+                    'files': {name: pub.digest(raw) for name, raw in contents.items()}}
+        raw = pub.encoded(metadata)
+        record = {key: value for key, value in metadata.items() if key != 'files'}
+        record.update(metadata_asset_id=22, metadata_sha256=pub.digest(raw),
+                      public_files={name: sha for name, sha in metadata['files'].items() if name != 'inputs.json'})
+        live = dict(contents)
+        def response(request, **kwargs):
+            name = request.full_url.removeprefix(pub.PUBLIC).split('?')[0]
+            return io.BytesIO(live[name])
+        with patch.object(pub, 'api', return_value=raw), \
+             patch.object(pub.urllib.request, 'urlopen', side_effect=response), \
+             patch.object(pub.time, 'sleep'):
+            pub.public_check(record)
+            live['inputs.json'] = b'{"sources":["old"]}'
+            with self.assertRaisesRegex(RuntimeError, 'Public file differs: inputs.json'):
+                pub.public_check(record)
+
+    def test_public_check_keeps_legacy_probe_without_manifest(self):
+        content = b'original static page'
+        metadata = {'manifest_sha256': None, 'files': {'index.html': pub.digest(content)}}
+        with patch.object(pub.urllib.request, 'urlopen', side_effect=lambda *args, **kwargs: io.BytesIO(content)):
+            pub.public_check(metadata)
+
     def test_archive_is_complete_reproducible_and_checked_before_materialization(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

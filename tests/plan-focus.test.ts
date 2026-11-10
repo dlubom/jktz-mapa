@@ -168,3 +168,15 @@ test('render reports memory reduction changes with the same active plan list',as
   ]);
   plans.dispose();
 });
+
+test('zero-opacity plans release image demand and reload when made visible',()=>{
+  const {plans,render,wanted}=setup();
+  plans.show(entries[0]);plans.setIsolation(true);
+  render(2);assert.deepEqual(wanted(),['a-preview.webp']);
+  plans.opacity.set('a',0);
+  render(2);assert.deepEqual(wanted(),[],'fully transparent imagery should not be fetched or retained as wanted');
+  assert.equal(plans.focusId,'a');assert.ok(plans.selected.has('a'));
+  plans.opacity.set('a',.75);
+  render(2);assert.deepEqual(wanted(),['a-preview.webp']);
+  plans.dispose();
+});
