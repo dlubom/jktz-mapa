@@ -1,5 +1,8 @@
 # Wyszukiwanie i wybór podkładu
 
+Dokument historyczny: zakres scalonego PR #11. Bieżące instrukcje pracy i odbioru
+są w [AGENTS.md](../../../AGENTS.md).
+
 > Realizacja: równoległe, niezależne zadania z integracją i przeglądem całej zmiany.
 
 **Cel:** znaleźć lokalizację jaskini i dostępne materiały oraz wiedzieć, jaki podkład faktycznie widać.

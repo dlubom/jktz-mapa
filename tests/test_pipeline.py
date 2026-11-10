@@ -1,5 +1,6 @@
 """Contract tests use small generated inputs; the full build is a separate acceptance run."""
 from pathlib import Path
+import errno
 import io
 import json
 import math
@@ -161,6 +162,117 @@ class GPSContractTests(unittest.TestCase):
                 archive.write(db, 'katalog.sqlite')
             with self.assertRaisesRegex(ValueError, 'Invalid Best reference: B'):
                 p.import_gps(root, {}, root / 'out')
+
+
+class BuildPublicationTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name).resolve()
+        self.cache = self.root / 'inputs'
+        self.output = self.root / 'public' / 'data'
+        self.lock = {'resolvedAt': '2026-01-01', 'sources': [
+            {'key': key, 'repository': repository, 'tag': 'v1', 'commit': 'a' * 40,
+             'url': 'https://example.test/release', 'publishedAt': '2026-01-01',
+             'assets': [], 'files': []}
+            for key, repository in p.REPOSITORIES.items()
+        ]}
+
+        # Only source conversion is replaced: fetch, catalog/report writing,
+        # directory publication and cleanup all use the production code.
+        def import_gps(cache, source, output):
+            p.write_json(output / 'caves.json', [])
+            return ([{'id': 'A', 'coordinate': [560000, 150000]}],
+                    {'A': {'modelIds': [], 'planIds': []}}, {'objects': 1})
+        for name, replacement in (
+            ('import_gps', import_gps),
+            ('import_jktz', lambda *args: []),
+            ('import_plans', lambda *args, **kwargs: ([], {'plans': 0, 'tiles': 0, 'rasterBytes': 0})),
+        ):
+            patcher = patch.object(p, name, replacement)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def test_overlapping_input_and_output_paths_are_rejected_before_mutation(self):
+        for cache, output in (
+            (self.root / 'same', self.root / 'same'),
+            (self.root / 'inside-input', self.root / 'inside-input' / 'output'),
+            (self.root / 'inside-output' / 'input', self.root / 'inside-output'),
+        ):
+            with self.subTest(cache=cache, output=output):
+                cache.mkdir(parents=True)
+                (cache / 'source.txt').write_text('original input')
+                with self.assertRaisesRegex(ValueError, 'Inputs and output must be separate'):
+                    p.build(self.lock, cache, output)
+                self.assertEqual('original input', (cache / 'source.txt').read_text())
+                self.assertFalse((cache / 'verification.json').exists())
+
+    def test_symlink_alias_of_input_is_rejected_before_mutation(self):
+        self.cache.mkdir()
+        alias = self.root / 'alias'
+        alias.symlink_to(self.cache, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'Inputs and output must be separate'):
+            p.build(self.lock, self.cache, alias / 'data')
+        self.assertEqual([], list(self.cache.iterdir()))
+
+    def test_existing_output_file_is_rejected_before_mutation(self):
+        self.output.parent.mkdir(parents=True)
+        self.output.write_text('unrelated file')
+        with self.assertRaisesRegex(ValueError, 'Output must be a directory'):
+            p.build(self.lock, self.cache, self.output)
+        self.assertEqual('unrelated file', self.output.read_text())
+        self.assertFalse(self.cache.exists())
+
+    def test_failed_promotion_preserves_previous_complete_output(self):
+        self.output.mkdir(parents=True)
+        (self.output / 'previous.txt').write_text('previous successful build')
+        replace = Path.replace
+
+        def fail_new_output(path, target):
+            if (path / 'catalog.json').is_file() and Path(target) == self.output:
+                raise OSError(errno.EACCES, 'simulated publication failure')
+            return replace(path, target)
+
+        with patch.object(Path, 'replace', fail_new_output):
+            with self.assertRaisesRegex(OSError, 'simulated publication failure'):
+                p.build(self.lock, self.cache, self.output)
+        self.assertEqual(['previous.txt'], sorted(path.name for path in self.output.iterdir()))
+        self.assertEqual('previous successful build', (self.output / 'previous.txt').read_text())
+        self.assertEqual([self.output], list(self.output.parent.iterdir()))
+
+    def test_staging_uses_destination_filesystem_and_replaces_old_output(self):
+        self.output.mkdir(parents=True)
+        (self.output / 'obsolete.txt').write_text('old')
+        replace = Path.replace
+
+        def require_destination_filesystem(path, target):
+            if (path / 'catalog.json').is_file() and path.parent != Path(target).parent:
+                raise OSError(errno.EXDEV, 'simulated separate cache filesystem')
+            return replace(path, target)
+
+        with patch.object(Path, 'replace', require_destination_filesystem):
+            p.build(self.lock, self.cache, self.output)
+        self.assertEqual('A', p.json_read((self.output / 'catalog.json').read_bytes())['objects'][0]['id'])
+        self.assertFalse((self.output / 'obsolete.txt').exists())
+        self.assertEqual([self.output], list(self.output.parent.iterdir()))
+        self.assertTrue((self.cache / 'verification.json').is_file())
+
+    def test_failed_restore_keeps_previous_output_for_manual_recovery(self):
+        self.output.mkdir(parents=True)
+        (self.output / 'previous.txt').write_text('previous successful build')
+        replace = Path.replace
+
+        def fail_publication_and_restore(path, target):
+            if Path(target) == self.output:
+                raise OSError(errno.EACCES, 'simulated publication failure')
+            return replace(path, target)
+
+        with patch.object(Path, 'replace', fail_publication_and_restore):
+            with self.assertRaises(OSError):
+                p.build(self.lock, self.cache, self.output)
+        retained = list(self.output.parent.rglob('previous.txt'))
+        self.assertEqual(1, len(retained))
+        self.assertEqual('previous successful build', retained[0].read_text())
 
 
 class RasterContractTests(unittest.TestCase):

@@ -33,6 +33,9 @@ def make_site(root):
         'assets/map.js': 'console.log("map")', 'assets/map.css': 'body{margin:0}',
         'data/inputs.json': '{"sources":[]}', 'data/objects/one.json': '{}',
         'data/caves/one.json': '{}', 'data/models/one.geojson': '{}',
+        'data/measurements.geojson': '{"type":"FeatureCollection","features":[]}',
+        'data/differences.geojson': '{"type":"FeatureCollection","features":[]}',
+        'data/build-report.json': '{}',
         'data/plans/one/preview.webp': 'preview', 'data/plans/one/details.json': '{}',
         'data/plans/one/tiles/0/0-0.webp': 'detail',
     }
@@ -76,6 +79,8 @@ class PreviewTests(unittest.TestCase):
 
     def test_missing_runtime_assets_block_publish_with_consistent_checksums(self):
         for missing in ('data/catalog.json', 'assets/map.js', 'assets/map.css', 'data/objects/one.json',
+                        'data/measurements.geojson', 'data/differences.geojson',
+                        'data/build-report.json',
                         'data/caves/one.json', 'data/models/one.geojson', 'data/plans/one/preview.webp',
                         'data/plans/one/details.json', 'data/plans/one/tiles/0/0-0.webp'):
             with self.subTest(missing=missing), tempfile.TemporaryDirectory() as tmp:
@@ -87,6 +92,15 @@ class PreviewTests(unittest.TestCase):
                 (bundle / 'checksums.json').write_bytes(preview.encoded(preview.inventory(bundle)))
                 with self.assertRaisesRegex(RuntimeError, 'Missing|catalogue'):
                     preview.verify_bundle(bundle, identity())
+
+    def test_missing_diagnostics_or_report_block_bundle_creation(self):
+        for missing in ('data/measurements.geojson', 'data/differences.geojson', 'data/build-report.json'):
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                site, pins = make_site(root)
+                (site / missing).unlink()
+                with self.assertRaisesRegex(RuntimeError, f'Missing catalogue/runtime asset: {missing}'):
+                    preview.build_bundle(site, pins, root / 'bundle', identity())
 
     def test_small_plan_is_complete_with_preview_and_no_tile_levels(self):
         with tempfile.TemporaryDirectory() as tmp:

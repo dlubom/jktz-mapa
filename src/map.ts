@@ -28,7 +28,6 @@ import {Plans} from './plans.ts';
 import type {Catalog, Extent, ModelEntry, Coordinate} from './types.ts';
 
 proj4.defs('EPSG:2180','+proj=tmerc +lat_0=0 +lon_0=19 +k=0.9993 +x_0=500000 +y_0=-5300000 +ellps=GRS80 +units=m +no_defs');register(proj4);
-const white=new Fill({color:'#fff'});
 const pointStyle=(color:string,radius:number)=>new Style({image:new Circle({radius,fill:new Fill({color}),stroke:new Stroke({color:'#fff',width:1.5})})});
 type BasemapSource=XYZ|TileWMS|OSM;
 interface TrackedTile {tile:Tile;extent:Extent;zoom:number;listener?:EventsKey}

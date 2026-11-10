@@ -65,7 +65,7 @@ export class Plans {
     // reduces detail uniformly, never silently drops a fixed number of plans.
     let detailResolution=resolution/pixelRatio;
     for(const [id,fitResolution] of this.wholePreview)if(resolution<fitResolution*.95)this.wholePreview.delete(id);
-    const makeDraws=()=>eligible.map(p=>this.wholePreview.has(p.id)?[{url:p.preview.url,extent:p.preview.extent||p.extent,gutter:0}]:this.draws(p,extent,resolution>1?resolution:detailResolution));
+    const makeDraws=()=>eligible.map(p=>this.opacity.get(p.id)===0?[]:this.wholePreview.has(p.id)?[{url:p.preview.url,extent:p.preview.extent||p.extent,gutter:0}]:this.draws(p,extent,resolution>1?resolution:detailResolution));
     let drawLists=makeDraws();
     let estimate=()=>drawLists.reduce((sum,list)=>sum+list.length*514*514*4,0);
     this.reduced=false;

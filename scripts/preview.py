@@ -154,6 +154,9 @@ def verify_catalogue(site, files):
 
     asset('data/catalog.json')
     asset('data/inputs.json')
+    asset('data/measurements.geojson')
+    asset('data/differences.geojson')
+    asset('data/build-report.json')
     require(files['data/inputs.json'] == files['inputs.json'], 'Catalogue input checksum differs')
     catalog = read_json(site / 'data/catalog.json')
     require(catalog.get('schemaVersion') == 1 and catalog.get('crs') == 'EPSG:2180', 'Invalid catalogue schema')

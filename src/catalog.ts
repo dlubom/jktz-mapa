@@ -2,9 +2,6 @@ import type {Catalog, CaveEntry, ObjectEntry, PlanEntry, Extent, Coordinate} fro
 export function normalize(value: string): string {
   return value.toLocaleLowerCase('pl').replaceAll('ł', 'l').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
-export function searchCatalog(objects: ObjectEntry[], query: string): ObjectEntry[] {
-  return rankedEntries(objects.map(entry=>({entry})),query).map(result=>result.entry);
-}
 type SearchEntry = ObjectEntry | CaveEntry;
 export type CatalogSearchResult = (
   {kind:'object';entry:ObjectEntry} | {kind:'cave';entry:CaveEntry}

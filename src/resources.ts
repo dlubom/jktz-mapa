@@ -10,6 +10,7 @@ export class ImagePool {
   private wanted = new Set<string>();
   private pending = new Map<string,AbortController>();
   private failed = new Set<string>();
+  private overBudget = new Set<string>();
   private closed=false;
   bytes=0;
   private concurrency:number;
@@ -23,7 +24,10 @@ export class ImagePool {
     return bitmap;
   }
   want(urls:string[]):void {
-    this.wanted=new Set(urls);
+    const wanted=new Set(urls);
+    // A different view can free capacity; a network failure still needs retry.
+    if(wanted.size!==this.wanted.size||[...wanted].some(url=>!this.wanted.has(url)))this.overBudget.clear();
+    this.wanted=wanted;
     for(const [url,controller] of this.pending) if(!this.wanted.has(url)) controller.abort();
     this.pump();
   }
@@ -31,7 +35,7 @@ export class ImagePool {
     if(this.closed)return;
     for(const url of this.wanted){
       if(this.pending.size>=this.concurrency)break;
-      if(this.cache.has(url)||this.pending.has(url)||this.failed.has(url))continue;
+      if(this.cache.has(url)||this.pending.has(url)||this.failed.has(url)||this.overBudget.has(url))continue;
       const controller=new AbortController();this.pending.set(url,controller);
       this.loader(url,controller.signal).then(bitmap=>{
         if(this.closed||controller.signal.aborted||!this.wanted.has(url)){bitmap.close();return;}
@@ -41,14 +45,14 @@ export class ImagePool {
           if(this.wanted.has(key))continue;
           this.cache.delete(key);this.bytes-=image.width*image.height*4;image.close();
         }
-        if(this.bytes+size>this.budget){bitmap.close();this.failed.add(url);return;}
+        if(this.bytes+size>this.budget){bitmap.close();this.overBudget.add(url);return;}
         this.cache.set(url,bitmap);this.bytes+=size;
       }).catch(error=>{if(error.name!=='AbortError')this.failed.add(url);})
         .finally(()=>{this.pending.delete(url);if(!this.closed){this.pump();this.changed();}});
     }
   }
-  clear():void {this.wanted.clear();for(const c of this.pending.values())c.abort();for(const b of this.cache.values())b.close();this.cache.clear();this.bytes=0;this.failed.clear();}
-  retry():void {this.failed.clear();this.pump();}
-  get stats(){return {bytes:this.bytes,cached:this.cache.size,loading:this.pending.size,failed:[...this.failed].filter(url=>this.wanted.has(url)).length,wanted:this.wanted.size};}
+  clear():void {this.wanted.clear();for(const c of this.pending.values())c.abort();for(const b of this.cache.values())b.close();this.cache.clear();this.bytes=0;this.failed.clear();this.overBudget.clear();}
+  retry():void {this.failed.clear();this.overBudget.clear();this.pump();}
+  get stats(){return {bytes:this.bytes,cached:this.cache.size,loading:this.pending.size,failed:[...this.failed,...this.overBudget].filter(url=>this.wanted.has(url)).length,wanted:this.wanted.size};}
   dispose():void {this.closed=true;for(const c of this.pending.values())c.abort();for(const b of this.cache.values())b.close();this.cache.clear();this.bytes=0;this.wanted.clear();}
 }
