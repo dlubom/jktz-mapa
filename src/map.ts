@@ -22,7 +22,7 @@ import {listen} from 'ol/events.js';
 import {calculateSourceExtentResolution} from 'ol/reproj.js';
 import type Tile from 'ol/Tile.js';
 import type {EventsKey} from 'ol/events.js';
-import {intersects, readJson} from './catalog.ts';
+import {DataHttpError, intersects, readJson} from './catalog.ts';
 import {basemapDefinition,basemapStatus,BasemapFailures,type BasemapTile,type BasemapStatusInput} from './basemaps.ts';
 import {Plans} from './plans.ts';
 import type {Catalog, Extent, ModelEntry, Coordinate} from './types.ts';
@@ -185,7 +185,14 @@ export class MapController {
     try{const data=await readJson(model.url,controller.signal);if(controller.signal.aborted)return;
       const layer=new VectorLayer({source:new VectorSource({features:this.format.readFeatures(data,{dataProjection:'EPSG:2180',featureProjection:'EPSG:2180'})}),zIndex:10,style:new Style({stroke:new Stroke({color:'#9c3851',width:1.6})})});
       this.modelLayers.set(model.id,layer);this.map.addLayer(layer);
-    }catch(error){if(!controller.signal.aborted)this.report(`Nie wczytano ciągu ${model.name}. Przesuń mapę, aby ponowić.`,'data');}
+    }catch(error){
+      if(controller.signal.aborted)return;
+      if(error instanceof DataHttpError && error.status===404){
+        this.report(`Plik ciągu ${model.name} jest niedostępny. Odśwież mapę, aby wczytać aktualny katalog.`,'refresh');
+      }else{
+        this.report(`Nie wczytano ciągu ${model.name}. Przesuń mapę, aby ponowić.`,'data');
+      }
+    }
     finally{if(this.modelRequests.get(model.id)===controller)this.modelRequests.delete(model.id);}
   }
   fit(){this.map.getView().fit(this.catalog.extent,{padding:[40,40,40,40],duration:300});}

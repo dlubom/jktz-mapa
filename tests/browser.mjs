@@ -11,6 +11,11 @@ const catalogBytes=await readFile('dist/data/catalog.json');
 const catalog=JSON.parse(catalogBytes);
 const catalogUrl=`assets/catalog.${createHash('sha256').update(catalogBytes).digest('hex')}.json`;
 assert.deepEqual(await readFile(`dist/${catalogUrl}`),catalogBytes,'the build contains the versioned catalog');
+for(const model of catalog.models){
+ const bytes=await readFile(`dist/${model.url}`);
+ const digest=createHash('sha256').update(bytes).digest('hex');
+ assert.equal(model.url,`data/models/${model.id}.${digest}.geojson`,'model URL matches its published bytes');
+}
 const server=createServer(async(req,res)=>{try{const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(!path.startsWith(prefix)){res.writeHead(404).end();return;}const file=resolve(root,path.slice(prefix.length)||'index.html');if(!file.startsWith(root+'/')){res.writeHead(403).end();return;}const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});res.end(data);}catch{res.writeHead(404).end('Not found');}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url=`http://127.0.0.1:${server.address().port}${prefix}`;
@@ -21,6 +26,21 @@ try{
   console.log(`Launching ${name}`);
   const browser=await({chromium,firefox,webkit}[name]).launch({headless:true,timeout:30000});
   try{
+   const stalePage=await browser.newPage();
+   try{
+    await stalePage.route(url+catalogUrl,route=>route.fulfill({status:404}));
+    await stalePage.route(url+catalog.models[0].url,route=>route.fulfill({status:404}));
+    await stalePage.goto(url,{waitUntil:'domcontentloaded'});
+    await stalePage.getByRole('heading',{name:'Warstwy i podkład'}).waitFor({timeout:10000});
+    const refreshMap=stalePage.getByRole('button',{name:'Odśwież mapę',exact:true});
+    await refreshMap.waitFor({timeout:10000});
+    await stalePage.unroute(url+catalogUrl);
+    await stalePage.unroute(url+catalog.models[0].url);
+    const recoveredModel=stalePage.waitForResponse(response=>response.url()===url+catalog.models[0].url&&response.ok());
+    await refreshMap.click();
+    await recoveredModel;
+    await refreshMap.waitFor({state:'hidden'});
+   }finally{await stalePage.close();}
    for(const mobile of [false,true]){
     const context=await browser.newContext({viewport:mobile?{width:393,height:852}:{width:1440,height:960},deviceScaleFactor:mobile?3:1,hasTouch:mobile});
     const page=await context.newPage(),errors=[],requests=[],network=new Map(),finishedURLs=new Set();

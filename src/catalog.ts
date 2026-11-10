@@ -52,8 +52,29 @@ export function formatCoordinate(c: Coordinate): string {
   return `X — północ: ${f.format(c[1])} m · Y — wschód: ${f.format(c[0])} m`;
 }
 export function escapeHtml(value: unknown): string {return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));}
+export class DataHttpError extends Error {
+  readonly status: number;
+
+  constructor(status: number) {
+    super(`Nie udało się wczytać danych (HTTP ${status}).`);
+    this.status = status;
+  }
+}
+
+export async function readCatalog(versionedUrl?: string): Promise<Catalog> {
+  if (versionedUrl) {
+    try {
+      return await readJson<Catalog>(versionedUrl);
+    } catch (error) {
+      // A cached page can outlive the versioned files of its deployment.
+      if (!(error instanceof DataHttpError) || error.status !== 404) throw error;
+    }
+  }
+  return readJson<Catalog>('data/catalog.json', undefined, 'no-cache');
+}
+
 export async function readJson<T>(url: string, signal?: AbortSignal, cache?: RequestCache): Promise<T> {
   const response = await fetch(url,{signal,cache});
-  if (!response.ok) throw new Error(`Nie udało się wczytać danych (HTTP ${response.status}).`);
+  if (!response.ok) throw new DataHttpError(response.status);
   return response.json();
 }
