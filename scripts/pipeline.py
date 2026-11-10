@@ -19,7 +19,6 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
-import sqlite3
 import stat
 import subprocess
 import sys
@@ -29,6 +28,7 @@ import urllib.parse
 import zipfile
 
 import raster_cache as raster_store
+from gps_dump import read_gps_dump
 
 PROFILE = 'map-data-v1-webp512-gutter1'
 REPOSITORIES = {
@@ -38,6 +38,7 @@ REPOSITORIES = {
 }
 TILE_SIZE = 512
 GUTTER = 1
+GPS_ASSETS = ('katalog.dump', 'metadata.json')
 
 
 def require(condition, message):
@@ -111,7 +112,7 @@ def resolve(lock_path):
             obj = api(f'repos/{repository}/git/tags/{obj["sha"]}')['object']
             chain.append(obj)
         require(obj['type'] == 'commit', f'Tag does not resolve to commit: {repository}')
-        names = {'jktz': [f'JKTZ-{tag}.zip'], 'gps': ['katalog.sqlite.zip', 'metadata.json'], 'geo': [f'geotiff-tatry-{tag}.zip']}[key]
+        names = {'jktz': [f'JKTZ-{tag}.zip'], 'gps': GPS_ASSETS, 'geo': [f'geotiff-tatry-{tag}.zip']}[key]
         assets = []
         for name in names:
             selected = [a for a in release['assets'] if a['name'] == name]
@@ -150,6 +151,8 @@ def read_lock(path):
         require(source['repository'] == REPOSITORIES[source['key']], 'Unexpected source repository')
         require(not source['draft'] and not source['prerelease'], 'Unstable pinned release')
         require(re.fullmatch('[a-f0-9]{40}', source['commit']), 'Missing commit pin')
+        if source['key'] == 'gps':
+            gps_assets(source)
         for a in source['assets']:
             safe_id(a['name'])
         for f in source['files']:
@@ -217,26 +220,33 @@ def coordinate(record, prefix=''):
     return [east, north]
 
 
+def gps_assets(source):
+    assets = {asset['name']: asset for asset in source['assets']}
+    require(set(assets) == set(GPS_ASSETS) and len(source['assets']) == len(GPS_ASSETS),
+            f"GPS {source['tag']} inputs require katalog.dump and metadata.json; run resolve with a new lock path")
+    return assets
+
+
 def import_gps(cache, source, out):
-    metadata = json_read((cache / 'metadata.json').read_bytes())
-    require(metadata['metadata_schema_version'] == 1 and metadata['data_schema_version'] == 1, 'Unsupported GPS metadata schema')
-    with zipfile.ZipFile(cache / 'katalog.sqlite.zip') as archive:
-        require('katalog.sqlite' in safe_archive(archive), 'Missing katalog.sqlite')
-        db = cache / 'katalog.sqlite'
-        db.write_bytes(archive.read('katalog.sqlite'))
-    con = sqlite3.connect(f'file:{db}?mode=ro', uri=True)
-    con.row_factory = sqlite3.Row
-    try:
-        require(con.execute('pragma integrity_check').fetchone()[0] == 'ok', 'GPS database integrity error')
-        require(not con.execute('pragma foreign_key_check').fetchall(), 'GPS foreign key error')
-        names = ['objects', 'caves', 'measurements', 'best_measurements', 'object_external_refs', 'cave_external_refs', 'relations', 'attachments', 'metadata', 'validation_flags']
-        tables = {name: [dict(r) for r in con.execute(f'select * from {name}')] for name in names}
-    finally:
-        con.close()
-    meta = {r['key']: r['value'] for r in tables['metadata']}
-    require(meta.get('schema_version') == '1', 'Unsupported GPS SQLite schema')
+    assets = gps_assets(source)
+
+    def verified_bytes(name):
+        data = (cache / name).read_bytes()
+        validate_asset(assets[name], data)
+        return data
+
+    metadata = json_read(verified_bytes('metadata.json'))
+    require(metadata['metadata_schema_version'] == 1 and metadata['data_schema_version'] == 1,
+            'Unsupported GPS metadata schema')
+    require(metadata['counts']['validation_errors'] == 0, 'GPS release has validation errors')
+    tables = read_gps_dump(verified_bytes('katalog.dump'))
+    for name in ('objects', 'caves', 'measurements', 'relations'):
+        require(len(tables[name]) == metadata['counts'][name], f'GPS release count mismatch: {name}')
+    errors = [row for row in tables['validation_flags'] if row['severity'] == 'error']
+    require(not errors, f'GPS database validation error: {errors[:1]}')
     caves = {r['id']: r for r in tables['caves']}
     best = {r['object_id']: r for r in tables['best_measurements']}
+    require(len(best) == len(tables['best_measurements']), 'Duplicate GPS Best reference')
     measurements = defaultdict(list)
     seen = set()
     for row in tables['measurements']:
@@ -247,11 +257,11 @@ def import_gps(cache, source, out):
     objects, details, points, differences = [], {}, [], []
     for obj in tables['objects']:
         oid = safe_id(obj['id'])
+        name = obj['name_local'] or oid
         choice = best.get(oid)
         require(choice is not None and (oid, choice['measurement_id']) in seen, f'Invalid Best reference: {oid}')
         chosen = next(m for m in measurements[oid] if m['id'] == choice['measurement_id'])
         best_xy = coordinate(chosen)
-        require(obj['best_measurement_id'] == choice['measurement_id'], f'Inconsistent Best reference: {oid}')
         cave = caves.get(obj['cave_id'])
         refs = [r for r in tables['object_external_refs'] if r['object_id'] == oid]
         cave_refs = [r for r in tables['cave_external_refs'] if r['cave_id'] == obj['cave_id']]
@@ -262,7 +272,7 @@ def import_gps(cache, source, out):
             distance = math.dist(best_xy, xy) if xy is not None and best_xy is not None else None
             row = {**measurement, 'coordinate': xy, 'role': role, 'differenceM': distance}
             rows.append(row)
-            props = {'objectId': oid, 'id': measurement['id'], 'name': obj['name_local'], 'role': role, 'source': measurement['source'], 'status': measurement['verification_status'], 'differenceM': distance, 'horizontalAccuracy': measurement['horizontal_accuracy_m']}
+            props = {'objectId': oid, 'id': measurement['id'], 'name': name, 'role': role, 'source': measurement['source'], 'status': measurement['verification_status'], 'differenceM': distance, 'horizontalAccuracy': measurement['horizontal_accuracy_m']}
             if xy is not None:
                 points.append(feature({'type': 'Point', 'coordinates': xy}, props))
                 if role != 'best' and best_xy is not None:
@@ -272,7 +282,7 @@ def import_gps(cache, source, out):
                         'attachments': [r for r in tables['attachments'] if r['object_id'] == oid], 'modelIds': [], 'planIds': []}
         search = [obj['name_local'], oid, obj['cave_id'], cave.get('name') if cave else '', cave.get('system_name') if cave else '', obj.get('notes'), cave.get('notes') if cave else '']
         search.extend(r['external_id'] for r in refs + cave_refs)
-        objects.append({'id': oid, 'name': obj['name_local'], 'caveId': obj['cave_id'], 'caveName': cave['name'] if cave else None, 'systemName': cave['system_name'] if cave else None,
+        objects.append({'id': oid, 'name': name, 'caveId': obj['cave_id'], 'caveName': cave['name'] if cave else None, 'systemName': cave['system_name'] if cave else None,
                         'coordinate': best_xy, 'searchText': ' '.join(str(v) for v in search if v),
                         'best': {'id': choice['measurement_id'], 'source': chosen['source'], 'verificationStatus': chosen['verification_status'], 'horizontalAccuracy': chosen['horizontal_accuracy_m']},
                         'detailUrl': f'data/objects/{oid}.json', 'modelIds': [], 'planIds': []})
@@ -280,7 +290,8 @@ def import_gps(cache, source, out):
     for cave in tables['caves']:
         cid = safe_id(cave['id'])
         refs = [r for r in tables['cave_external_refs'] if r['cave_id'] == cid]
-        object_ids = [obj['id'] for obj in tables['objects'] if obj['cave_id'] == cid]
+        members = [obj for obj in tables['objects'] if obj['cave_id'] == cid]
+        object_ids = [obj['id'] for obj in sorted(members, key=lambda obj: obj['membership_ordinal'])]
         search = [cid, cave.get('name'), cave.get('system_name'), cave.get('notes')]
         search.extend(r['external_id'] for r in refs)
         cave_entries.append({'id': cid, 'name': cave['name'], 'systemName': cave.get('system_name'), 'objectIds': object_ids,
