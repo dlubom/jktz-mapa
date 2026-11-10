@@ -1,5 +1,6 @@
 """Contract tests use small generated inputs; the full build is a separate acceptance run."""
 from pathlib import Path
+import hashlib
 import io
 import json
 import math
@@ -10,6 +11,47 @@ import zipfile
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import pipeline as p
+
+
+class ModelContractTests(unittest.TestCase):
+    def test_model_url_changes_only_when_geojson_changes(self):
+        from osgeo import ogr, osr
+        ogr.UseExceptions()
+        osr.UseExceptions()
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = {'key': 'jktz', 'commit': 'a' * 40, 'assets': [{'name': 'survey.zip'}]}
+            template = p.source_path(root, source, 'Poligony/OTWORY.SRV.j2')
+            template.parent.mkdir(parents=True)
+            template.write_text('')
+            reference = osr.SpatialReference()
+            reference.ImportFromEPSG(32634)
+            shapefile = root / 'survey.shp'
+            driver = ogr.GetDriverByName('ESRI Shapefile')
+
+            def import_survey(x, name):
+                if shapefile.exists():
+                    driver.DeleteDataSource(str(shapefile))
+                with driver.CreateDataSource(str(shapefile)) as dataset:
+                    layer = dataset.CreateLayer('survey', reference, ogr.wkbLineString25D)
+                    leg = ogr.Feature(layer.GetLayerDefn())
+                    leg.SetGeometry(ogr.CreateGeometryFromWkt(f'LINESTRING Z (410000 5450000 1000, {x} 5450010 1002)'))
+                    layer.CreateFeature(leg)
+                with zipfile.ZipFile(root / 'survey.zip', 'w') as archive:
+                    for component in sorted(root.glob('survey.*')):
+                        if component.suffix != '.zip':
+                            archive.write(component, f'exports/caves/{component.name}')
+                out = root / name / 'data'
+                model, = p.import_jktz(root, source, out, {})
+                content = (out.parent / model['url']).read_bytes()
+                self.assertEqual('survey', model['id'])
+                self.assertEqual(f'data/models/survey.{hashlib.sha256(content).hexdigest()}.geojson', model['url'])
+                return model['url']
+
+            original = import_survey(410010, 'original')
+            self.assertEqual(original, import_survey(410010, 'repeat'))
+            self.assertNotEqual(original, import_survey(410011, 'changed'))
 
 
 class InputContractTests(unittest.TestCase):

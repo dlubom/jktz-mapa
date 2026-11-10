@@ -58,9 +58,13 @@ def json_read(data):
     return json.loads(data, object_pairs_hook=unique_pairs)
 
 
+def json_bytes(value):
+    return (json.dumps(value, ensure_ascii=False, separators=(',', ':'), allow_nan=False) + '\n').encode('utf-8')
+
+
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, separators=(',', ':'), allow_nan=False) + '\n')
+    path.write_bytes(json_bytes(value))
 
 
 def digest(data):
@@ -357,6 +361,8 @@ def import_jktz(cache, source, out, details):
     target.ImportFromEPSG(2180)
     target.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     models = []
+    model_dir = out / 'models'
+    model_dir.mkdir(parents=True, exist_ok=True)
     for path in paths:
         mid = safe_id(PurePosixPath(path).stem)
         for ext in ('.dbf', '.prj', '.shx'):
@@ -388,8 +394,10 @@ def import_jktz(cache, source, out, details):
                 details[oid]['modelIds'].append(mid)
         names_for_model = [details[oid]['object']['name_local'] for oid in object_ids if oid in details]
         name = ' / '.join(dict.fromkeys(names_for_model)) or mid
-        models.append({'id': mid, 'name': name, 'extent': union_extent(extents), 'objectIds': object_ids, 'url': f'data/models/{mid}.geojson', 'featureCount': len(features)})
-        write_json(out / 'models' / f'{mid}.geojson', collection(features))
+        content = json_bytes(collection(features))
+        filename = f'{mid}.{digest(content)}.geojson'
+        (model_dir / filename).write_bytes(content)
+        models.append({'id': mid, 'name': name, 'extent': union_extent(extents), 'objectIds': object_ids, 'url': f'data/models/{filename}', 'featureCount': len(features)})
     return models
 
 

@@ -52,8 +52,8 @@ export function formatCoordinate(c: Coordinate): string {
   return `X — północ: ${f.format(c[1])} m · Y — wschód: ${f.format(c[0])} m`;
 }
 export function escapeHtml(value: unknown): string {return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));}
-export async function readJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url,{signal});
+export async function readJson<T>(url: string, signal?: AbortSignal, cache?: RequestCache): Promise<T> {
+  const response = await fetch(url,{signal,cache});
   if (!response.ok) throw new Error(`Nie udało się wczytać danych (HTTP ${response.status}).`);
   return response.json();
 }
