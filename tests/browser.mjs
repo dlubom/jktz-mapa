@@ -1,4 +1,5 @@
 import {createServer} from 'node:http';
+import {createHash} from 'node:crypto';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import assert from 'node:assert/strict';
@@ -6,10 +7,18 @@ import {chromium,firefox,webkit} from 'playwright';
 
 const root=resolve('dist'),prefix=process.env.TEST_BASE_PATH||'/jktz-mapa/';
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.geojson':'application/geo+json','.webp':'image/webp'};
+const catalogBytes=await readFile('dist/data/catalog.json');
+const catalog=JSON.parse(catalogBytes);
+const catalogUrl=`assets/catalog.${createHash('sha256').update(catalogBytes).digest('hex')}.json`;
+assert.deepEqual(await readFile(`dist/${catalogUrl}`),catalogBytes,'the build contains the versioned catalog');
+for(const model of catalog.models){
+ const bytes=await readFile(`dist/${model.url}`);
+ const digest=createHash('sha256').update(bytes).digest('hex');
+ assert.equal(model.url,`data/models/${model.id}.${digest}.geojson`,'model URL matches its published bytes');
+}
 const server=createServer(async(req,res)=>{try{const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(!path.startsWith(prefix)){res.writeHead(404).end();return;}const file=resolve(root,path.slice(prefix.length)||'index.html');if(!file.startsWith(root+'/')){res.writeHead(403).end();return;}const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});res.end(data);}catch{res.writeHead(404).end('Not found');}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url=`http://127.0.0.1:${server.address().port}${prefix}`;
-const catalog=JSON.parse(await readFile('dist/data/catalog.json','utf8'));
 await mkdir('output/playwright',{recursive:true});
 const results=[];
 try{
@@ -17,6 +26,21 @@ try{
   console.log(`Launching ${name}`);
   const browser=await({chromium,firefox,webkit}[name]).launch({headless:true,timeout:30000});
   try{
+   const stalePage=await browser.newPage();
+   try{
+    await stalePage.route(url+catalogUrl,route=>route.fulfill({status:404}));
+    await stalePage.route(url+catalog.models[0].url,route=>route.fulfill({status:404}));
+    await stalePage.goto(url,{waitUntil:'domcontentloaded'});
+    await stalePage.getByRole('heading',{name:'Warstwy i podkład'}).waitFor({timeout:10000});
+    const refreshMap=stalePage.getByRole('button',{name:'Odśwież mapę',exact:true});
+    await refreshMap.waitFor({timeout:10000});
+    await stalePage.unroute(url+catalogUrl);
+    await stalePage.unroute(url+catalog.models[0].url);
+    const recoveredModel=stalePage.waitForResponse(response=>response.url()===url+catalog.models[0].url&&response.ok());
+    await refreshMap.click();
+    await recoveredModel;
+    await refreshMap.waitFor({state:'hidden'});
+   }finally{await stalePage.close();}
    for(const mobile of [false,true]){
     const context=await browser.newContext({viewport:mobile?{width:393,height:852}:{width:1440,height:960},deviceScaleFactor:mobile?3:1,hasTouch:mobile});
     const page=await context.newPage(),errors=[],requests=[],network=new Map(),finishedURLs=new Set();
@@ -201,6 +225,7 @@ try{
     console.log(`Checking ${name} ${mobile?'mobile':'desktop'}`);
     const started=Date.now();await page.goto(url);
     await page.getByRole('heading',{name:'Warstwy i podkład'}).waitFor();
+    assert.ok(requests.includes(url+catalogUrl),'map boot uses the catalog URL of this build');
     const readyMs=Date.now()-started;
     assert.equal(await page.locator('#layer-best').isChecked(),true);assert.equal(await page.locator('#layer-other').isChecked(),false);assert.equal(await page.locator('#layer-rejected').isChecked(),false);assert.equal(await page.locator('#layer-differences').isChecked(),false);assert.equal(await page.locator('#layer-models').isChecked(),true);assert.equal(await page.locator('#layer-plans').isChecked(),true);
     assert.equal(await page.locator('#layer-diagnostics').evaluate(el=>el.open),false,'measurement diagnostics start closed');
@@ -323,8 +348,7 @@ try{
     geologyOffline=true;await page.locator('#basemap').selectOption('smgt_a_zakryta');
     // WebKit can reuse decoded images despite routing. Zoom to request uncached tiles.
     await page.locator('.ol-zoom-in').click();
-    await page.locator('#tpn-message').waitFor({state:'visible'});
-    assert.match(await page.locator('#tpn-message').innerText(),/geologiczn.*OSM/);
+    await page.locator('#tpn-message .message-text').filter({hasText:/geologiczn.*OSM/}).waitFor({state:'visible'});
     await waitForBasemapStatus(visible=>/OpenStreetMap/.test(visible)&&/niedostępn/.test(visible),'an outage reports OSM or mixed coverage rather than an unqualified provider');
     // Exhaust the automatic retry while offline before testing the manual retry.
     // Otherwise a slow click can race the timer, which restores tiles and hides the button.
