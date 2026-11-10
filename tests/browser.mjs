@@ -1,4 +1,5 @@
 import {createServer} from 'node:http';
+import {createHash} from 'node:crypto';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import assert from 'node:assert/strict';
@@ -6,10 +7,13 @@ import {chromium,firefox,webkit} from 'playwright';
 
 const root=resolve('dist'),prefix=process.env.TEST_BASE_PATH||'/jktz-mapa/';
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.geojson':'application/geo+json','.webp':'image/webp'};
+const catalogBytes=await readFile('dist/data/catalog.json');
+const catalog=JSON.parse(catalogBytes);
+const catalogUrl=`assets/catalog.${createHash('sha256').update(catalogBytes).digest('hex')}.json`;
+assert.deepEqual(await readFile(`dist/${catalogUrl}`),catalogBytes,'the build contains the versioned catalog');
 const server=createServer(async(req,res)=>{try{const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(!path.startsWith(prefix)){res.writeHead(404).end();return;}const file=resolve(root,path.slice(prefix.length)||'index.html');if(!file.startsWith(root+'/')){res.writeHead(403).end();return;}const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});res.end(data);}catch{res.writeHead(404).end('Not found');}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url=`http://127.0.0.1:${server.address().port}${prefix}`;
-const catalog=JSON.parse(await readFile('dist/data/catalog.json','utf8'));
 await mkdir('output/playwright',{recursive:true});
 const results=[];
 try{
@@ -201,6 +205,7 @@ try{
     console.log(`Checking ${name} ${mobile?'mobile':'desktop'}`);
     const started=Date.now();await page.goto(url);
     await page.getByRole('heading',{name:'Warstwy i podkład'}).waitFor();
+    assert.ok(requests.includes(url+catalogUrl),'map boot uses the catalog URL of this build');
     const readyMs=Date.now()-started;
     assert.equal(await page.locator('#layer-best').isChecked(),true);assert.equal(await page.locator('#layer-other').isChecked(),false);assert.equal(await page.locator('#layer-rejected').isChecked(),false);assert.equal(await page.locator('#layer-differences').isChecked(),false);assert.equal(await page.locator('#layer-models').isChecked(),true);assert.equal(await page.locator('#layer-plans').isChecked(),true);
     assert.equal(await page.locator('#layer-diagnostics').evaluate(el=>el.open),false,'measurement diagnostics start closed');
