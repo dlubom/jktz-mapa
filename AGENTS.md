@@ -44,8 +44,12 @@ Dane przygotowuje Python z GDAL; aplikacja działa bez backendu i QGIS.
 ## Uruchomienie i sprawdzenia
 
 Potrzebne: Node.js 22.14+, Python 3.12+, GDAL/PROJ z WebP, NumPy,
-`curl` i GitHub CLI `gh` z dostępem do API (`gh auth login` lub `GH_TOKEN`).
+działający Docker, `curl` i GitHub CLI `gh` z dostępem do API (`gh auth login` lub `GH_TOKEN`).
 Środowisko referencyjne CI: Ubuntu 24.04; instalacja w `.github/actions/setup/action.yml`.
+Build odtwarza przypięty `katalog.dump` GPS w tymczasowym kontenerze
+PostgreSQL/PostGIS. Docker musi obsługiwać obraz `linux/amd64`; baza działa
+bez dostępu do sieci i jest usuwana po imporcie. Dla starego przypięcia GPS
+utwórz nowy lock przez `resolve`.
 
 ```sh
 npm ci
