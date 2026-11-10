@@ -348,8 +348,7 @@ try{
     geologyOffline=true;await page.locator('#basemap').selectOption('smgt_a_zakryta');
     // WebKit can reuse decoded images despite routing. Zoom to request uncached tiles.
     await page.locator('.ol-zoom-in').click();
-    await page.locator('#tpn-message').waitFor({state:'visible'});
-    assert.match(await page.locator('#tpn-message').innerText(),/geologiczn.*OSM/);
+    await page.locator('#tpn-message .message-text').filter({hasText:/geologiczn.*OSM/}).waitFor({state:'visible'});
     await waitForBasemapStatus(visible=>/OpenStreetMap/.test(visible)&&/niedostępn/.test(visible),'an outage reports OSM or mixed coverage rather than an unqualified provider');
     // Exhaust the automatic retry while offline before testing the manual retry.
     // Otherwise a slow click can race the timer, which restores tiles and hides the button.
