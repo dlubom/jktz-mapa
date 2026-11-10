@@ -226,75 +226,20 @@
       "sha256": "df7fa748b473bd9b29d56c912a414caf388bf80bf9ebbbdaed825f11097a95dc"
     }
   },
-  "current": "pages-42853984752",
+  "current": "pages-42866095430",
   "last": {
-    "confirmed_at": "2026-11-10T16:37:37.538772+00:00",
-    "created_at": "2026-11-10T16:23:06Z",
+    "confirmed_at": "2026-11-10T17:46:19.274110+00:00",
+    "created_at": "2026-11-10T17:33:01Z",
     "head_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
-    "job_id": 129969549067,
-    "job_name": "publish-42853984752-1",
+    "job_id": 130011837397,
+    "job_name": "publish-42866095430-1",
     "run_attempt": 1,
-    "run_id": 42853984752,
+    "run_id": 42866095430,
     "step_name": "Publish Pages",
     "step_number": 6,
-    "to": "pages-42853984752"
-  },
-  "pending": {
-    "archives": {
-      "pages-42853984752": {
-        "app_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
-        "asset_id": 732148338,
-        "bytes": 291148554,
-        "manifest_sha256": "2615d1e00d025eac5d175d3fdb98b6512c6eff4729623be7cb6a909f3c435d6b",
-        "metadata_asset_id": 732149049,
-        "metadata_sha256": "f695b8473ed5329d5dbbbef3f7f8bbce1d64d1eadd4cbb4ebc62e95c395cc907",
-        "package_id": "pages-42853984752",
-        "public_files": {
-          "assets/catalog.d7d3e4f686aa97093a378d6c7b8f372875780d10bb6fbc3f5ed8afc76ff8cdaa.json": "d7d3e4f686aa97093a378d6c7b8f372875780d10bb6fbc3f5ed8afc76ff8cdaa",
-          "assets/index-BYTsRd4R.js": "29abdd5a253700c265f61c4d012f9b2a4867f0cc999daf3147a9021771801fa9",
-          "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
-          "data/catalog.json": "d7d3e4f686aa97093a378d6c7b8f372875780d10bb6fbc3f5ed8afc76ff8cdaa",
-          "index.html": "8ad2cafeb69b2f97f6315b98a4fc07913c20d6a9140dabfbc9ea9963d7c98866",
-          "publication.json": "2615d1e00d025eac5d175d3fdb98b6512c6eff4729623be7cb6a909f3c435d6b"
-        },
-        "release_id": 440622560,
-        "sha256": "701d50e1223ce5c519d94ec6a78e2f5bbf697b9a2240315e3dae532db8eca85e",
-        "site_bytes": 314028616
-      },
-      "pages-42866095430": {
-        "app_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
-        "asset_id": 732363911,
-        "bytes": 291148173,
-        "manifest_sha256": "371e10c883dda9272ebd6acf2586882fb7c27a86e02e9160f6a995951a777788",
-        "metadata_asset_id": 732364456,
-        "metadata_sha256": "ead7ae365c378ede04eb846fd90de4ce74f28fee0d60829fa814b6cbd49f55fc",
-        "package_id": "pages-42866095430",
-        "public_files": {
-          "assets/catalog.473214fa71b93a3505415ae323094191b8f11e1afe20049a07b55e0af5b458f4.json": "473214fa71b93a3505415ae323094191b8f11e1afe20049a07b55e0af5b458f4",
-          "assets/index-BYTsRd4R.js": "29abdd5a253700c265f61c4d012f9b2a4867f0cc999daf3147a9021771801fa9",
-          "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
-          "data/catalog.json": "473214fa71b93a3505415ae323094191b8f11e1afe20049a07b55e0af5b458f4",
-          "index.html": "1ada687ef9a4cf27139f3381c40aa7d80ce4e67bb8411046e2d75c23a19b7ae1",
-          "publication.json": "371e10c883dda9272ebd6acf2586882fb7c27a86e02e9160f6a995951a777788"
-        },
-        "release_id": 440699100,
-        "sha256": "10a912a6eb0a9561355e76fb827338d1bb6601feab5ad599dd4bd1f7d17a7358",
-        "site_bytes": 314028964
-      }
-    },
-    "from": "pages-42853984752",
-    "operation": {
-      "created_at": "2026-11-10T17:33:01Z",
-      "head_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
-      "job_id": 130011837397,
-      "job_name": "publish-42866095430-1",
-      "run_attempt": 1,
-      "run_id": 42866095430,
-      "step_name": "Publish Pages",
-      "step_number": 6
-    },
     "to": "pages-42866095430"
   },
+  "pending": null,
   "retired": {
     "pages-41198442070": "2026-11-15T14:15:14.412255+00:00",
     "pages-41207949826": "2026-11-15T15:14:12.630208+00:00",
@@ -304,6 +249,7 @@
     "pages-41335995525": "2026-11-19T12:11:17.896678+00:00",
     "pages-41824829082": "2026-11-25T14:56:26.490026+00:00",
     "pages-42837593263": "2026-11-25T16:37:37.538772+00:00",
+    "pages-42853984752": "2026-11-25T17:46:19.274110+00:00",
     "probe-original": "2026-11-15T12:03:57.273379+00:00"
   },
   "schema": 1
