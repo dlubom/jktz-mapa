@@ -1,24 +1,5 @@
 {
   "archives": {
-    "pages-41239431411": {
-      "app_sha": "4c83ca724edba4d1c6c9f60c1042b97499be2d06",
-      "asset_id": 696460368,
-      "bytes": 290743106,
-      "manifest_sha256": "386b4bd91d6c435ef5b6966879dc5293a43e630b22ce17f6e1bdd0c7e0629afe",
-      "metadata_asset_id": 696460692,
-      "metadata_sha256": "aee0b1a40dc8cceec44ca218222509f8f388a84e468eefd7c7e92828bfe7da4b",
-      "package_id": "pages-41239431411",
-      "public_files": {
-        "assets/index-C5cXVUbd.js": "1a43d35a4a3d8e8560691ef5a8cac38fa48c4f8b7850482f725203de6cce628a",
-        "assets/index-Z6upSrAn.css": "0a49930a90a2db00fea8f0bbbc1bc6aa63d8fb71c12082b610e7aed964f285e7",
-        "data/catalog.json": "9e883d44284504d5f2fb58df2346a933cb3416d9476996c2a3c1c952a43949d6",
-        "index.html": "d33dc89e2095859e3602fc6410bf7b8623db198b6f4068c831894e5ad300d6bb",
-        "publication.json": "386b4bd91d6c435ef5b6966879dc5293a43e630b22ce17f6e1bdd0c7e0629afe"
-      },
-      "release_id": 430181266,
-      "sha256": "8086b19dfaaf45d874efca2a50159c71e3ce0c0e1d9932999df40f1451f248d5",
-      "site_bytes": 309928176
-    },
     "pages-41303956951": {
       "app_sha": "0ffd9c0a50bbbe19de9df0a0d13566af021fb3cc",
       "asset_id": 698212536,
@@ -224,7 +205,6 @@
   },
   "pending": null,
   "retired": {
-    "pages-41239431411": "2026-11-16T11:59:25.045201+00:00",
     "pages-41303956951": "2026-11-16T18:26:58.031537+00:00",
     "pages-41335995525": "2026-11-19T12:11:17.896678+00:00",
     "pages-41824829082": "2026-11-25T14:56:26.490026+00:00",
