@@ -1,24 +1,5 @@
 {
   "archives": {
-    "pages-41212208072": {
-      "app_sha": "fb6f6db6576eaa7d4883019d042092ed692425bc",
-      "asset_id": 695698131,
-      "bytes": 290741457,
-      "manifest_sha256": "fb231d74122bce56dda4c7ba11d3d71e85af6f33a3d820425b573a5a33a20806",
-      "metadata_asset_id": 695698413,
-      "metadata_sha256": "0d594ccd028ef3aee7cfcc3bd876aefc2d65184dc7620af4b19dba99903d9dac",
-      "package_id": "pages-41212208072",
-      "public_files": {
-        "assets/index-D0wCP7Gr.js": "585f579a718e00143e86d12dba5333ebbd456fba4ac0d36a12f758e7a3e33b28",
-        "assets/index-DpGxH6Bu.css": "3126a5dc96332993f659473116bec9542cc93380490c7c98cc42cafd3098e7a4",
-        "data/catalog.json": "5dacfe0045d745e2b9f9d1494a87ce4b6bf89a0bcf9d4dd15270f10da67d67f5",
-        "index.html": "93e6660a43d8f178b5ebdce8e96006a660824e4e704a5dae61a1a4c2b8cd89e8",
-        "publication.json": "fb231d74122bce56dda4c7ba11d3d71e85af6f33a3d820425b573a5a33a20806"
-      },
-      "release_id": 430008914,
-      "sha256": "ccf7edad26700424605832aefe8f29297ab05a754aa262ed1fe369cd017d0180",
-      "site_bytes": 309925614
-    },
     "pages-41239431411": {
       "app_sha": "4c83ca724edba4d1c6c9f60c1042b97499be2d06",
       "asset_id": 696460368,
@@ -243,7 +224,6 @@
   },
   "pending": null,
   "retired": {
-    "pages-41212208072": "2026-11-15T20:56:57.165779+00:00",
     "pages-41239431411": "2026-11-16T11:59:25.045201+00:00",
     "pages-41303956951": "2026-11-16T18:26:58.031537+00:00",
     "pages-41335995525": "2026-11-19T12:11:17.896678+00:00",
