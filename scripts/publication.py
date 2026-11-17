@@ -249,7 +249,15 @@ def inputs_phase(readback=False):
     require(len(artifacts) <= 1, 'Ambiguous inputs artifact')
     if artifacts:
         import zipfile
-        raw = api(f'repos/{REPO}/actions/artifacts/{artifacts[0]["id"]}/zip', binary=True)
+        path = f'repos/{REPO}/actions/artifacts/{artifacts[0]["id"]}/zip'
+        raw = api(path, binary=True, missing_ok=True)
+        # The artifact may be listed before the download endpoint serves its ZIP.
+        for delay in (2, 5, 10, 20, 30):
+            if raw is not None:
+                break
+            time.sleep(delay)
+            raw = api(path, binary=True, missing_ok=True)
+        require(raw is not None, 'Inputs artifact ZIP is still unavailable after retries')
         expected = artifacts[0].get('digest')
         require(expected == 'sha256:' + digest(raw), 'Inputs artifact checksum differs')
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
