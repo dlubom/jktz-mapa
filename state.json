@@ -175,6 +175,26 @@
       "sha256": "f51d65e2ee76730fe23b059d1e82d50eb7207efaa384f5872b8ca0c96cffeb46",
       "site_bytes": 313326973
     },
+    "pages-44116135080": {
+      "app_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
+      "asset_id": 759647989,
+      "bytes": 290196644,
+      "manifest_sha256": "4084776f910b12a953d77884c038c5754ec7ab6b36c827466d95d4a5e3624f53",
+      "metadata_asset_id": 759648693,
+      "metadata_sha256": "0d5de6a310d3582467ec37eff481b0e2a66654eac0c445e4c671cfae2f38a190",
+      "package_id": "pages-44116135080",
+      "public_files": {
+        "assets/catalog.b6cbd51b983335c43fb1e5d6218860d0ddf67b584ec64f50f4127e49cc1f4f3a.json": "b6cbd51b983335c43fb1e5d6218860d0ddf67b584ec64f50f4127e49cc1f4f3a",
+        "assets/index-BYTsRd4R.js": "29abdd5a253700c265f61c4d012f9b2a4867f0cc999daf3147a9021771801fa9",
+        "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
+        "data/catalog.json": "b6cbd51b983335c43fb1e5d6218860d0ddf67b584ec64f50f4127e49cc1f4f3a",
+        "index.html": "90d557d3a29929f436543eb4444bfb7b4ec2bcf3d38ef5f450ef1e95ea78f2bd",
+        "publication.json": "4084776f910b12a953d77884c038c5754ec7ab6b36c827466d95d4a5e3624f53"
+      },
+      "release_id": 448851114,
+      "sha256": "4539a66056c218172523cb791955960410d07a79b3057806df4d217d602fef7e",
+      "site_bytes": 313327815
+    },
     "probe-original": {
       "asset": "original.tar",
       "asset_id": 694852569,
@@ -203,7 +223,62 @@
     "step_number": 6,
     "to": "pages-43911781399"
   },
-  "pending": null,
+  "pending": {
+    "archives": {
+      "pages-43911781399": {
+        "app_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
+        "asset_id": 755675516,
+        "bytes": 290196889,
+        "manifest_sha256": "0eca957289ec773ade0e1ee932a77a1994679790b8510ffb697dc62f7b1e889b",
+        "metadata_asset_id": 755676328,
+        "metadata_sha256": "2b70448e26f4255cb85085922187e8959406841f9dc617929184d690ea98351f",
+        "package_id": "pages-43911781399",
+        "public_files": {
+          "assets/catalog.9217c4a6f9e13b83290f4a4e1ee8ae01f0a8782008dbecd38f9ba73c892eeb00.json": "9217c4a6f9e13b83290f4a4e1ee8ae01f0a8782008dbecd38f9ba73c892eeb00",
+          "assets/index-BYTsRd4R.js": "29abdd5a253700c265f61c4d012f9b2a4867f0cc999daf3147a9021771801fa9",
+          "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
+          "data/catalog.json": "9217c4a6f9e13b83290f4a4e1ee8ae01f0a8782008dbecd38f9ba73c892eeb00",
+          "index.html": "f9a1cbe2a9fc214592ed0b04253dfce719d9fcc5dd5148860b338dc5e7241562",
+          "publication.json": "0eca957289ec773ade0e1ee932a77a1994679790b8510ffb697dc62f7b1e889b"
+        },
+        "release_id": 447334780,
+        "sha256": "f51d65e2ee76730fe23b059d1e82d50eb7207efaa384f5872b8ca0c96cffeb46",
+        "site_bytes": 313326973
+      },
+      "pages-44116135080": {
+        "app_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
+        "asset_id": 759647989,
+        "bytes": 290196644,
+        "manifest_sha256": "4084776f910b12a953d77884c038c5754ec7ab6b36c827466d95d4a5e3624f53",
+        "metadata_asset_id": 759648693,
+        "metadata_sha256": "0d5de6a310d3582467ec37eff481b0e2a66654eac0c445e4c671cfae2f38a190",
+        "package_id": "pages-44116135080",
+        "public_files": {
+          "assets/catalog.b6cbd51b983335c43fb1e5d6218860d0ddf67b584ec64f50f4127e49cc1f4f3a.json": "b6cbd51b983335c43fb1e5d6218860d0ddf67b584ec64f50f4127e49cc1f4f3a",
+          "assets/index-BYTsRd4R.js": "29abdd5a253700c265f61c4d012f9b2a4867f0cc999daf3147a9021771801fa9",
+          "assets/index-DLOM3oMS.css": "5ef0ad831e006f91ab5c617f814d7364615eb8165dbc591012ad2ecef58b2547",
+          "data/catalog.json": "b6cbd51b983335c43fb1e5d6218860d0ddf67b584ec64f50f4127e49cc1f4f3a",
+          "index.html": "90d557d3a29929f436543eb4444bfb7b4ec2bcf3d38ef5f450ef1e95ea78f2bd",
+          "publication.json": "4084776f910b12a953d77884c038c5754ec7ab6b36c827466d95d4a5e3624f53"
+        },
+        "release_id": 448851114,
+        "sha256": "4539a66056c218172523cb791955960410d07a79b3057806df4d217d602fef7e",
+        "site_bytes": 313327815
+      }
+    },
+    "from": "pages-43911781399",
+    "operation": {
+      "created_at": "2026-11-17T15:35:44Z",
+      "head_sha": "59feb7ae958958ef3aeebdbe09a786b09c68666c",
+      "job_id": 134163504202,
+      "job_name": "publish-44116135080-1",
+      "run_attempt": 1,
+      "run_id": 44116135080,
+      "step_name": "Publish Pages",
+      "step_number": 6
+    },
+    "to": "pages-44116135080"
+  },
   "retired": {
     "pages-41303956951": "2026-11-16T18:26:58.031537+00:00",
     "pages-41335995525": "2026-11-19T12:11:17.896678+00:00",
