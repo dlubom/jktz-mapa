@@ -42,7 +42,7 @@ class PublicationTests(unittest.TestCase):
             pub.choose_inputs(2, None, resolver)
         self.assertEqual(calls, ['latest', 'latest'])
 
-    def test_inputs_readback_downloads_zip_with_json_accept_header(self):
+    def test_inputs_readback_retries_an_unavailable_zip_with_json_accept_header(self):
         pins = b'{"schemaVersion":1,"sources":[]}\n'
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, 'w') as archive:
@@ -56,6 +56,8 @@ class PublicationTests(unittest.TestCase):
             if path.endswith('/123/zip'):
                 if accept != 'Accept: application/vnd.github+json':
                     return subprocess.CompletedProcess(args, 1, b'', b'Unsupported Accept header (HTTP 415)')
+                if sum(request[0] == path for request in requests) == 1:
+                    return subprocess.CompletedProcess(args, 1, b'', b'Not Found (HTTP 404)')
                 return subprocess.CompletedProcess(args, 0, zipped, b'')
             return subprocess.CompletedProcess(args, 0, pub.encoded({'artifacts': [artifact]}), b'')
         with tempfile.TemporaryDirectory() as temp:
@@ -63,8 +65,10 @@ class PublicationTests(unittest.TestCase):
             (root / 'inputs.json').write_bytes(pins)
             output = root / 'output.txt'
             with patch.object(pub, 'BUILD', root), patch.object(pub.subprocess, 'run', side_effect=github), \
+                 patch.object(pub.time, 'sleep') as sleep, \
                  patch.dict(os.environ, {'GITHUB_RUN_ID': '456', 'GITHUB_RUN_ATTEMPT': '1', 'GITHUB_OUTPUT': str(output)}):
                 pub.inputs_phase(readback=True)
+            sleep.assert_called_once()
             self.assertEqual((root / 'inputs.json').read_bytes(), pins)
             self.assertEqual(output.read_text(), 'upload=false\n')
             self.assertEqual(requests[-1], ('repos/dlubom/jktz-mapa/actions/artifacts/123/zip', 'Accept: application/vnd.github+json'))
