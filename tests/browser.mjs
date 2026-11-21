@@ -244,6 +244,56 @@ try{
     assert.match((await waitForBasemapStatus(visible=>/^OpenStreetMap.*przybliż/.test(visible),'initial zoomed-out view reports OSM and its scale condition')).text,/Zdjęcia lotnicze.*2020/);
     assert.ok(osmMockRequests>0,'the OSM fallback is controlled by the fixture, including the bare tile host');
     await checkCatalogSearch();
+    const modelSwatch=async id=>page.locator(`[data-model-toggle="${id}"] + .model-swatch`).evaluateAll(nodes=>nodes.map(el=>getComputedStyle(el).backgroundColor));
+    assert.deepEqual(await modelSwatch('WielkaSniezna'),['rgb(0, 104, 179)'],'Wielka Śnieżna has a blue swatch');
+    assert.deepEqual(await modelSwatch('SnieznaStudnia'),['rgb(193, 84, 0)'],'Śnieżna Studnia has an orange swatch');
+    const layersTab=page.getByRole('tab',{name:'Warstwy',exact:true});
+    const clearModelFocus=page.getByRole('button',{name:'Zakończ wyróżnienie ciągu'});
+    const surveyPixels=async()=>{
+      const screenshot=await page.locator('#map').screenshot({scale:'css'});
+      return page.evaluate(async base64=>{
+        const image=new Image();
+        image.src='data:image/png;base64,'+base64;
+        await image.decode();
+        const canvas=document.createElement('canvas');
+        canvas.width=image.width;canvas.height=image.height;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(image,0,0);
+        const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+        const counts={WielkaSniezna:0,SnieznaStudnia:0};
+        for(let i=0;i<pixels.length;i+=4){
+          if(pixels[i]===0&&pixels[i+1]===104&&pixels[i+2]===179)counts.WielkaSniezna++;
+          if(pixels[i]===193&&pixels[i+1]===84&&pixels[i+2]===0)counts.SnieznaStudnia++;
+        }
+        return counts;
+      },screenshot.toString('base64'));
+    };
+    await layersTab.click();
+    const surveys=[['MLZ-0068','WielkaSniezna'],['MLZ-0059','SnieznaStudnia']];
+    for(const [objectId,modelId] of surveys){
+      await page.locator('#layer-models').uncheck();
+      await openObject(objectId);
+      const surveyLoads=surveys.map(([,id])=>page.waitForResponse(response=>response.url()===url+catalog.models.find(m=>m.id===id).url&&response.ok()));
+      await page.locator(`#object-primary-actions [data-model-fit="${modelId}"]`).click();
+      for(const response of await Promise.all(surveyLoads))assert.equal(await response.finished(),null);
+      assert.match(await page.locator('#model-focus-announcement').textContent(),/^Wyróżniony ciąg/);
+      await ensurePanelOpen();await layersTab.click();
+      assert.equal(await page.locator('#layer-models').isChecked(),true,'showing a model enables the survey layer');
+      assert.ok((await page.locator('#model-focus-name').innerText()).includes(catalog.models.find(m=>m.id===modelId).name));
+      // Sample a settled map with the same view before and after clearing focus.
+      await page.waitForTimeout(300);await waitForMapRender();
+      const focused=mobile?null:await surveyPixels();
+      await clearModelFocus.click();
+      assert.equal(await clearModelFocus.isVisible(),false,'the focus can be cleared without disabling the surveys');
+      assert.equal(await page.locator('#layer-models').isChecked(),true);
+      assert.equal(await page.locator('#layer-models').evaluate(el=>el===document.activeElement),true,'clearing focus leaves a reachable Layers control focused');
+      if(focused){
+        await waitForMapRender();
+        const normal=await surveyPixels(),other=surveys.find(([,id])=>id!==modelId)[1];
+        assert.ok(normal[other]>0&&focused[other]===0,'the other survey regains its full color when focus is cleared');
+        assert.ok(focused[modelId]>normal[modelId]&&normal[modelId]>0,'the chosen survey is drawn with a wider stroke in focus');
+      }
+    }
     await page.locator('#search').fill('piwnica mietusia');
     await page.locator('[data-object="MTZ-0017"]').first().click();
     await page.locator('#object-primary-actions').waitFor();

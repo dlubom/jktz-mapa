@@ -40,10 +40,12 @@ export class MapController {
   best:VectorLayer; other:VectorLayer; rejected:VectorLayer; differences:VectorLayer;
   modelsEnabled=true;hiddenModels=new Set<string>();
   selectedId:string|null=null;
+  modelFocusId?:string;
   private allNames=false;
   private modelLayers=new globalThis.Map<string,VectorLayer>();
   private modelRequests=new globalThis.Map<string,AbortController>();
   private catalog:Catalog;
+  private readonly modelZIndices:ReadonlyMap<string,number>;
   private report:(message:string,kind:string)=>void;
   private tpnTimer:ReturnType<typeof setTimeout>|undefined;
   private tpnRetries=0;
@@ -58,8 +60,10 @@ export class MapController {
   private measurements?:Promise<void>;
   private differenceRequest?:Promise<void>;
   private format=new GeoJSON();
-  constructor(catalog:Catalog,select:(ids:string[])=>void,coordinates:(c:Coordinate)=>void,report:(message:string,kind:string)=>void,planReport:()=>void){
+  constructor(catalog:Catalog,select:(ids:string[])=>void,coordinates:(c:Coordinate)=>void,report:(message:string,kind:string)=>void,planReport:()=>void,private readonly modelColors:ReadonlyMap<string,string>){
     this.catalog=catalog;this.report=report;
+    const modelIds=catalog.models.map(model=>model.id).sort();
+    this.modelZIndices=new globalThis.Map(modelIds.map((id,index)=>[id,10+index/modelIds.length]));
     const features=catalog.objects.filter(o=>o.coordinate).map(o=>new Feature({geometry:new Point(o.coordinate!),objectId:o.id,name:o.name}));
     this.best=new VectorLayer({source:new VectorSource({features}),zIndex:30,declutter:true,renderOrder:(a,b)=>Number(b.get('objectId')===this.selectedId)-Number(a.get('objectId')===this.selectedId),style:feature=>{
       const active=feature.get('objectId')===this.selectedId;
@@ -173,6 +177,21 @@ export class MapController {
     this.differenceRequest??=readJson('data/differences.geojson').then(data=>{this.differences.getSource()!.addFeatures(this.format.readFeatures(data,{dataProjection:'EPSG:2180',featureProjection:'EPSG:2180'}));this.report('','data');}).catch(error=>{this.differenceRequest=undefined;throw error;});
     try{await this.differenceRequest;}catch(error){this.report(`${error} Wyłącz i włącz warstwę, aby ponowić.`,'data');}
   }
+  setModelFocus(id?:string){
+    if(this.modelFocusId===id)return;
+    this.modelFocusId=id;
+    for(const [modelId,layer] of this.modelLayers)this.styleModelLayer(modelId,layer);
+  }
+  private styleModelLayer(id:string,layer:VectorLayer){
+    const focused=this.modelFocusId===id;
+    const width=focused?3.5:2;
+    layer.setStyle([
+      new Style({zIndex:0,stroke:new Stroke({color:'rgba(255,255,255,.9)',width:width+2})}),
+      new Style({zIndex:1,stroke:new Stroke({color:this.modelColors.get(id)!,width})}),
+    ]);
+    layer.setOpacity(this.modelFocusId && !focused ? 0.28 : 1);
+    layer.setZIndex(focused?12:this.modelZIndices.get(id)??10);
+  }
   updateModels(){
     const extent=this.map.getView().calculateExtent(this.map.getSize()) as Extent;
     const visible=this.catalog.models.filter(m=>this.modelsEnabled&&!this.hiddenModels.has(m.id)&&intersects(m.extent,extent));const ids=new Set(visible.map(m=>m.id));
@@ -183,7 +202,8 @@ export class MapController {
   private async loadModel(model:ModelEntry){
     const controller=new AbortController();this.modelRequests.set(model.id,controller);
     try{const data=await readJson(model.url,controller.signal);if(controller.signal.aborted)return;
-      const layer=new VectorLayer({source:new VectorSource({features:this.format.readFeatures(data,{dataProjection:'EPSG:2180',featureProjection:'EPSG:2180'})}),zIndex:10,style:new Style({stroke:new Stroke({color:'#9c3851',width:1.6})})});
+      const layer=new VectorLayer({source:new VectorSource({features:this.format.readFeatures(data,{dataProjection:'EPSG:2180',featureProjection:'EPSG:2180'})})});
+      this.styleModelLayer(model.id,layer);
       this.modelLayers.set(model.id,layer);this.map.addLayer(layer);
     }catch(error){
       if(controller.signal.aborted)return;
